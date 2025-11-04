@@ -1,2 +1,2 @@
 # GitChores
-To organize roommate chores..
+To organize roommate chores.

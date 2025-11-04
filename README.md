@@ -1,7 +1,7 @@
 # GitChores
 To organize roommate chores.
 
-Week 1 (UI)
+### Week 1 (UI)
 - [ ] TODO: Create join page
 - [ ] TODO: Create login/signup page
 - [ ] TODO: Create contribution map
@@ -10,5 +10,5 @@ Week 1 (UI)
 - [ ] TODO: Create profile (?)
 - [ ] TODO: Create Swing stuff
 
----------- Team ----------
+### Team
 Pera Kasemsripitak, Peter Lee, Alexandr Ivkov, Praneeth Suryadevara, Amin Behbudov, Kiko Chen

@@ -1,7 +1,7 @@
 package app;
 
 import view.JoinView;
-import view.Viewmanager;
+import view.ViewManager;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.join.JoinViewModel;
 

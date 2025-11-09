@@ -3,7 +3,8 @@ package entity;
 import java.time.LocalDateTime;
 
 /**
- * An entity that represents a commit within the room. This signifies the completion of a task and is accompanied by
+ * An entity that represents a commit within the room. This signifies the
+ * completion of a task and is accompanied by
  * a message.
  */
 public class Commit {
@@ -15,9 +16,11 @@ public class Commit {
 
     /**
      * Creates a new commit with the given details.
-     * @param commitId the ID of the commit - unsure how generated for now, can modify to be created in this class
-     * @param message the commit message
-     * @param userId the ID of the user creating the commit
+     * 
+     * @param commitId the ID of the commit - unsure how generated for now, can
+     *                 modify to be created in this class
+     * @param message  the commit message
+     * @param userId   the ID of the user creating the commit
      * @throws IllegalArgumentException if any of the parameters are null or empty
      */
     public Commit(String commitId, String message, String userId) {
@@ -36,11 +39,19 @@ public class Commit {
         this.timestamp = LocalDateTime.now();
     }
 
-    public String getCommitId() {return commitId;}
+    public String getCommitId() {
+        return commitId;
+    }
 
-    public String getMessage() {return message;}
+    public String getMessage() {
+        return message;
+    }
 
-    public String getUserId() {return userId;}
+    public String getUserId() {
+        return userId;
+    }
 
-    public LocalDateTime getTimestamp() {return timestamp;}
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
 }

@@ -1,4 +1,4 @@
-package main.java.interface_adapter.join;
+package interface_adapter.join;
 
 /**
  * The state for the Join View Model.

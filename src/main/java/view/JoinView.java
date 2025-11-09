@@ -1,13 +1,14 @@
 package view;
 
-import javax.swing.*;
 import java.awt.*;
+
+import javax.swing.*;
 
 import interface_adapter.join.JoinViewModel;
 
 public class JoinView extends JPanel {
     private final String viewName = "join/create";
-    private final JoinViewModel joinViewModel;
+    // private final JoinViewModel joinViewModel;
 
     private final JTextField roomCodeField;
 
@@ -15,17 +16,15 @@ public class JoinView extends JPanel {
     private final JButton createButton;
 
     public JoinView(JoinViewModel joinViewModel) {
-        this.joinViewModel = joinViewModel;
 
-        // TODO: Add property change listener
-        // this.joinViewModel.addPropertyChangeListener(this);
+        // this.joinViewModel = joinViewModel;
 
         final JLabel title = new JLabel("GitChores");
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         final JPanel joinPanel = new JPanel();
         joinPanel.setLayout(new BoxLayout(joinPanel, BoxLayout.Y_AXIS));
-        roomCodeField = new JTextField(10);
+        roomCodeField = new JTextField(Constants.TEXT_FIELD_COLUMNS);
         joinButton = new JButton("Join Room");
         createButton = new JButton(" Room");
         joinPanel.add(roomCodeField);

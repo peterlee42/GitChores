@@ -23,6 +23,17 @@
 hs_err_pid*
 replay_pid*
 
-# IDE AND TEXT EDITOR
+# IDE AND TEXT EDITOR CONFIGS
 .idea/
 .vscode/
+*.iml
+
+# environment variables
+.env
+
+# Maven build output
+target/
+
+# OS-specific files
+.DS_Store
+Thumbs.db

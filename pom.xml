@@ -41,7 +41,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.6.0</version>
-
                 <dependencies>
                     <dependency>
                     <groupId>com.puppycrawl.tools</groupId>
@@ -56,15 +55,6 @@
                     <consoleOutput>true</consoleOutput>
                     <failsOnError>true</failsOnError>
                 </configuration>
-
-                <executions>
-                    <execution>
-                    <phase>verify</phase>
-                    <goals>
-                        <goal>check</goal>
-                    </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

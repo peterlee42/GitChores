@@ -21,7 +21,7 @@ jobs:
           java-version: '17'
           cache: maven
 
-checkstyle:
+  checkstyle:
     name: Checkstyle Validation
     runs-on: ubuntu-latest
     needs: setup
@@ -64,6 +64,6 @@ checkstyle:
           distribution: 'oracle'
           java-version: '17'
           cache: maven
-  
+
       - name: Build with Maven
         run: mvn -B package --file pom.xml

@@ -5,7 +5,7 @@ To organize roommate chores.
 - [ ] TODO: Views
 - [ ] TODO: Entities
 - [ ] TODO: Interface adapters
-- [ ] TODO: Add checkstyle
+- [X] TODO: Add checkstyle
 - [ ] TODO: Create/Join room feature
 - [ ] TODO: Login/sign up
 

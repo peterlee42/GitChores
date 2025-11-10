@@ -6,6 +6,9 @@ import javax.swing.*;
 
 import interface_adapter.join.JoinViewModel;
 
+/**
+ * The view for joining or creating a room.
+ */
 public class JoinView extends JPanel {
     private final String viewName = "join/create";
     // private final JoinViewModel joinViewModel;
@@ -15,6 +18,11 @@ public class JoinView extends JPanel {
     private final JButton joinButton;
     private final JButton createButton;
 
+    /**
+     * Constructs a JoinView with the given JoinViewModel.
+     * 
+     * @param joinViewModel the JoinViewModel
+     */
     public JoinView(JoinViewModel joinViewModel) {
 
         // this.joinViewModel = joinViewModel;

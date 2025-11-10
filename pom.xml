@@ -41,12 +41,30 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.6.0</version>
+
+                <dependencies>
+                    <dependency>
+                    <groupId>com.puppycrawl.tools</groupId>
+                    <artifactId>checkstyle</artifactId>
+                    <version>12.1.1</version>
+                    </dependency>
+                </dependencies>
+
                 <configuration>
-                    <configLocation>check.xml</configLocation>
-                    <failsOnError>true</failsOnError>
+                    <configLocation>checkstyle.xml</configLocation>
+                    <encoding>UTF-8</encoding>
                     <consoleOutput>true</consoleOutput>
-                    <outputFile>${project.build.directory}/checkstyle/checkstyle-report.xml</outputFile>
+                    <failsOnError>true</failsOnError>
                 </configuration>
+
+                <executions>
+                    <execution>
+                    <phase>verify</phase>
+                    <goals>
+                        <goal>check</goal>
+                    </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

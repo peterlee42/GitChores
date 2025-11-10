@@ -21,5 +21,18 @@ jobs:
           java-version: '17'
           cache: maven
 
+      - name: Run Checkstyle (Fail on violations)
+        run: mvn checkstyle:check
+
+      - name: Generate Checkstyle Report
+        run: mvn checkstyle:checkstyle
+
+      - name: Upload Checkstyle Report
+        uses: actions/upload-artifact@v5
+        with:
+          name: checkstyle-report
+          path: target/checkstyle/*
+          retention-days: 15
+
       - name: Build with Maven
         run: mvn -B package --file pom.xml

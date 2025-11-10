@@ -1,7 +1,9 @@
 package app;
 
+import interface_adapter.git_console.GitConsoleViewModel;
+import view.GitConsoleView;
 import view.JoinView;
-import view.Viewmanager;
+import view.ViewManager;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.join.JoinViewModel;
 
@@ -13,6 +15,8 @@ public class AppBuilder {
     private final CardLayout cardLayout = new CardLayout();
 
     private JoinView joinView;
+    private GitConsoleView gitConsoleView;
+    private GitConsoleViewModel gitConsoleViewModel;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -22,6 +26,13 @@ public class AppBuilder {
         JoinViewModel joinViewModel = new JoinViewModel();
         joinView = new JoinView(joinViewModel);
         cardPanel.add(joinView, joinView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addGitConsoleView() {
+        GitConsoleViewModel gitConsoleViewModel = new GitConsoleViewModel();
+        gitConsoleView = new GitConsoleView(gitConsoleViewModel);
+        cardPanel.add(gitConsoleView, gitConsoleView.getViewName());
         return this;
     }
 

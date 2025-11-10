@@ -7,12 +7,18 @@ import javax.swing.*;
 import interface_adapter.join.JoinViewModel;
 import view.JoinView;
 
+/**
+ * Class for building the app.
+ */
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
 
     private JoinView joinView;
 
+    /**
+     * Constructor for AppBuilder.
+     */
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
     }

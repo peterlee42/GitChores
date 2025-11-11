@@ -14,7 +14,10 @@ public class Main {
 
     public static void main(String[] args) {
         final AppBuilder appBuilder = new AppBuilder();
-        final JFrame application = appBuilder.addJoinView().build();
+        final JFrame application = appBuilder
+                .addJoinView()
+                .addProfileView()   // ⬅️ add this in the chain
+                .build();
 
         application.pack();
         application.setLocationRelativeTo(null);

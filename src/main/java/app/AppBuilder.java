@@ -1,6 +1,11 @@
 package app;
 
+import interface_adapter.git_console.GitConsoleController;
+import interface_adapter.git_console.GitConsolePresenter;
 import interface_adapter.git_console.GitConsoleViewModel;
+import use_case.git_console.GitConsoleInputBoundary;
+import use_case.git_console.GitConsoleInteractor;
+import use_case.git_console.GitConsoleOutputBoundary;
 import view.GitConsoleView;
 import view.JoinView;
 import view.ViewManager;
@@ -30,9 +35,19 @@ public class AppBuilder {
     }
 
     public AppBuilder addGitConsoleView() {
-        GitConsoleViewModel gitConsoleViewModel = new GitConsoleViewModel();
+        gitConsoleViewModel = new GitConsoleViewModel();
         gitConsoleView = new GitConsoleView(gitConsoleViewModel);
         cardPanel.add(gitConsoleView, gitConsoleView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addGitConsoleUseCase() {
+        // To be implemented
+        final GitConsoleOutputBoundary gitConsoleOutputBoundary = new GitConsolePresenter(gitConsoleViewModel);
+        final GitConsoleInputBoundary gitConsoleInteractor = new GitConsoleInteractor(gitConsoleOutputBoundary);
+
+        GitConsoleController controller = new GitConsoleController(gitConsoleInteractor);
+        gitConsoleView.setGitConsoleController(controller);
         return this;
     }
 

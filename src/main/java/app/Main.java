@@ -14,7 +14,13 @@ public class Main {
 
     public static void main(String[] args) {
         final AppBuilder appBuilder = new AppBuilder();
-        final JFrame application = appBuilder.addJoinView().build();
+        final JFrame application = appBuilder
+                // .addJoinView()
+                .addGitConsoleView()
+                .addGitConsoleUseCase()
+                .build();
+        // application.setMinimumSize(new java.awt.Dimension(400, 300));
+        // ^ ABOVE LINE IS SUBJECT TO CHANGE
 
         application.pack();
         application.setLocationRelativeTo(null);

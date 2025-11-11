@@ -1,8 +1,17 @@
 package app;
 
-import javax.swing.*;
+import javax.swing.JFrame;
 
+/**
+ * Main class for the GitChores.
+ */
 public class Main {
+    /**
+     * Main class constructor.
+     *
+     * @param args command-line arguments
+     */
+
     public static void main(String[] args) {
         AppBuilder appBuilder = new AppBuilder();
         JFrame application = appBuilder

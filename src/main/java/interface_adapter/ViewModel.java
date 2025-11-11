@@ -18,6 +18,11 @@ public class ViewModel<T> {
 
     private T state;
 
+    /**
+     * Creates a new ViewModel with the given view name.
+     * 
+     * @param viewName the name of the view associated with this ViewModel
+     */
     public ViewModel(String viewName) {
         this.viewName = viewName;
     }
@@ -50,6 +55,7 @@ public class ViewModel<T> {
      * it can use the property name to distinguish which property has changed.
      * 
      * @param propertyName the label for the property that was changed
+     * 
      */
     public void firePropertyChange(String propertyName) {
         this.support.firePropertyChange(propertyName, null, this.state);

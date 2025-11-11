@@ -5,6 +5,9 @@ import java.awt.Dimension;
 
 import javax.swing.*;
 
+/**
+ * View for displaying and editing the user's profile.
+ */
 public class ProfileView extends JPanel {
 
     private final String viewName = "profile";
@@ -18,11 +21,11 @@ public class ProfileView extends JPanel {
     private final JButton backButton;
 
     public ProfileView() {
-        // title
+        // Title
         titleLabel = new JLabel("Profile");
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // fields
+        // Fields
         usernameLabel = new JLabel("Username:");
         usernameField = new JTextField(Constants.TEXT_FIELD_COLUMNS);
 
@@ -32,13 +35,10 @@ public class ProfileView extends JPanel {
         saveButton = new JButton("Save");
         backButton = new JButton("Back");
 
-        // form panel
-        JPanel formPanel = new JPanel();
-        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
-
-        JPanel userRow = new JPanel();
-        userRow.add(usernameLabel);
-        userRow.add(usernameField);
+        // Rows
+        JPanel usernameRow = new JPanel();
+        usernameRow.add(usernameLabel);
+        usernameRow.add(usernameField);
 
         JPanel emailRow = new JPanel();
         emailRow.add(emailLabel);
@@ -48,17 +48,15 @@ public class ProfileView extends JPanel {
         buttonsRow.add(backButton);
         buttonsRow.add(saveButton);
 
-        formPanel.add(userRow);
-        formPanel.add(emailRow);
-        formPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        formPanel.add(buttonsRow);
-
-        // main layout
+        // Layout for the whole view
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(Box.createRigidArea(new Dimension(0, 10)));
         add(titleLabel);
         add(Box.createRigidArea(new Dimension(0, 10)));
-        add(formPanel);
+        add(usernameRow);
+        add(emailRow);
+        add(Box.createRigidArea(new Dimension(0, 10)));
+        add(buttonsRow);
     }
 
     public String getViewName() {

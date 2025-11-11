@@ -1,26 +1,23 @@
 package app;
 
+import java.awt.*;
+
+import javax.swing.*;
+
 import interface_adapter.git_console.GitConsoleController;
 import interface_adapter.git_console.GitConsolePresenter;
 import interface_adapter.git_console.GitConsoleViewModel;
+import interface_adapter.join.JoinViewModel;
 import use_case.git_console.GitConsoleInputBoundary;
 import use_case.git_console.GitConsoleInteractor;
 import use_case.git_console.GitConsoleOutputBoundary;
 import view.GitConsoleView;
 import view.JoinView;
-import view.ViewManager;
-import interface_adapter.ViewManagerModel;
-import interface_adapter.join.JoinViewModel;
-import java.awt.*;
-
-import javax.swing.*;
-
-import interface_adapter.join.JoinViewModel;
-import view.JoinView;
 
 /**
  * Class for building the app.
  */
+@SuppressWarnings({"checkstyle:ClassDataAbstractionCoupling", "checkstyle:SuppressWarnings"})
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -48,6 +45,11 @@ public class AppBuilder {
         return this;
     }
 
+    /**
+     * Placeholder.
+     *
+     * @return Placeholder.
+     */
     public AppBuilder addGitConsoleView() {
         gitConsoleViewModel = new GitConsoleViewModel();
         gitConsoleView = new GitConsoleView(gitConsoleViewModel);
@@ -55,12 +57,17 @@ public class AppBuilder {
         return this;
     }
 
+    /**
+     * Placeholder.
+     *
+     * @return Placeholder.
+     */
     public AppBuilder addGitConsoleUseCase() {
         // To be implemented
         final GitConsoleOutputBoundary gitConsoleOutputBoundary = new GitConsolePresenter(gitConsoleViewModel);
         final GitConsoleInputBoundary gitConsoleInteractor = new GitConsoleInteractor(gitConsoleOutputBoundary);
 
-        GitConsoleController controller = new GitConsoleController(gitConsoleInteractor);
+        final GitConsoleController controller = new GitConsoleController(gitConsoleInteractor);
         gitConsoleView.setGitConsoleController(controller);
         return this;
     }

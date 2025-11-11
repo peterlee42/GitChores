@@ -8,15 +8,27 @@ public class GitConsoleState {
     private String lastCommand = "";
     private String lastResponse = "";
 
-    public String getCommand() {return command;}
+    public String getCommand() {
+        return command;
+    }
 
-    public String getLastCommand() {return lastCommand;}
+    public String getLastCommand() {
+        return lastCommand;
+    }
 
-    public String getLastResponse() {return lastResponse;}
+    public String getLastResponse() {
+        return lastResponse;
+    }
 
-    public void setCommand(String command) {this.command = command;}
+    public void setCommand(String command) {
+        this.command = command;
+    }
 
-    public void setLastCommand(String lastCommand) {this.lastCommand = lastCommand;}
+    public void setLastCommand(String lastCommand) {
+        this.lastCommand = lastCommand;
+    }
 
-    public void setLastResponse(String lastResponse) {this.lastResponse = lastResponse;}
+    public void setLastResponse(String lastResponse) {
+        this.lastResponse = lastResponse;
+    }
 }

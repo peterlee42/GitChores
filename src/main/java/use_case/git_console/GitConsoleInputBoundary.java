@@ -1,7 +1,7 @@
 package use_case.git_console;
 
 /**
- * Input Boundary for the actions related to the Git Console
+ * Input Boundary for the actions related to the Git Console.
  */
 public interface GitConsoleInputBoundary {
 

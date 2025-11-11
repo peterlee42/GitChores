@@ -17,55 +17,66 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
     @Override
     public void executeCommand(String command) {
 
+        String output = "";
         // Handle exceptions (poorly structured messages)
         // Reject empty messages
         if (command == null || command.isBlank()) {
-            presenter.presentResponse(command,"Please enter a command.");
-            return;
+            presenter.presentResponse(command, "Please enter a command.");
         }
         // Verify the prefix of the command
-        if (!(command.startsWith("git "))) {
-            presenter.presentResponse(command,"Invalid command. Commands must start with 'git'.");
-            return;
+        else if (!(command.startsWith("git "))) {
+            presenter.presentResponse(command, "Invalid command. Commands must start with 'git'.");
         }
+        else {
 
-        // Break command into sub-parts for easier identification
-        String [] parts = command.split(" ");
-        if (parts.length < 2) {
-            presenter.presentResponse(command,"Missing subcommand after git.");
-            return;
+            // Break command into sub-parts for easier identification
+            final String[] parts = command.split(" ");
+            if (parts.length < 2) {
+                presenter.presentResponse(command, "Missing subcommand after git.");
+            }
+            else {
+                final String subcommand = parts[1];
+                output = switch (subcommand) {
+                    case "commit" -> handleCommit(command);
+                    case "push" -> handlePush();
+                    case "checkout" -> handleCheckout(command);
+                    default -> "Unknown subcommand: " + subcommand;
+                };
+            }
         }
-
-        String subcommand = parts[1];
-        String output = switch (subcommand) {
-            case "commit" -> handleCommit(command);
-            case "push" -> handlePush();
-            case "checkout" -> handleCheckout(command);
-            default -> "Unknown subcommand: " + subcommand;
-        };
 
         presenter.presentResponse(command, output);
     }
 
     /**
-     * THESE COMMANDS ARE YET TO BE IMPLEMENTED PROPERLY
+     * THESE COMMANDS ARE YET TO BE IMPLEMENTED PROPERLY.
+     *
+     * @param command command
+     * @return PLACEHOLDER
      */
     private String handleCommit(String command) {
+        final String output;
+
         if (!command.contains("-m")) {
-            return "Your commit is missing an '-m' before the message";
-        }
-        String [] parts = command.split("-m",2);
-        String message;
-        if (parts.length > 1) {
-            message = parts[1].trim().replaceAll("^\"\"$|", "");
+            output = "Your commit is missing an '-m' before the message";
         }
         else {
-            message = "";
+            final String[] parts = command.split("-m", 2);
+            final String message;
+            if (parts.length > 1) {
+                message = parts[1].trim().replaceAll("^\"\"$|", "");
+            }
+            else {
+                message = "";
+            }
+            if (message.isEmpty()) {
+                output = "Error: empty commit message";
+            }
+            else {
+                output = "Commit successful! Message: " + "\"" + message + "\"";
+            }
         }
-        if (message.isEmpty()) {
-            return "Error: empty commit message";
-        }
-        return "Commit successful! Message: " + "\"" + message + "\"";
+        return output;
     }
 
     private String handlePush() {

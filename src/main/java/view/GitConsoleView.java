@@ -1,21 +1,23 @@
 package view;
 
-import interface_adapter.git_console.GitConsoleController;
-import interface_adapter.git_console.GitConsoleViewModel;
-import interface_adapter.git_console.GitConsoleState;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import interface_adapter.git_console.GitConsoleController;
+import interface_adapter.git_console.GitConsoleState;
+import interface_adapter.git_console.GitConsoleViewModel;
+
 /**
  * The view seen when the user wishes to add commits to the Git console.
  */
+@SuppressWarnings({"checkstyle:ClassDataAbstractionCoupling", "checkstyle:SuppressWarnings"})
 public class GitConsoleView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final String viewName = "Git Console";
@@ -24,7 +26,7 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
     private final JTextField commandInputField = new JTextField(20);
     private final JButton submitCommand;
     private final JLabel outOperator;
-    private GitConsoleController gitConsoleController = null;
+    private GitConsoleController gitConsoleController;
 
     public GitConsoleView(GitConsoleViewModel gitConsoleViewModel) {
         this.gitConsoleViewModel = gitConsoleViewModel;
@@ -32,7 +34,8 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
 
         // Title
         final JLabel title = new JLabel(GitConsoleViewModel.TITLE_LABEL);
-        Font largeFont = new Font(title.getFont().getName(), title.getFont().getSize(), 16);
+        final Font largeFont = new Font(title.getFont().getName(), title.getFont().getSize(),
+                GitConsoleViewModel.INPUT_WIDTH);
         title.setFont(largeFont);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -40,7 +43,7 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
         previousCommands = new JPanel();
         previousCommands.setLayout(new BoxLayout(previousCommands, BoxLayout.Y_AXIS));
         previousCommands.setBackground(getBackground());
-        JScrollPane scrollPane = new JScrollPane(previousCommands);
+        final JScrollPane scrollPane = new JScrollPane(previousCommands);
         scrollPane.getViewport().setBackground(getBackground());
         scrollPane.setBorder(null);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -56,7 +59,8 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
         commandPanel.add(commandInputField);
         commandPanel.add(submitCommand);
 
-        submitCommand.addActionListener(this); // May have to expand on this based on the ca-lab
+        // May have to expand on this based on the ca-lab
+        submitCommand.addActionListener(this);
         commandInputField.addActionListener(this);
         addCommandListener();
 
@@ -66,6 +70,7 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
         this.add(commandPanel);
     }
 
+    @SuppressWarnings({"checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings"})
     private void addCommandListener() {
         commandInputField.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -96,22 +101,23 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
     public void actionPerformed(ActionEvent e) {
         // To be implemented
         final GitConsoleState currentState = gitConsoleViewModel.getState();
-        String command = currentState.getCommand();
+        final String command = currentState.getCommand();
 
         gitConsoleController.executeCommand(command);
-        commandInputField.setText(""); // Reset text
+        // Reset text
+        commandInputField.setText("");
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
 
         if ("state".equals(evt.getPropertyName())) {
-            GitConsoleState currentState = (GitConsoleState) evt.getNewValue();
+            final GitConsoleState currentState = (GitConsoleState) evt.getNewValue();
 
             if (currentState.getLastResponse() != null && currentState.getLastCommand() != null) {
-                JLabel commandLabel = new JLabel(GitConsoleViewModel.OPERATOR_LABEL
+                final JLabel commandLabel = new JLabel(GitConsoleViewModel.OPERATOR_LABEL
                         + " " + currentState.getLastCommand());
-                JLabel responseLabel = new JLabel(currentState.getLastResponse());
+                final JLabel responseLabel = new JLabel(currentState.getLastResponse());
 
                 previousCommands.add(commandLabel);
                 previousCommands.add(responseLabel);
@@ -121,7 +127,8 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
                 previousCommands.repaint();
 
                 // Keeps scroll bar at bottom of terminal command chain
-                JScrollBar vertical = ((JScrollPane) previousCommands.getParent().getParent()).getVerticalScrollBar();
+                final JScrollBar vertical = ((JScrollPane) previousCommands.getParent().getParent())
+                        .getVerticalScrollBar();
                 vertical.setValue(vertical.getMaximum());
             }
         }

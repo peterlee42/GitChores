@@ -8,13 +8,14 @@ import use_case.git_console.GitConsoleOutputBoundary;
 public class GitConsolePresenter implements GitConsoleOutputBoundary {
 
     private final GitConsoleViewModel gitConsoleViewModel;
+
     public GitConsolePresenter(GitConsoleViewModel gitConsoleViewModel) {
         this.gitConsoleViewModel = gitConsoleViewModel;
     }
 
     @Override
     public void presentResponse(String command, String response) {
-        GitConsoleState state = gitConsoleViewModel.getState();
+        final GitConsoleState state = gitConsoleViewModel.getState();
 
         state.setLastCommand(command);
         state.setLastResponse(response);

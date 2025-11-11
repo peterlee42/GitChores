@@ -16,7 +16,7 @@ public class User {
      * @param firstName   the user's first name
      * @param lastName    the user's last name
      * @param credentials the user's credentials
-     * @throws IllegalArgumentException if the ID or credentials are invalid
+     * @throws IllegalArgumentException if any of the parameters are null or empty
      */
     public User(String id, String firstName, String lastName, Credentials credentials) {
         if (id == null || id.isEmpty()) {

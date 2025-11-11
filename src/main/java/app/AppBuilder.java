@@ -16,7 +16,7 @@ public class AppBuilder {
     private final CardLayout cardLayout = new CardLayout();
 
     private JoinView joinView;
-    private ProfileView profileView;   // ⬅️ add this
+    private ProfileView profileView;
 
     /**
      * Constructor for AppBuilder.
@@ -32,7 +32,7 @@ public class AppBuilder {
      */
     public AppBuilder addJoinView() {
         final JoinViewModel joinViewModel = new JoinViewModel();
-        joinView = new JoinView(joinViewModel);
+        joinView = new JoinView(joinViewModel, cardPanel, cardLayout);
         cardPanel.add(joinView, joinView.getViewName());
         return this;
     }
@@ -43,7 +43,7 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addProfileView() {
-        profileView = new ProfileView();
+        profileView = new ProfileView(cardPanel, cardLayout);
         cardPanel.add(profileView, profileView.getViewName());
         return this;
     }

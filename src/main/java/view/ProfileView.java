@@ -1,8 +1,6 @@
 package view;
 
-import java.awt.Component;
-import java.awt.Dimension;
-
+import java.awt.*;
 import javax.swing.*;
 
 /**
@@ -12,6 +10,9 @@ public class ProfileView extends JPanel {
 
     private final String viewName = "profile";
 
+    private final JPanel parent;
+    private final CardLayout layout;
+
     private final JLabel titleLabel;
     private final JLabel usernameLabel;
     private final JTextField usernameField;
@@ -20,7 +21,10 @@ public class ProfileView extends JPanel {
     private final JButton saveButton;
     private final JButton backButton;
 
-    public ProfileView() {
+    public ProfileView(JPanel parent, CardLayout layout) {
+        this.parent = parent;
+        this.layout = layout;
+
         // Title
         titleLabel = new JLabel("Profile");
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -57,6 +61,9 @@ public class ProfileView extends JPanel {
         add(emailRow);
         add(Box.createRigidArea(new Dimension(0, 10)));
         add(buttonsRow);
+
+        // Back to join/create view
+        backButton.addActionListener(e -> layout.show(parent, "join/create"));
     }
 
     public String getViewName() {

@@ -13,18 +13,23 @@ public class JoinView extends JPanel {
     private final String viewName = "join/create";
     // private final JoinViewModel joinViewModel;
 
+    private final JPanel parent;
+    private final CardLayout layout;
+
     private final JTextField roomCodeField;
     private final JButton joinButton;
     private final JButton createButton;
     private final JButton profileButton;
 
-
     /**
      * Constructs a JoinView with the given JoinViewModel.
-     * 
+     *
      * @param joinViewModel the JoinViewModel
      */
-    public JoinView(JoinViewModel joinViewModel) {
+    public JoinView(JoinViewModel joinViewModel, JPanel parent, CardLayout layout) {
+
+        this.parent = parent;
+        this.layout = layout;
 
         // this.joinViewModel = joinViewModel;
 
@@ -44,17 +49,13 @@ public class JoinView extends JPanel {
         joinPanel.add(createButton);
         joinPanel.add(profileButton);
 
-        // TODO: later, wire profileButton to actually switch to ProfileView
-        profileButton.addActionListener(e -> JOptionPane.showMessageDialog(
-                this,
-                "Profile page is implemented; navigation will be wired next."
-        ));
+        // switch to profile screen
+        profileButton.addActionListener(e -> layout.show(parent, "profile"));
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(title);
         this.add(joinPanel);
     }
-
 
     public String getViewName() {
         return viewName;

@@ -3,16 +3,15 @@ package entity;
 /**
  * An entity that represents a room within the app.
  */
-public class Room {
+public class Room extends Domain {
 
-    private final String id;
     private String name;
     private String description;
     private final String ownerId;
     private final String inviteCode;
 
     /**
-     * Creates a new user with the given non-empty id and non-empty username.
+     * Creates a new room with the given non-empty name and description.
      *
      * @param id          the room ID
      * @param name        the room name
@@ -22,9 +21,8 @@ public class Room {
      * @throws IllegalArgumentException if any of the parameters are null or empty
      */
     public Room(String id, String name, String description, String ownerId, String inviteCode) {
-        if (id == null || id.trim().isEmpty()) {
-            throw new IllegalArgumentException("Room ID cannot be null or empty");
-        }
+        super(id);
+
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Room name cannot be null or empty");
         }
@@ -35,20 +33,13 @@ public class Room {
             throw new IllegalArgumentException("Room invite code cannot be null or empty");
         }
 
-        this.id = id;
         this.name = name;
         this.description = description;
         this.ownerId = ownerId;
         this.inviteCode = inviteCode;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
+    public String getName() {return name;}
 
     public String getDescription() {
         return description;

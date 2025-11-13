@@ -3,8 +3,7 @@ package entity;
 /**
  * An entity that represents a user in our app.
  */
-public class User {
-    private final String id;
+public class User extends Domain {
     private String firstName;
     private String lastName;
     private final Credentials credentials;
@@ -19,9 +18,8 @@ public class User {
      * @throws IllegalArgumentException if any of the parameters are null or empty
      */
     public User(String id, String firstName, String lastName, Credentials credentials) {
-        if (id == null || id.isEmpty()) {
-            throw new IllegalArgumentException("User ID cannot be empty");
-        }
+        super(id);
+
         if (credentials == null) {
             throw new IllegalArgumentException("Credentials cannot be null");
         }
@@ -31,7 +29,7 @@ public class User {
         if (lastName == null || lastName.isEmpty()) {
             throw new IllegalArgumentException("Last name cannot be empty");
         }
-        this.id = id;
+
         this.credentials = credentials;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -39,10 +37,6 @@ public class User {
 
     public Credentials getCredentials() {
         return credentials;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public String getFirstName() {

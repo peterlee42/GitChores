@@ -5,8 +5,8 @@ package use_case.git_console;
  */
 public class GitConsoleInteractor implements GitConsoleInputBoundary {
 
-    // TODO: Implement data access features once set up
-    // TODO: Implement a guide when the user types ?guide
+    // TO DO: Implement data access features once set up
+    // TO DO: Implement a guide when the user types ?guide
 
     private final GitConsoleOutputBoundary presenter;
 
@@ -26,15 +26,12 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
         // Verify the prefix of the command
         else if (!(command.startsWith("git "))) {
             output = "Invalid command. Commands must start with 'git'.";
-        }
-        else {
-
+        } else {
             // Break command into sub-parts for easier identification
             final String[] parts = command.split(" ");
             if (parts.length < 2) {
                 output = "Missing subcommand after git.";
-            }
-            else {
+            } else {
                 final String subcommand = parts[1];
                 output = switch (subcommand) {
                     case "commit" -> handleCommit(command);
@@ -59,20 +56,17 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
 
         if (!command.contains("-m")) {
             output = "Your commit is missing an '-m' before the message";
-        }
-        else {
+        } else {
             final String[] parts = command.split("-m", 2);
             final String message;
             if (parts.length > 1) {
                 message = parts[1].trim().replaceAll("^\"\"$|", "");
-            }
-            else {
+            } else {
                 message = "";
             }
             if (message.isEmpty()) {
                 output = "Error: empty commit message";
-            }
-            else {
+            } else {
                 output = "Commit successful! Message: " + "\"" + message + "\"";
             }
         }

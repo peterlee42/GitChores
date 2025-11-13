@@ -32,7 +32,7 @@ public class JoinView extends JPanel {
 
         final JPanel joinPanel = new JPanel();
         joinPanel.setLayout(new BoxLayout(joinPanel, BoxLayout.Y_AXIS));
-        roomCodeField = new JTextField(Constants.TEXT_FIELD_COLUMNS);
+        roomCodeField = new JTextField(JoinViewModel.MAX_TEXT_FIELD_LENGTH);
         joinButton = new JButton("Join Room");
         createButton = new JButton(" Room");
         joinPanel.add(roomCodeField);

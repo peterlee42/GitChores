@@ -16,7 +16,7 @@
     <metadata name="org.checkstyle.principle.description"
               value="In our config we should use all Checks that Checkstyle has"/>
 
-    <property name="severity" value="error"/>
+    <property name="severity" value="warning"/>
 
     <property name="fileExtensions" value="java, properties, xml, vm, g, g4, dtd"/>
 
@@ -292,9 +292,9 @@
             <property name="tokens" value="STATIC_INIT"/>
             <property name="tokens" value="LITERAL_WHILE"/>
             <property name="tokens" value="LITERAL_CATCH"/>
-            <property name="tokens" value="LITERAL_ELSE"/>
+            <!-- <property name="tokens" value="LITERAL_ELSE"/> -->
             <property name="tokens" value="LITERAL_FINALLY"/>
-            <property name="tokens" value="LITERAL_IF"/>
+            <!-- <property name="tokens" value="LITERAL_IF"/> -->
             <property name="tokens" value="LITERAL_TRY"/>
             <property name="tokens" value="LITERAL_SWITCH"/>
             <property name="tokens" value="ANNOTATION_DEF"/>

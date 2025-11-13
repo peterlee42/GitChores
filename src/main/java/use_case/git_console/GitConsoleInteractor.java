@@ -21,16 +21,16 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
         // Handle exceptions (poorly structured messages)
         // Reject empty messages
         if (command == null || command.isBlank()) {
-            presenter.presentResponse(command, "Please enter a command.");
+            output = "Please enter a command.";
         }
         // Verify the prefix of the command
         else if (!(command.startsWith("git "))) {
-            presenter.presentResponse(command, "Invalid command. Commands must start with 'git'.");
+            output = "Invalid command. Commands must start with 'git'.";
         } else {
             // Break command into sub-parts for easier identification
             final String[] parts = command.split(" ");
             if (parts.length < 2) {
-                presenter.presentResponse(command, "Missing subcommand after git.");
+                output = "Missing subcommand after git.";
             } else {
                 final String subcommand = parts[1];
                 output = switch (subcommand) {

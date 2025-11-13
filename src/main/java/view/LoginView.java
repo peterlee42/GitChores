@@ -12,8 +12,10 @@ import javax.swing.event.DocumentListener;
 
 import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
-import interface_adapter.signup.SignupState;
 
+/**
+ * The Login View.
+ */
 public class LoginView extends JPanel implements ActionListener, PropertyChangeListener {
     private final String viewName = "login";
 
@@ -124,9 +126,9 @@ public class LoginView extends JPanel implements ActionListener, PropertyChangeL
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        final SignupState state = (SignupState) evt.getNewValue();
-        if (state.getUsernameError() != null) {
-            JOptionPane.showMessageDialog(this, state.getUsernameError());
+        final LoginState state = (LoginState) evt.getNewValue();
+        if (state.getLoginError() != null) {
+            JOptionPane.showMessageDialog(this, state.getLoginError());
         }
     }
 

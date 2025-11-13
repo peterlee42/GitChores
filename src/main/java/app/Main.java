@@ -18,7 +18,8 @@ public class Main {
                 // .addJoinView()
                 // .addGitConsoleView()
                 // .addGitConsoleUseCase()
-                .addSignupView()
+                // .addSignupView()
+                .addLoginView()
                 .build();
 
         application.pack();

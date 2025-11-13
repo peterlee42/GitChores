@@ -16,11 +16,10 @@ public class Main {
         final AppBuilder appBuilder = new AppBuilder();
         final JFrame application = appBuilder
                 // .addJoinView()
-                .addGitConsoleView()
-                .addGitConsoleUseCase()
+                // .addGitConsoleView()
+                // .addGitConsoleUseCase()
+                .addSignupView()
                 .build();
-        // application.setMinimumSize(new java.awt.Dimension(400, 300));
-        // ^ ABOVE LINE IS SUBJECT TO CHANGE
 
         application.pack();
         application.setLocationRelativeTo(null);

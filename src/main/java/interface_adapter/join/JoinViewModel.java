@@ -7,6 +7,8 @@ import interface_adapter.ViewModel;
  */
 public class JoinViewModel extends ViewModel<JoinState> {
 
+    public static final int MAX_TEXT_FIELD_LENGTH = 6;
+
     /**
      * Constructor for a JoinViewModel.
      */

@@ -1,16 +1,17 @@
 package view;
 
-import interface_adapter.signup.SignupState;
-import interface_adapter.signup.SignupViewModel;
-
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import interface_adapter.signup.SignupState;
+import interface_adapter.signup.SignupViewModel;
 
 /**
  * The view for joining or creating a room.
@@ -21,8 +22,7 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
     private final SignupViewModel signupViewModel;
     private final JTextField usernameField = new JTextField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
     private final JTextField passwordField = new JTextField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
-    private final JTextField repeatPasswordField =
-            new JTextField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
+    private final JTextField repeatPasswordField = new JTextField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
 
     private final JButton loginButton;
     private final JButton createAccountButton;
@@ -71,6 +71,7 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
         this.add(buttons);
     }
 
+    @SuppressWarnings({ "checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings" })
     private void addUsernameListener() {
         usernameField.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -97,6 +98,7 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
         });
     }
 
+    @SuppressWarnings({ "checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings" })
     private void addPasswordListener() {
         passwordField.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -123,6 +125,7 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
         });
     }
 
+    @SuppressWarnings({ "checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings" })
     private void addRepeatPasswordListener() {
         repeatPasswordField.getDocument().addDocumentListener(new DocumentListener() {
 

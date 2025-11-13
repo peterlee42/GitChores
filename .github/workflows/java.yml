@@ -21,7 +21,7 @@ jobs:
           java-version: '17'
           cache: maven
 
-      - name: Run Checkstyle (Fail on violations)
+      - name: Run Checkstyle
         run: mvn checkstyle:check
 
       - name: Generate Checkstyle Report

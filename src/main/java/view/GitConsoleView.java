@@ -17,7 +17,7 @@ import interface_adapter.git_console.GitConsoleViewModel;
 /**
  * The view seen when the user wishes to add commits to the Git console.
  */
-@SuppressWarnings({"checkstyle:ClassDataAbstractionCoupling", "checkstyle:SuppressWarnings"})
+@SuppressWarnings({ "checkstyle:ClassDataAbstractionCouplingCheck", "checkstyle:SuppressWarnings" })
 public class GitConsoleView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final String viewName = "Git Console";
@@ -70,7 +70,7 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
         this.add(commandPanel);
     }
 
-    @SuppressWarnings({"checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings"})
+    @SuppressWarnings({ "checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings" })
     private void addCommandListener() {
         commandInputField.getDocument().addDocumentListener(new DocumentListener() {
 

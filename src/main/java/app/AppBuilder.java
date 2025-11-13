@@ -7,12 +7,14 @@ import javax.swing.*;
 import interface_adapter.git_console.GitConsoleController;
 import interface_adapter.git_console.GitConsolePresenter;
 import interface_adapter.git_console.GitConsoleViewModel;
+import interface_adapter.signup.SignupViewModel;
 import interface_adapter.join.JoinViewModel;
 import use_case.git_console.GitConsoleInputBoundary;
 import use_case.git_console.GitConsoleInteractor;
 import use_case.git_console.GitConsoleOutputBoundary;
 import view.GitConsoleView;
 import view.JoinView;
+import view.SignupView;
 
 /**
  * Class for building the app.
@@ -23,6 +25,7 @@ public class AppBuilder {
     private final CardLayout cardLayout = new CardLayout();
 
     private JoinView joinView;
+    private SignupView signupView;
     private GitConsoleView gitConsoleView;
     private GitConsoleViewModel gitConsoleViewModel;
 
@@ -46,9 +49,22 @@ public class AppBuilder {
     }
 
     /**
-     * Placeholder.
+     * Adds Sign Up View
+     * 
+     * @return AppBuilder
+     */
+    public AppBuilder addSignupView() {
+        final SignupViewModel signupViewModel = new SignupViewModel();
+        signupView = new SignupView(signupViewModel);
+        cardPanel.add(signupView, signupView.getViewName());
+
+        return this;
+    }
+
+    /**
+     * Adds Git Console view.
      *
-     * @return Placeholder.
+     * @return AppBuilder
      */
     public AppBuilder addGitConsoleView() {
         gitConsoleViewModel = new GitConsoleViewModel();
@@ -58,14 +74,16 @@ public class AppBuilder {
     }
 
     /**
-     * Placeholder.
+     * Adds Git Console use case.
      *
-     * @return Placeholder.
+     * @return AppBuilder
      */
     public AppBuilder addGitConsoleUseCase() {
         // To be implemented
-        final GitConsoleOutputBoundary gitConsoleOutputBoundary = new GitConsolePresenter(gitConsoleViewModel);
-        final GitConsoleInputBoundary gitConsoleInteractor = new GitConsoleInteractor(gitConsoleOutputBoundary);
+        final GitConsoleOutputBoundary gitConsoleOutputBoundary =
+                new GitConsolePresenter(gitConsoleViewModel);
+        final GitConsoleInputBoundary gitConsoleInteractor =
+                new GitConsoleInteractor(gitConsoleOutputBoundary);
 
         final GitConsoleController controller = new GitConsoleController(gitConsoleInteractor);
         gitConsoleView.setGitConsoleController(controller);

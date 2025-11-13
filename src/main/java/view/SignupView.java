@@ -25,7 +25,7 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
     private final JTextField repeatPasswordField = new JTextField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
 
     private final JButton loginButton;
-    private final JButton createAccountButton;
+    private final JButton signupButton;
     private final JButton cancelButton;
 
     /**
@@ -50,8 +50,8 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
         final JPanel buttons = new JPanel();
         loginButton = new JButton(SignupViewModel.LOGIN_BUTTON_LABEL);
         buttons.add(loginButton);
-        createAccountButton = new JButton(SignupViewModel.SIGNUP_BUTTON_LABEL);
-        buttons.add(createAccountButton);
+        signupButton = new JButton(SignupViewModel.SIGNUP_BUTTON_LABEL);
+        buttons.add(signupButton);
         cancelButton = new JButton(SignupViewModel.CANCEL_BUTTON_LABEL);
         buttons.add(cancelButton);
 
@@ -60,7 +60,7 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
         addRepeatPasswordListener();
 
         loginButton.addActionListener(this);
-        createAccountButton.addActionListener(this);
+        signupButton.addActionListener(this);
         cancelButton.addActionListener(this);
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));

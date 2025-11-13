@@ -1,13 +1,20 @@
 package view;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.signup.SignupState;
 
-public class LoginView extends JPanel {
+public class LoginView extends JPanel implements ActionListener, PropertyChangeListener {
     private final String viewName = "login";
 
     private final LoginViewModel loginViewModel;
@@ -42,10 +49,88 @@ public class LoginView extends JPanel {
         cancelButton = new JButton(LoginViewModel.CANCEL_BUTTON_LABEL);
         buttons.add(cancelButton);
 
+        addUsernameListener();
+        addPasswordListener();
+
+        loginButton.addActionListener(this);
+        signupButton.addActionListener(this);
+        cancelButton.addActionListener(this);
+
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(title);
         this.add(usernameInfo);
         this.add(passwordInfo);
         this.add(buttons);
+    }
+
+    @SuppressWarnings({ "checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings" })
+    private void addUsernameListener() {
+        usernameField.getDocument().addDocumentListener(new DocumentListener() {
+
+            private void documentListenerHelper() {
+                final LoginState currentState = loginViewModel.getState();
+                currentState.setCurrentUsername(usernameField.getText());
+                loginViewModel.setState(currentState);
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+        });
+    }
+
+    @SuppressWarnings({ "checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings" })
+    private void addPasswordListener() {
+        passwordField.getDocument().addDocumentListener(new DocumentListener() {
+
+            private void documentListenerHelper() {
+                final LoginState currentState = loginViewModel.getState();
+                currentState.setPassword(new String(passwordField.getText()));
+                loginViewModel.setState(currentState);
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+        });
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent evt) {
+        JOptionPane.showMessageDialog(this, "Cancel not implemented yet.");
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        final SignupState state = (SignupState) evt.getNewValue();
+        if (state.getUsernameError() != null) {
+            JOptionPane.showMessageDialog(this, state.getUsernameError());
+        }
+    }
+
+    public String getViewName() {
+        return viewName;
     }
 }

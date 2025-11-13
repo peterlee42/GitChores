@@ -1,6 +1,7 @@
 package view;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -16,7 +17,8 @@ import interface_adapter.signup.SignupViewModel;
 /**
  * The view for joining or creating a room.
  */
-public class SignupView extends JPanel implements ActionListener, PropertyChangeListener {
+@SuppressWarnings({ "checkstyle:ClassDataAbstractionCouplingCheck", "checkstyle:SuppressWarnings" })
+public class SignupView extends JSplitPane implements ActionListener, PropertyChangeListener {
     private final String viewName = "sign up";
 
     private final SignupViewModel signupViewModel;
@@ -34,6 +36,7 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
      * @param signupViewModel the SignupViewModel
      */
     public SignupView(SignupViewModel signupViewModel) {
+        super(JSplitPane.HORIZONTAL_SPLIT);
         this.signupViewModel = signupViewModel;
         // signupViewModel.addPropertyChangeListener(this);
 
@@ -47,13 +50,24 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
         final LabelTextPanel repeatPasswordInfo = new LabelTextPanel(
                 new JLabel(SignupViewModel.REPEAT_PASSWORD_LABEL), repeatPasswordField);
 
+        signupButton = new JButton(SignupViewModel.SIGNUP_BUTTON_LABEL);
+
         final JPanel buttons = new JPanel();
         loginButton = new JButton(SignupViewModel.LOGIN_BUTTON_LABEL);
         buttons.add(loginButton);
-        signupButton = new JButton(SignupViewModel.SIGNUP_BUTTON_LABEL);
-        buttons.add(signupButton);
         cancelButton = new JButton(SignupViewModel.CANCEL_BUTTON_LABEL);
         buttons.add(cancelButton);
+
+        final JPanel signupPanel = new JPanel();
+        signupPanel.setLayout(new BoxLayout(signupPanel, BoxLayout.Y_AXIS));
+        signupPanel.add(title);
+        signupPanel.add(usernameInfo);
+        signupPanel.add(passwordInfo);
+        signupPanel.add(repeatPasswordInfo);
+        signupPanel.add(buttons);
+
+        final ImagePanel logoPanel = new ImagePanel(SignupViewModel.LOGO_IMAGE_PATH, SignupViewModel.LOGO_IMAGE_WIDTH,
+                SignupViewModel.LOGO_IMAGE_HEIGHT);
 
         addUsernameListener();
         addPasswordListener();
@@ -63,12 +77,15 @@ public class SignupView extends JPanel implements ActionListener, PropertyChange
         signupButton.addActionListener(this);
         cancelButton.addActionListener(this);
 
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.add(title);
-        this.add(usernameInfo);
-        this.add(passwordInfo);
-        this.add(repeatPasswordInfo);
-        this.add(buttons);
+        this.setLeftComponent(signupPanel);
+        this.setRightComponent(logoPanel);
+        this.setResizeWeight(0.5);
+        this.setDividerLocation(0.5);
+        this.setContinuousLayout(true);
+        this.setDividerSize(2);
+        this.setBorder(null);
+
+        this.setPreferredSize(new Dimension(SignupViewModel.VIEW_WIDTH, SignupViewModel.VIEW_HEIGHT));
     }
 
     @SuppressWarnings({ "checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings" })

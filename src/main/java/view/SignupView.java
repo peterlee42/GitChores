@@ -1,7 +1,9 @@
 package view;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -58,16 +60,21 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         cancelButton = new JButton(SignupViewModel.CANCEL_BUTTON_LABEL);
         buttons.add(cancelButton);
 
-        final JPanel signupPanel = new JPanel();
-        signupPanel.setLayout(new BoxLayout(signupPanel, BoxLayout.Y_AXIS));
-        signupPanel.add(title);
-        signupPanel.add(usernameInfo);
-        signupPanel.add(passwordInfo);
-        signupPanel.add(repeatPasswordInfo);
-        signupPanel.add(buttons);
+        final JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        leftPanel.add(title);
+        leftPanel.add(usernameInfo);
+        leftPanel.add(passwordInfo);
+        leftPanel.add(repeatPasswordInfo);
+        leftPanel.add(buttons);
 
-        final ImagePanel logoPanel = new ImagePanel(SignupViewModel.LOGO_IMAGE_PATH, SignupViewModel.LOGO_IMAGE_WIDTH,
+        final ImageLabel logoImage = new ImageLabel(SignupViewModel.LOGO_IMAGE_PATH,
+                SignupViewModel.LOGO_IMAGE_WIDTH,
                 SignupViewModel.LOGO_IMAGE_HEIGHT);
+
+        final JPanel rightPanel = new JPanel(new GridBagLayout());
+        rightPanel.add(logoImage);
+        rightPanel.setBackground(new Color(252, 244, 235));
 
         addUsernameListener();
         addPasswordListener();
@@ -77,12 +84,12 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         signupButton.addActionListener(this);
         cancelButton.addActionListener(this);
 
-        this.setLeftComponent(signupPanel);
-        this.setRightComponent(logoPanel);
+        this.setLeftComponent(leftPanel);
+        this.setRightComponent(rightPanel);
         this.setResizeWeight(0.5);
         this.setDividerLocation(0.5);
         this.setContinuousLayout(true);
-        this.setDividerSize(2);
+        this.setDividerSize(1);
         this.setBorder(null);
 
         this.setPreferredSize(new Dimension(SignupViewModel.VIEW_WIDTH, SignupViewModel.VIEW_HEIGHT));

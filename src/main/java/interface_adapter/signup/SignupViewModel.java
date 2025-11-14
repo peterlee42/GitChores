@@ -18,8 +18,8 @@ public class SignupViewModel extends ViewModel<SignupState> {
     public static final int MAX_TEXT_FIELD_LENGTH = 20;
 
     public static final String LOGO_IMAGE_PATH = "src/main/resources/logo.png";
-    public static final int LOGO_IMAGE_WIDTH = (int) (Toolkit.getDefaultToolkit().getScreenSize().width * 0.2);
-    public static final int LOGO_IMAGE_HEIGHT = (int) (Toolkit.getDefaultToolkit().getScreenSize().width * 0.2);
+    public static final int LOGO_IMAGE_WIDTH = (int) (Toolkit.getDefaultToolkit().getScreenSize().width * 0.1);
+    public static final int LOGO_IMAGE_HEIGHT = (int) (Toolkit.getDefaultToolkit().getScreenSize().width * 0.1);
 
     public static final int VIEW_WIDTH = (int) (Toolkit.getDefaultToolkit().getScreenSize().width * 0.6);
     public static final int VIEW_HEIGHT = (int) (Toolkit.getDefaultToolkit().getScreenSize().height * 0.6);

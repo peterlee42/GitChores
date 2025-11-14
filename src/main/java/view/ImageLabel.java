@@ -8,10 +8,17 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
-public class ImagePanel extends JPanel {
-    ImagePanel(String imagePath, int width, int height) {
+/**
+ * A JLabel that displays an image from a given file path, scaled to the
+ * specified width and height.
+ */
+class ImageLabel extends JLabel {
+    ImageLabel(String imagePath, int width, int height) {
+        super(createIcon(imagePath, width, height));
+    }
+
+    private static ImageIcon createIcon(String imagePath, int width, int height) {
         final BufferedImage logoImage;
         try {
             logoImage = ImageIO.read(new File(imagePath));
@@ -19,8 +26,6 @@ public class ImagePanel extends JPanel {
             throw new RuntimeException(ioException);
         }
         final Image scaledImage = logoImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-        final JLabel picLabel = new JLabel(new ImageIcon(scaledImage));
-        this.add(picLabel);
-        this.setPreferredSize(new java.awt.Dimension(width, height));
+        return new ImageIcon(scaledImage);
     }
 }

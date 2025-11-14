@@ -3,6 +3,7 @@ package view;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,11 +53,11 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         final LabelTextPanel repeatPasswordInfo = new LabelTextPanel(
                 new JLabel(SignupViewModel.REPEAT_PASSWORD_LABEL), repeatPasswordField);
 
-        signupButton = new JButton(SignupViewModel.SIGNUP_BUTTON_LABEL);
+        loginButton = new JButton(SignupViewModel.LOGIN_BUTTON_LABEL);
 
         final JPanel buttons = new JPanel();
-        loginButton = new JButton(SignupViewModel.LOGIN_BUTTON_LABEL);
-        buttons.add(loginButton);
+        signupButton = new JButton(SignupViewModel.SIGNUP_BUTTON_LABEL);
+        buttons.add(signupButton);
         cancelButton = new JButton(SignupViewModel.CANCEL_BUTTON_LABEL);
         buttons.add(cancelButton);
 
@@ -73,7 +74,15 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
                 SignupViewModel.LOGO_IMAGE_HEIGHT);
 
         final JPanel rightPanel = new JPanel(new GridBagLayout());
-        rightPanel.add(logoImage);
+        GridBagConstraints rightPanelConstraint = new GridBagConstraints();
+        rightPanelConstraint.fill = GridBagConstraints.HORIZONTAL;
+
+        rightPanelConstraint.gridx = 0;
+        rightPanelConstraint.gridy = 0;
+        rightPanel.add(logoImage, rightPanelConstraint);
+
+        rightPanelConstraint.gridy = 1;
+        rightPanel.add(loginButton, rightPanelConstraint);
         rightPanel.setBackground(new Color(252, 244, 235));
 
         addUsernameListener();

@@ -3,7 +3,7 @@ package entity;
 /**
  * An entity that represents a room within the app.
  */
-public class Room extends Domain {
+public class Room extends AbstractDomain {
 
     private String name;
     private String description;

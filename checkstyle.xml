@@ -16,7 +16,7 @@
     <metadata name="org.checkstyle.principle.description"
               value="In our config we should use all Checks that Checkstyle has"/>
 
-    <property name="severity" value="warning"/>
+    <property name="severity" value="error"/>
 
     <property name="fileExtensions" value="java, properties, xml, vm, g, g4, dtd"/>
 
@@ -242,6 +242,7 @@
         <module name="MissingDeprecated"/>
         <module name="MissingOverride"/>
         <module name="PackageAnnotation"/>
+        <!--
         <module name="SuppressWarnings">
             <property name="format" value="^((?!unchecked|deprecation|rawtypes|resource).)*$"/>
             <message key="suppressed.warning.not.allowed"
@@ -252,6 +253,7 @@
            please use javadoc block tag @noinspection"
             />
         </module>
+        -->
         <module name="SuppressWarningsHolder"/>
 
         <!-- Block Checks -->
@@ -304,11 +306,11 @@
             <property name="tokens" value="COMPACT_CTOR_DEF"/>
             <property name="option" value="alone_or_singleline"/>
         </module>
-        -->
         <module name="RightCurly">
             <property name="tokens" value="LITERAL_DO"/>
             <property name="option" value="same"/>
         </module>
+        -->
         <module name="RightCurly">
             <property name="tokens" value="INTERFACE_DEF"/>
             <property name="option" value="alone_or_singleline"/>

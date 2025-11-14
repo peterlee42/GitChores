@@ -3,7 +3,7 @@ package entity;
 /**
  * An entity that represents a user in our app.
  */
-public class User extends Domain {
+public class User extends AbstractDomain {
     private String firstName;
     private String lastName;
     private final Credentials credentials;

@@ -21,6 +21,8 @@ public class Main {
                 // .addLoginView()
                 .build();
 
+        application.setMinimumSize(application.getMinimumSize());
+
         application.pack();
         application.setLocationRelativeTo(null);
         application.setVisible(true);

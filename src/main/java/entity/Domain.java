@@ -26,11 +26,17 @@ public abstract class Domain {
         this.updatedAt = this.createdAt;
     }
 
-    public String getId() { return id; }
+    public String getId() {
+        return id;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 
     /**
      * Records most recent update (touch) time.

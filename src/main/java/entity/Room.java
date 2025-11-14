@@ -39,7 +39,9 @@ public class Room extends Domain {
         this.inviteCode = inviteCode;
     }
 
-    public String getName() {return name;}
+    public String getName() {
+        return name;
+    }
 
     public String getDescription() {
         return description;

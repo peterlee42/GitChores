@@ -20,7 +20,7 @@ import interface_adapter.signup.SignupViewModel;
 /**
  * The view for joining or creating a room.
  */
-@SuppressWarnings({ "checkstyle:ClassDataAbstractionCouplingCheck", "checkstyle:SuppressWarnings" })
+@SuppressWarnings("checkstyle:ClassDataAbstractionCouplingCheck")
 public class SignupView extends JSplitPane implements ActionListener, PropertyChangeListener {
     private final String viewName = "sign up";
 
@@ -57,7 +57,7 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         this.setMinimumSize(new Dimension(SignupViewModel.VIEW_WIDTH, SignupViewModel.VIEW_HEIGHT));
     }
 
-    @SuppressWarnings({ "checkstyle:ExecutableStatementCountCheck", "checkstyle:SuppressWarnings" })
+    @SuppressWarnings("checkstyle:ExecutableStatementCountCheck")
     private JPanel buildLeftPanel(JPanel panel) {
         final JLabel welcomeMessage = new JLabel(SignupViewModel.WELCOME_MESSAGE);
         welcomeMessage.setFont(SignupViewModel.WELCOME_FONT);
@@ -191,7 +191,7 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         });
     }
 
-    @SuppressWarnings({ "checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings" })
+    @SuppressWarnings("checkstyle:AnonInnerLength")
     private void addPasswordListener() {
         passwordField.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -218,7 +218,7 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         });
     }
 
-    @SuppressWarnings({ "checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings" })
+    @SuppressWarnings("checkstyle:AnonInnerLength")
     private void addRepeatPasswordListener() {
         repeatPasswordField.getDocument().addDocumentListener(new DocumentListener() {
 

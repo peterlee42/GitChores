@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 /**
  * An abstract entity that tracks entity creation and updates.
  */
-public abstract class Domain {
+public abstract class AbstractDomain {
     private final String id;
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -16,7 +16,7 @@ public abstract class Domain {
      * @param id The domain entity ID
      * @throws IllegalArgumentException if any of the parameters are null or empty
      */
-    protected Domain(String id) {
+    protected AbstractDomain(String id) {
         if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("ID cannot be null or empty");
         }

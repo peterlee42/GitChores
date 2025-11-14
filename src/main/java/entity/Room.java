@@ -13,11 +13,11 @@ public class Room extends Domain {
     /**
      * Creates a new room with the given non-empty name and description.
      *
-     * @param id            the room ID
-     * @param name          the room name
-     * @param description   the room description
-     * @param ownerId       the user ID of the room owner
-     * @param inviteCode    the room invite code — TODO: generation
+     * @param id          the room ID
+     * @param name        the room name
+     * @param description the room description
+     * @param ownerId     the user ID of the room owner
+     * @param inviteCode  the room invite code — TODO: generation
      * @throws IllegalArgumentException if any of the parameters are null or empty
      */
     public Room(String id, String name, String description, String ownerId, String inviteCode) {
@@ -41,13 +41,23 @@ public class Room extends Domain {
 
     public String getName() {return name;}
 
-    public String getDescription() {return description;}
+    public String getDescription() {
+        return description;
+    }
 
-    public String getOwnerId() {return ownerId;}
+    public String getOwnerId() {
+        return ownerId;
+    }
 
-    public String getInviteCode() {return inviteCode;}
+    public String getInviteCode() {
+        return inviteCode;
+    }
 
-    public void setName(String name) { this.name = name; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public void setDescription(String description) { this.description = description; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

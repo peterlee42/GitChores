@@ -8,12 +8,14 @@ import interface_adapter.git_console.GitConsoleController;
 import interface_adapter.git_console.GitConsolePresenter;
 import interface_adapter.git_console.GitConsoleViewModel;
 import interface_adapter.join.JoinViewModel;
+import interface_adapter.login.LoginViewModel;
 import interface_adapter.signup.SignupViewModel;
 import use_case.git_console.GitConsoleInputBoundary;
 import use_case.git_console.GitConsoleInteractor;
 import use_case.git_console.GitConsoleOutputBoundary;
 import view.GitConsoleView;
 import view.JoinView;
+import view.LoginView;
 import view.SignupView;
 
 /**
@@ -26,6 +28,7 @@ public class AppBuilder {
 
     private JoinView joinView;
     private SignupView signupView;
+    private LoginView loginView;
     private GitConsoleView gitConsoleView;
     private GitConsoleViewModel gitConsoleViewModel;
 
@@ -57,6 +60,19 @@ public class AppBuilder {
         final SignupViewModel signupViewModel = new SignupViewModel();
         signupView = new SignupView(signupViewModel);
         cardPanel.add(signupView, signupView.getViewName());
+
+        return this;
+    }
+
+    /**
+     * Adds Login View.
+     * 
+     * @return AppBuilder
+     */
+    public AppBuilder addLoginView() {
+        final LoginViewModel loginViewModel = new LoginViewModel();
+        loginView = new LoginView(loginViewModel);
+        cardPanel.add(loginView, loginView.getViewName());
 
         return this;
     }

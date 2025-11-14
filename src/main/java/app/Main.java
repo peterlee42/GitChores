@@ -11,7 +11,6 @@ public class Main {
      *
      * @param args command-line arguments
      */
-
     public static void main(String[] args) {
         final AppBuilder appBuilder = new AppBuilder();
         final JFrame application = appBuilder
@@ -19,6 +18,7 @@ public class Main {
                 // .addGitConsoleView()
                 // .addGitConsoleUseCase()
                 .addSignupView()
+                // .addLoginView()
                 .build();
 
         application.pack();

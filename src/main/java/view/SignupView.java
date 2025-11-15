@@ -57,7 +57,7 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         this.setMinimumSize(new Dimension(SignupViewModel.VIEW_WIDTH, SignupViewModel.VIEW_HEIGHT));
     }
 
-    @SuppressWarnings({ "checkstyle:ExecutableStatementCountCheck", "checkstyle:SuppressWarnings" })
+    @SuppressWarnings("checkstyle:ExecutableStatementCountCheck")
     private JPanel buildLeftPanel(JPanel panel) {
         final JLabel welcomeMessage = new JLabel(SignupViewModel.WELCOME_MESSAGE);
         welcomeMessage.setFont(SignupViewModel.WELCOME_FONT);
@@ -68,29 +68,29 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
 
         final JLabel usernameLabel = new JLabel(SignupViewModel.USERNAME_LABEL);
         usernameLabel.setFont(SignupViewModel.LABEL_FONT);
+        usernameField.setFont(SignupViewModel.LABEL_FONT);
         final LabelTextPanel usernameInfo = new LabelTextPanel(usernameLabel, usernameField);
         usernameInfo.setBackground(Color.WHITE);
 
         final JLabel passwordLabel = new JLabel(SignupViewModel.PASSWORD_LABEL);
         passwordLabel.setFont(SignupViewModel.LABEL_FONT);
+        passwordField.setFont(SignupViewModel.LABEL_FONT);
         final LabelTextPanel passwordInfo = new LabelTextPanel(passwordLabel, passwordField);
         passwordInfo.setBackground(Color.WHITE);
 
         final JLabel repeatPasswordLabel = new JLabel(SignupViewModel.REPEAT_PASSWORD_LABEL);
         repeatPasswordLabel.setFont(SignupViewModel.LABEL_FONT);
+        repeatPasswordField.setFont(SignupViewModel.LABEL_FONT);
         final LabelTextPanel repeatPasswordInfo = new LabelTextPanel(repeatPasswordLabel, repeatPasswordField);
         repeatPasswordInfo.setBackground(Color.WHITE);
 
         final JPanel buttons = new JPanel();
         buttons.setBackground(Color.WHITE);
-        buttons.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        final CustomButton signupButton = new CustomButton(SignupViewModel.SIGNUP_BUTTON_LABEL, ViewColors.getOrange(),
-                Color.WHITE, BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        final JButton signupButton = createButton(SignupViewModel.SIGNUP_BUTTON_LABEL);
         buttons.add(signupButton);
 
-        final CustomButton cancelButton = new CustomButton(SignupViewModel.CANCEL_BUTTON_LABEL, ViewColors.getOrange(),
-                Color.WHITE, BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        final JButton cancelButton = createButton(SignupViewModel.CANCEL_BUTTON_LABEL);
         buttons.add(cancelButton);
 
         panel.setLayout(new GridBagLayout());
@@ -100,24 +100,20 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         panelConstraints.fill = GridBagConstraints.HORIZONTAL;
         panelConstraints.insets = SignupViewModel.TEXT_FIELD_INSETS;
 
-        panelConstraints.gridx = 0;
-        panelConstraints.gridy = 0;
-        panel.add(welcomeMessage, panelConstraints);
+        final Component[] components = {
+                welcomeMessage,
+                title,
+                usernameInfo,
+                passwordInfo,
+                repeatPasswordInfo,
+                buttons,
+        };
 
-        panelConstraints.gridy += 1;
-        panel.add(title, panelConstraints);
-
-        panelConstraints.gridy += 1;
-        panel.add(usernameInfo, panelConstraints);
-
-        panelConstraints.gridy += 1;
-        panel.add(passwordInfo, panelConstraints);
-
-        panelConstraints.gridy += 1;
-        panel.add(repeatPasswordInfo, panelConstraints);
-
-        panelConstraints.gridy += 1;
-        panel.add(buttons, panelConstraints);
+        for (Component component : components) {
+            panelConstraints.gridx = 0;
+            panelConstraints.gridy++;
+            panel.add(component, panelConstraints);
+        }
 
         // Listeners
         addUsernameListener();
@@ -136,8 +132,7 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
                 SignupViewModel.LOGO_IMAGE_HEIGHT);
 
         final JLabel loginMessage = new JLabel(SignupViewModel.LOGIN_MESSAGE);
-        final CustomButton loginButton = new CustomButton(SignupViewModel.LOGIN_BUTTON_LABEL,
-                new Color(234, 89, 44), Color.WHITE, BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        final JButton loginButton = createButton(SignupViewModel.LOGIN_BUTTON_LABEL);
 
         panel.setLayout(new GridBagLayout());
         panel.setBackground(ViewColors.getSandBackground());
@@ -164,7 +159,18 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         return panel;
     }
 
-    @SuppressWarnings({ "checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings" })
+    private JButton createButton(String text) {
+        final JButton button = new ButtonBuilder()
+                .setText(text)
+                .setFont(SignupViewModel.LABEL_FONT)
+                .setBackground(ViewColors.getOrange())
+                .setForeground(Color.WHITE)
+                .setBorder(SignupViewModel.DEFAULT_TEXT_FIELD_BORDER)
+                .build();
+        return button;
+    }
+
+    @SuppressWarnings("checkstyle:AnonInnerLength")
     private void addUsernameListener() {
         usernameField.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -191,7 +197,7 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         });
     }
 
-    @SuppressWarnings({ "checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings" })
+    @SuppressWarnings("checkstyle:AnonInnerLength")
     private void addPasswordListener() {
         passwordField.getDocument().addDocumentListener(new DocumentListener() {
 
@@ -218,7 +224,7 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         });
     }
 
-    @SuppressWarnings({ "checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings" })
+    @SuppressWarnings("checkstyle:AnonInnerLength")
     private void addRepeatPasswordListener() {
         repeatPasswordField.getDocument().addDocumentListener(new DocumentListener() {
 

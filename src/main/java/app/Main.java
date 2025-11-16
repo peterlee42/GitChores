@@ -17,8 +17,9 @@ public class Main {
                 // .addJoinView()
                 // .addGitConsoleView()
                 // .addGitConsoleUseCase()
-                .addSignupView()
+                // .addSignupView()
                 // .addLoginView()
+                .addChoreCreationView()
                 .build();
 
         application.setMinimumSize(application.getMinimumSize());

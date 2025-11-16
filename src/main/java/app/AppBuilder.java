@@ -10,6 +10,7 @@ import interface_adapter.git_console.GitConsoleViewModel;
 import interface_adapter.join.JoinViewModel;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.chore_creation.ChoreCreationViewModel;
 import use_case.git_console.GitConsoleInputBoundary;
 import use_case.git_console.GitConsoleInteractor;
 import use_case.git_console.GitConsoleOutputBoundary;
@@ -17,6 +18,7 @@ import view.GitConsoleView;
 import view.JoinView;
 import view.LoginView;
 import view.SignupView;
+import view.ChoreCreationView;
 
 /**
  * Class for building the app.
@@ -31,6 +33,7 @@ public class AppBuilder {
     private LoginView loginView;
     private GitConsoleView gitConsoleView;
     private GitConsoleViewModel gitConsoleViewModel;
+    private ChoreCreationView choreCreationView;
 
     /**
      * Constructor for AppBuilder.
@@ -101,6 +104,19 @@ public class AppBuilder {
 
         final GitConsoleController controller = new GitConsoleController(gitConsoleInteractor);
         gitConsoleView.setGitConsoleController(controller);
+        return this;
+    }
+
+    /**
+     * Adds Chore Creation View.
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addChoreCreationView() {
+        final ChoreCreationViewModel choreCreationViewModel = new ChoreCreationViewModel();
+        choreCreationView = new ChoreCreationView(choreCreationViewModel);
+        cardPanel.add(choreCreationView, choreCreationView.getViewName());
+
         return this;
     }
 

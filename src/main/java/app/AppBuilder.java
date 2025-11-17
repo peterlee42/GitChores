@@ -14,7 +14,15 @@ import interface_adapter.signup.SignupViewModel;
 import use_case.git_console.GitConsoleInputBoundary;
 import use_case.git_console.GitConsoleInteractor;
 import use_case.git_console.GitConsoleOutputBoundary;
-import view.*;
+import view.Constants;
+import view.DashboardView;
+import view.GitConsoleView;
+import view.JoinView;
+import view.LoginView;
+import view.MainView;
+import view.ProfileView;
+import view.SignupView;
+import view.ViewManager;
 
 /**
  * Class for building the app.
@@ -54,6 +62,16 @@ public class AppBuilder {
     }
 
     /**
+     * Adds dashboard view - incomplete.
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addDashboardView() {
+        dashboardView = new DashboardView();
+        return this;
+    }
+
+    /**
      * Wires the ViewManager engine so views can switch via a shared model.
      *
      * @return AppBuilder
@@ -61,11 +79,6 @@ public class AppBuilder {
     public AppBuilder addViewManager() {
         viewManagerModel = new ViewManagerModel();
         new ViewManager(cardPanel, cardLayout, viewManagerModel);
-        return this;
-    }
-
-    public AppBuilder addDashboardView() {
-        dashboardView = new DashboardView();
         return this;
     }
 

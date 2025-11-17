@@ -15,9 +15,11 @@ import use_case.git_console.GitConsoleInputBoundary;
 import use_case.git_console.GitConsoleInteractor;
 import use_case.git_console.GitConsoleOutputBoundary;
 import view.Constants;
+import view.DashboardView;
 import view.GitConsoleView;
 import view.JoinView;
 import view.LoginView;
+import view.MainView;
 import view.ProfileView;
 import view.SignupView;
 import view.ViewManager;
@@ -30,11 +32,14 @@ public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
 
+    private MainView mainView;
     private JoinView joinView;
     private SignupView signupView;
     private LoginView loginView;
+    private DashboardView dashboardView;
     private GitConsoleView gitConsoleView;
     private GitConsoleViewModel gitConsoleViewModel;
+    private ProfileView profileView;
 
     private ViewManagerModel viewManagerModel;
 
@@ -43,6 +48,27 @@ public class AppBuilder {
      */
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
+    }
+
+    /**
+     * Adds main view.
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addMainView() {
+        mainView = new MainView(dashboardView, gitConsoleView, profileView);
+        cardPanel.add(mainView, mainView.getViewName());
+        return this;
+    }
+
+    /**
+     * Adds dashboard view - incomplete.
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addDashboardView() {
+        dashboardView = new DashboardView();
+        return this;
     }
 
     /**
@@ -102,7 +128,6 @@ public class AppBuilder {
     public AppBuilder addGitConsoleView() {
         gitConsoleViewModel = new GitConsoleViewModel();
         gitConsoleView = new GitConsoleView(gitConsoleViewModel);
-        cardPanel.add(gitConsoleView, gitConsoleView.getViewName());
         return this;
     }
 
@@ -145,8 +170,7 @@ public class AppBuilder {
             cardLayout.show(cardPanel, name);
         };
 
-        final ProfileView profileView = new ProfileView(viewManagerModel, backTarget, navigator);
-        cardPanel.add(profileView, profileView.getViewName());
+        profileView = new ProfileView(viewManagerModel, backTarget, navigator);
         return this;
     }
 
@@ -162,7 +186,9 @@ public class AppBuilder {
 
         // Start on a sensible screen if the ViewManager is wired.
         if (viewManagerModel != null) {
-            if (signupView != null) {
+            if (mainView != null) {
+                viewManagerModel.setActiveViewName(mainView.getViewName());
+            } else if (signupView != null) {
                 viewManagerModel.setActiveViewName(signupView.getViewName());
             } else if (joinView != null) {
                 viewManagerModel.setActiveViewName(joinView.getViewName());

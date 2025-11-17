@@ -35,13 +35,13 @@ public class Chore extends AbstractDomain {
         super(id);
 
         if (roomId == null || roomId.trim().isEmpty()) {
-            throw new IllegalArgumentException("Room ID cannot be empty.");
+            throw new IllegalArgumentException("Room ID cannot be null or empty.");
         }
         if (creatingUserId == null || creatingUserId.trim().isEmpty()) {
-            throw new IllegalArgumentException("Creating user ID cannot be empty.");
+            throw new IllegalArgumentException("Creating user ID cannot be null or empty.");
         }
         if (title == null || title.trim().isEmpty()) {
-            throw new IllegalArgumentException("Chore title cannot be empty.");
+            throw new IllegalArgumentException("Chore title cannot be null or empty.");
         }
         if (dueDate == null) {
             throw new IllegalArgumentException("Due date cannot be null.");

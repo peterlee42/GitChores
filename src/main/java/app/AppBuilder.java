@@ -14,13 +14,7 @@ import interface_adapter.signup.SignupViewModel;
 import use_case.git_console.GitConsoleInputBoundary;
 import use_case.git_console.GitConsoleInteractor;
 import use_case.git_console.GitConsoleOutputBoundary;
-import view.Constants;
-import view.GitConsoleView;
-import view.JoinView;
-import view.LoginView;
-import view.ProfileView;
-import view.SignupView;
-import view.ViewManager;
+import view.*;
 
 /**
  * Class for building the app.
@@ -30,11 +24,13 @@ public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
 
+    private MainView mainView;
     private JoinView joinView;
     private SignupView signupView;
     private LoginView loginView;
     private GitConsoleView gitConsoleView;
     private GitConsoleViewModel gitConsoleViewModel;
+    private ProfileView profileView;
 
     private ViewManagerModel viewManagerModel;
 
@@ -43,6 +39,12 @@ public class AppBuilder {
      */
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
+    }
+
+    public AppBuilder addMainView() {
+        mainView = new MainView(gitConsoleView, profileView);
+        cardPanel.add(mainView, mainView.getViewName());
+        return this;
     }
 
     /**
@@ -145,7 +147,7 @@ public class AppBuilder {
             cardLayout.show(cardPanel, name);
         };
 
-        final ProfileView profileView = new ProfileView(viewManagerModel, backTarget, navigator);
+        profileView = new ProfileView(viewManagerModel, backTarget, navigator);
         cardPanel.add(profileView, profileView.getViewName());
         return this;
     }

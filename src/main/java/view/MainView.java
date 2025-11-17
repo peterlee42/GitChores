@@ -16,13 +16,12 @@ public class MainView extends JPanel implements ActionListener {
     private final JButton consoleButton = new JButton("Console");
     private final JButton profileButton = new JButton("Profile");
 
-    private final JPanel dashboardView;
+    private final DashboardView dashboardView;
     private final GitConsoleView consoleView;
     private final ProfileView profileView;
 
-    @SuppressWarnings("checkstyle:MultipleStringLiterals")
-    public MainView(GitConsoleView consolePanel, ProfileView profilePanel) {
-        this.dashboardView = new JPanel();
+    public MainView(DashboardView dashboardPanel, GitConsoleView consolePanel, ProfileView profilePanel) {
+        this.dashboardView = dashboardPanel;
         this.consoleView = consolePanel;
         this.profileView = profilePanel;
 
@@ -36,7 +35,7 @@ public class MainView extends JPanel implements ActionListener {
 
         add(navBar, BorderLayout.NORTH);
 
-        contentPanel.add(dashboardView, "dashboard");
+        contentPanel.add(dashboardView, dashboardView.getViewName());
         contentPanel.add(consoleView, consoleView.getViewName());
         contentPanel.add(profileView, profileView.getViewName());
 

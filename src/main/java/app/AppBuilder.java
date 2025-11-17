@@ -28,6 +28,7 @@ public class AppBuilder {
     private JoinView joinView;
     private SignupView signupView;
     private LoginView loginView;
+    private DashboardView dashboardView;
     private GitConsoleView gitConsoleView;
     private GitConsoleViewModel gitConsoleViewModel;
     private ProfileView profileView;
@@ -41,8 +42,13 @@ public class AppBuilder {
         cardPanel.setLayout(cardLayout);
     }
 
+    /**
+     * Adds main view.
+     *
+     * @return AppBuilder
+     */
     public AppBuilder addMainView() {
-        mainView = new MainView(gitConsoleView, profileView);
+        mainView = new MainView(dashboardView, gitConsoleView, profileView);
         cardPanel.add(mainView, mainView.getViewName());
         return this;
     }
@@ -55,6 +61,11 @@ public class AppBuilder {
     public AppBuilder addViewManager() {
         viewManagerModel = new ViewManagerModel();
         new ViewManager(cardPanel, cardLayout, viewManagerModel);
+        return this;
+    }
+
+    public AppBuilder addDashboardView() {
+        dashboardView = new DashboardView();
         return this;
     }
 
@@ -104,7 +115,6 @@ public class AppBuilder {
     public AppBuilder addGitConsoleView() {
         gitConsoleViewModel = new GitConsoleViewModel();
         gitConsoleView = new GitConsoleView(gitConsoleViewModel);
-        cardPanel.add(gitConsoleView, gitConsoleView.getViewName());
         return this;
     }
 
@@ -148,7 +158,6 @@ public class AppBuilder {
         };
 
         profileView = new ProfileView(viewManagerModel, backTarget, navigator);
-        cardPanel.add(profileView, profileView.getViewName());
         return this;
     }
 
@@ -164,7 +173,9 @@ public class AppBuilder {
 
         // Start on a sensible screen if the ViewManager is wired.
         if (viewManagerModel != null) {
-            if (signupView != null) {
+            if (mainView != null) {
+                viewManagerModel.setActiveViewName(mainView.getViewName());
+            } else if (signupView != null) {
                 viewManagerModel.setActiveViewName(signupView.getViewName());
             } else if (joinView != null) {
                 viewManagerModel.setActiveViewName(joinView.getViewName());

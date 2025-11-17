@@ -17,6 +17,7 @@ public class Main {
                 .addViewManager()
                 // .addSignupView()
                 // .addJoinView()
+                .addDashboardView()
                 .addGitConsoleView()
                 .addGitConsoleUseCase()
                 // .addLoginView()

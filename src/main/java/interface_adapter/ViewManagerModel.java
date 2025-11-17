@@ -13,4 +13,12 @@ public class ViewManagerModel extends ViewModel<String> {
         this.setState("");
     }
 
+    /**
+     * Set the active view name (CardLayout key).
+     *
+     * @param viewName the view to display
+     */
+    public void setActiveViewName(final String viewName) {
+        this.setState(viewName);
+    }
 }

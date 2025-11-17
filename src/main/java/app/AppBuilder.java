@@ -4,6 +4,7 @@ import java.awt.*;
 
 import javax.swing.*;
 
+import interface_adapter.ViewManagerModel;
 import interface_adapter.git_console.GitConsoleController;
 import interface_adapter.git_console.GitConsolePresenter;
 import interface_adapter.git_console.GitConsoleViewModel;
@@ -14,10 +15,13 @@ import interface_adapter.chore_creation.ChoreCreationViewModel;
 import use_case.git_console.GitConsoleInputBoundary;
 import use_case.git_console.GitConsoleInteractor;
 import use_case.git_console.GitConsoleOutputBoundary;
+import view.Constants;
 import view.GitConsoleView;
 import view.JoinView;
 import view.LoginView;
+import view.ProfileView;
 import view.SignupView;
+import view.ViewManager;
 import view.ChoreCreationView;
 
 /**
@@ -35,6 +39,8 @@ public class AppBuilder {
     private GitConsoleViewModel gitConsoleViewModel;
     private ChoreCreationView choreCreationView;
 
+    private ViewManagerModel viewManagerModel;
+
     /**
      * Constructor for AppBuilder.
      */
@@ -43,8 +49,19 @@ public class AppBuilder {
     }
 
     /**
+     * Wires the ViewManager engine so views can switch via a shared model.
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addViewManager() {
+        viewManagerModel = new ViewManagerModel();
+        new ViewManager(cardPanel, cardLayout, viewManagerModel);
+        return this;
+    }
+
+    /**
      * Adds join view.
-     * 
+     *
      * @return AppBuilder
      */
     public AppBuilder addJoinView() {
@@ -56,7 +73,7 @@ public class AppBuilder {
 
     /**
      * Adds Sign Up View.
-     * 
+     *
      * @return AppBuilder
      */
     public AppBuilder addSignupView() {
@@ -69,7 +86,7 @@ public class AppBuilder {
 
     /**
      * Adds Login View.
-     * 
+     *
      * @return AppBuilder
      */
     public AppBuilder addLoginView() {
@@ -121,15 +138,54 @@ public class AppBuilder {
     }
 
     /**
+     * Adds Profile view (your screen). Does not modify teammates' views.
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addProfileView() {
+        // Prefer going back to Signup; else Join; else default name
+        final String backTarget;
+        if (signupView != null) {
+            backTarget = signupView.getViewName();
+        } else if (joinView != null) {
+            backTarget = joinView.getViewName();
+        } else {
+            backTarget = Constants.JOIN_VIEW_NAME;
+        }
+
+        // Navigation callback: always show the card; also drive CA engine if wired
+        final java.util.function.Consumer<String> navigator = (String name) -> {
+            if (viewManagerModel != null) {
+                viewManagerModel.setActiveViewName(name);
+            }
+            cardLayout.show(cardPanel, name);
+        };
+
+        final ProfileView profileView = new ProfileView(viewManagerModel, backTarget, navigator);
+        cardPanel.add(profileView, profileView.getViewName());
+        return this;
+    }
+
+    /**
      * Builds the view.
-     * 
+     *
      * @return JFrame
      */
     public JFrame build() {
         final JFrame application = new JFrame("GitChores");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
         application.add(cardPanel);
+
+        // Start on a sensible screen if the ViewManager is wired.
+        if (viewManagerModel != null) {
+            if (signupView != null) {
+                viewManagerModel.setActiveViewName(signupView.getViewName());
+            } else if (joinView != null) {
+                viewManagerModel.setActiveViewName(joinView.getViewName());
+            } else if (gitConsoleView != null) {
+                viewManagerModel.setActiveViewName(gitConsoleView.getViewName());
+            }
+        }
 
         return application;
     }

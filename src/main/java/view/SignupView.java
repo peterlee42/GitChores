@@ -165,7 +165,6 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
                 .setFont(ViewConstants.LABEL_FONT)
                 .setBackground(ViewColors.ORANGE)
                 .setForeground(Color.WHITE)
-                .setFocusBorder(ViewConstants.DEFAULT_BUTTON_FOCUS_BORDER)
                 .build();
         return button;
     }

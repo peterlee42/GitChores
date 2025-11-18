@@ -35,9 +35,7 @@ public final class ViewConstants {
 
     // ---- Border ----
     public static final Border EMPTY_BORDER = BorderFactory.createEmptyBorder(5, 15, 5, 15);
-    public static final Border DEFAULT_BUTTON_FOCUS_BORDER = BorderFactory
-            .createCompoundBorder(BorderFactory.createLineBorder(ViewColors.DARK_BLUE, 1),
-                    BorderFactory.createEmptyBorder(4, 14, 4, 14));
+    public static final Border DEFAULT_BUTTON_FOCUS_BORDER = BorderFactory.createLineBorder(ViewColors.DARK_BLUE, 2);
 
     private ViewConstants() {
     }

@@ -40,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: checkstyle-report
-          path: github/checkstyle/*
+          path: .github/checkstyle/*
           retention-days: 15
 
   build:

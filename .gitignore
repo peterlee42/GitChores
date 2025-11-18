@@ -37,3 +37,6 @@ target/
 # OS-specific files
 .DS_Store
 Thumbs.db
+
+# Checkstyle
+checkstyle.xml

@@ -2,6 +2,8 @@ package view;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 import javax.swing.JButton;
 import javax.swing.border.Border;
@@ -12,8 +14,8 @@ public class ButtonBuilder {
     private Color background;
     private Color foreground;
     private Border border;
+    private Border focusBorder;
     private boolean isOpaque = true;
-    private boolean isBorderPainted;
 
     /**
      * Adds text to button.
@@ -60,6 +62,17 @@ public class ButtonBuilder {
     }
 
     /**
+     * Adds focus border to button.
+     * 
+     * @param focusBorder when the button is focused, use this border
+     * @return ButtonBuilder
+     */
+    public ButtonBuilder setFocusBorder(Border focusBorder) {
+        this.focusBorder = focusBorder;
+        return this;
+    }
+
+    /**
      * Adds font to button.
      * 
      * @param font font to add
@@ -77,23 +90,48 @@ public class ButtonBuilder {
      */
     public JButton build() {
         final JButton button = new JButton(text);
+
         if (text != null) {
             button.setText(text);
         }
         if (background != null) {
+            button.setOpaque(isOpaque);
             button.setBackground(background);
         }
         if (foreground != null) {
             button.setForeground(foreground);
         }
-        if (border != null) {
-            button.setBorder(border);
-        }
         if (font != null) {
             button.setFont(font);
         }
-        button.setOpaque(isOpaque);
-        button.setBorderPainted(isBorderPainted);
+
+        // default border will be empty border if none is provided
+        button.setBorderPainted(true);
+        if (border != null) {
+            button.setBorder(border);
+        } else {
+            button.setBorder(ViewConstants.EMPTY_BORDER);
+        }
+
+        if (focusBorder != null) {
+            // turn off the default focus painting
+            button.setFocusPainted(false);
+
+            // turn focus border on if we focus on it
+            button.addFocusListener(new FocusAdapter() {
+                public void focusGained(FocusEvent evt) {
+                    button.setBorder(focusBorder);
+                }
+
+                public void focusLost(FocusEvent evt) {
+                    if (border != null) {
+                        button.setBorder(border);
+                    } else {
+                        button.setBorder(ViewConstants.EMPTY_BORDER);
+                    }
+                }
+            });
+        }
         return button;
     }
 }

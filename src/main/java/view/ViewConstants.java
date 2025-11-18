@@ -2,6 +2,9 @@ package view;
 
 import java.awt.Font;
 
+import javax.swing.BorderFactory;
+import javax.swing.border.Border;
+
 /** Centralized UI constants. */
 public final class ViewConstants {
 
@@ -29,6 +32,12 @@ public final class ViewConstants {
     // ---- Font ----
     public static final Font LABEL_FONT = new Font("Inter", Font.PLAIN, 14);
     public static final Font WELCOME_FONT = new Font("Inter", Font.BOLD, 24);
+
+    // ---- Border ----
+    public static final Border EMPTY_BORDER = BorderFactory.createEmptyBorder(5, 15, 5, 15);
+    public static final Border DEFAULT_BUTTON_FOCUS_BORDER = BorderFactory
+            .createCompoundBorder(BorderFactory.createLineBorder(ViewColors.DARK_BLUE, 1),
+                    BorderFactory.createEmptyBorder(4, 14, 4, 14));
 
     private ViewConstants() {
     }

@@ -1,17 +1,24 @@
 package use_case.git_console;
 
+import interface_adapter.commit.CommitController;
+import interface_adapter.commit.CommitPresenter;
+
 /**
  * The Git Console Interactor.
  */
 public class GitConsoleInteractor implements GitConsoleInputBoundary {
 
-    // TO DO: Implement data access features once set up
-    // TO DO: Implement a guide when the user types ?guide
-
     private final GitConsoleOutputBoundary presenter;
+    private final CommitController commitController;
+    private final CommitPresenter commitPresenter;
 
-    public GitConsoleInteractor(GitConsoleOutputBoundary presenter) {
+    public GitConsoleInteractor(GitConsoleOutputBoundary presenter,
+                                CommitController commitController,
+                                CommitPresenter commitPresenter) {
         this.presenter = presenter;
+        this.commitPresenter = commitPresenter;
+        this.commitController = commitController;
+
     }
 
     @Override
@@ -23,14 +30,18 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
         if (command == null || command.isBlank()) {
             output = "Please enter a command.";
         }
+        else if ("?guide".equals(command)) {
+            // Extract outside of file
+            output = "THIS IS THE GUIDE";
+        }
         // Verify the prefix of the command
         else if (!(command.startsWith("git "))) {
-            output = "Invalid command. Commands must start with 'git'.";
+            output = "Invalid command. Commands must start with 'git'. Type ?guide for help.";
         } else {
             // Break command into sub-parts for easier identification
             final String[] parts = command.split(" ");
             if (parts.length < 2) {
-                output = "Missing subcommand after git.";
+                output = "Missing subcommand after git. Type ?guide for help.";
             } else {
                 final String subcommand = parts[1];
                 output = switch (subcommand) {
@@ -66,18 +77,25 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
             }
             if (message.isEmpty()) {
                 output = "Error: empty commit message";
-            } else {
-                output = "Commit successful! Message: " + "\"" + message + "\"";
+            }
+            else {
+                // THESE ARE TEMP VARIABLES
+                final String tempRoomId = "Different room";
+                final String tempUserId = "PraneethSqw42";
+                commitController.execute(tempRoomId, tempUserId, message);
+                output = commitPresenter.getViewMessage();
             }
         }
         return output;
     }
 
+    // THIS WILL BE REPLACED WITH REQUEST_REVIEW
     private String handlePush() {
         // Temporary: Will replace with specific branch name
         return "Pushed changes to <branch_name>";
     }
 
+    // THIS WILL BE REPLACED WITH APPROVE
     private String handleCheckout(String command) {
         // Temporary: Will replace with specific branch name
         return "Switched branch to " + command;

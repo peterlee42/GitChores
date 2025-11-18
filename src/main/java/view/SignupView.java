@@ -60,27 +60,27 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
     @SuppressWarnings("checkstyle:ExecutableStatementCountCheck")
     private JPanel buildLeftPanel(JPanel panel) {
         final JLabel welcomeMessage = new JLabel(SignupViewModel.WELCOME_MESSAGE);
-        welcomeMessage.setFont(SignupViewModel.WELCOME_FONT);
+        welcomeMessage.setFont(ViewConstants.WELCOME_FONT);
 
         final JLabel title = new JLabel(SignupViewModel.TITLE_LABEL);
-        title.setFont(SignupViewModel.LABEL_FONT);
+        title.setFont(ViewConstants.LABEL_FONT);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         final JLabel usernameLabel = new JLabel(SignupViewModel.USERNAME_LABEL);
-        usernameLabel.setFont(SignupViewModel.LABEL_FONT);
-        usernameField.setFont(SignupViewModel.LABEL_FONT);
+        usernameLabel.setFont(ViewConstants.LABEL_FONT);
+        usernameField.setFont(ViewConstants.LABEL_FONT);
         final LabelTextPanel usernameInfo = new LabelTextPanel(usernameLabel, usernameField);
         usernameInfo.setBackground(Color.WHITE);
 
         final JLabel passwordLabel = new JLabel(SignupViewModel.PASSWORD_LABEL);
-        passwordLabel.setFont(SignupViewModel.LABEL_FONT);
-        passwordField.setFont(SignupViewModel.LABEL_FONT);
+        passwordLabel.setFont(ViewConstants.LABEL_FONT);
+        passwordField.setFont(ViewConstants.LABEL_FONT);
         final LabelTextPanel passwordInfo = new LabelTextPanel(passwordLabel, passwordField);
         passwordInfo.setBackground(Color.WHITE);
 
         final JLabel repeatPasswordLabel = new JLabel(SignupViewModel.REPEAT_PASSWORD_LABEL);
-        repeatPasswordLabel.setFont(SignupViewModel.LABEL_FONT);
-        repeatPasswordField.setFont(SignupViewModel.LABEL_FONT);
+        repeatPasswordLabel.setFont(ViewConstants.LABEL_FONT);
+        repeatPasswordField.setFont(ViewConstants.LABEL_FONT);
         final LabelTextPanel repeatPasswordInfo = new LabelTextPanel(repeatPasswordLabel, repeatPasswordField);
         repeatPasswordInfo.setBackground(Color.WHITE);
 
@@ -135,7 +135,7 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         final JButton loginButton = createButton(SignupViewModel.LOGIN_BUTTON_LABEL);
 
         panel.setLayout(new GridBagLayout());
-        panel.setBackground(ViewColors.getSandBackground());
+        panel.setBackground(ViewColors.SAND_BACKGROUND);
 
         final GridBagConstraints logoConstraints = new GridBagConstraints();
         logoConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -162,8 +162,8 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
     private JButton createButton(String text) {
         final JButton button = new ButtonBuilder()
                 .setText(text)
-                .setFont(SignupViewModel.LABEL_FONT)
-                .setBackground(ViewColors.getOrange())
+                .setFont(ViewConstants.LABEL_FONT)
+                .setBackground(ViewColors.ORANGE)
                 .setForeground(Color.WHITE)
                 .setBorder(SignupViewModel.DEFAULT_TEXT_FIELD_BORDER)
                 .build();

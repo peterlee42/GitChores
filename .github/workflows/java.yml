@@ -6,9 +6,13 @@ on:
   pull_request:
     branches: ['main']
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  checkstyle:
-    name: Version Check, Checkstyle Validation, and Build
+  java-version:
+    name: Java Version Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -20,6 +24,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           cache: maven
+          
+  checkstyle:
+    name: Checkstyle Validation
+    runs-on: ubuntu-latest
+    steps:
 
       - name: Run Checkstyle
         run: mvn checkstyle:check
@@ -31,8 +40,12 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: checkstyle-report
-          path: target/checkstyle/*
+          path: github/checkstyle/*
           retention-days: 15
 
-      - name: Build with Maven
+  build:
+    name: Build with Maven
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
         run: mvn -B package --file pom.xml

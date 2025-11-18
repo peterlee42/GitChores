@@ -14,7 +14,6 @@ import interface_adapter.signup.SignupViewModel;
 import use_case.git_console.GitConsoleInputBoundary;
 import use_case.git_console.GitConsoleInteractor;
 import use_case.git_console.GitConsoleOutputBoundary;
-import view.Constants;
 import view.DashboardView;
 import view.GitConsoleView;
 import view.JoinView;
@@ -22,6 +21,7 @@ import view.LoginView;
 import view.MainView;
 import view.ProfileView;
 import view.SignupView;
+import view.ViewConstants;
 import view.ViewManager;
 
 /**
@@ -159,7 +159,7 @@ public class AppBuilder {
         } else if (joinView != null) {
             backTarget = joinView.getViewName();
         } else {
-            backTarget = Constants.JOIN_VIEW_NAME;
+            backTarget = ViewConstants.JOIN_VIEW_NAME;
         }
 
         // Navigation callback: always show the card; also drive CA engine if wired

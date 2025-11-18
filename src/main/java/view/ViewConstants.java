@@ -1,7 +1,9 @@
 package view;
 
+import java.awt.Font;
+
 /** Centralized UI constants. */
-public final class Constants {
+public final class ViewConstants {
 
     // ---- Card names ----
     public static final String APPLICATION_TITLE = "GitChores";
@@ -24,6 +26,10 @@ public final class Constants {
     public static final int TEXT_FIELD_COLUMNS = 24;
     public static final int V_GAP = 16;
 
-    private Constants() {
+    // ---- Font ----
+    public static final Font LABEL_FONT = new Font("Inter", Font.PLAIN, 14);
+    public static final Font WELCOME_FONT = new Font("Inter", Font.BOLD, 24);
+
+    private ViewConstants() {
     }
 }

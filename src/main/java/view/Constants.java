@@ -24,5 +24,6 @@ public final class Constants {
     public static final int TEXT_FIELD_COLUMNS = 24;
     public static final int V_GAP = 16;
 
-    private Constants() { }
+    private Constants() {
+    }
 }

@@ -135,7 +135,7 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         final JButton loginButton = createButton(SignupViewModel.LOGIN_BUTTON_LABEL);
 
         panel.setLayout(new GridBagLayout());
-        panel.setBackground(ViewColors.getSandBackground());
+        panel.setBackground(ViewColors.SAND_BACKGROUND);
 
         final GridBagConstraints logoConstraints = new GridBagConstraints();
         logoConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -163,7 +163,7 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         final JButton button = new ButtonBuilder()
                 .setText(text)
                 .setFont(SignupViewModel.LABEL_FONT)
-                .setBackground(ViewColors.getOrange())
+                .setBackground(ViewColors.ORANGE)
                 .setForeground(Color.WHITE)
                 .setBorder(SignupViewModel.DEFAULT_TEXT_FIELD_BORDER)
                 .build();

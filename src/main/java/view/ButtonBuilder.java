@@ -17,7 +17,7 @@ public class ButtonBuilder {
     private Color background;
     private Color foreground;
     private Border border;
-    private Border focusBorder;
+    private LineBorder focusBorder;
     private boolean isOpaque = true;
 
     /**
@@ -70,7 +70,7 @@ public class ButtonBuilder {
      * @param focusBorder when the button is focused, use this border
      * @return ButtonBuilder
      */
-    public ButtonBuilder setFocusBorder(Border focusBorder) {
+    public ButtonBuilder setFocusBorder(LineBorder focusBorder) {
         this.focusBorder = focusBorder;
         return this;
     }
@@ -123,7 +123,7 @@ public class ButtonBuilder {
         final Insets borderInsets = button.getBorder().getBorderInsets(button);
         final int focusedBorderThickness;
         if (focusBorder != null) {
-            focusedBorderThickness = ((LineBorder) focusBorder).getThickness();
+            focusedBorderThickness = focusBorder.getThickness();
         } else {
             focusedBorderThickness = ((LineBorder) ViewConstants.DEFAULT_BUTTON_FOCUS_BORDER).getThickness();
         }

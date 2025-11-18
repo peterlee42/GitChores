@@ -27,28 +27,31 @@ public class ProfileView extends JPanel {
 
     /**
      * A.
+     * 
      * @param viewManagerModel   shared model used to switch screens (can be null)
-     * @param backTargetViewName card to show when Back is clicked (e.g., signupView.getViewName())
-     * @param navigator          callback that shows a given card name via CardLayout
+     * @param backTargetViewName card to show when Back is clicked (e.g.,
+     *                           signupView.getViewName())
+     * @param navigator          callback that shows a given card name via
+     *                           CardLayout
      */
     public ProfileView(final ViewManagerModel viewManagerModel,
-                       final String backTargetViewName,
-                       final Consumer<String> navigator) {
+            final String backTargetViewName,
+            final Consumer<String> navigator) {
         this.viewManagerModel = viewManagerModel;
         this.backTargetViewName = backTargetViewName;
         this.navigator = navigator;
 
-        final JLabel titleLabel = new JLabel(Constants.PROFILE_TITLE_TEXT);
+        final JLabel titleLabel = new JLabel(ViewConstants.PROFILE_TITLE_TEXT);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        final JLabel usernameLabel = new JLabel(Constants.USERNAME_LABEL_TEXT);
-        usernameField = new JTextField(Constants.TEXT_FIELD_COLUMNS);
+        final JLabel usernameLabel = new JLabel(ViewConstants.USERNAME_LABEL_TEXT);
+        usernameField = new JTextField(ViewConstants.TEXT_FIELD_COLUMNS);
 
-        final JLabel emailLabel = new JLabel(Constants.EMAIL_LABEL_TEXT);
-        emailField = new JTextField(Constants.TEXT_FIELD_COLUMNS);
+        final JLabel emailLabel = new JLabel(ViewConstants.EMAIL_LABEL_TEXT);
+        emailField = new JTextField(ViewConstants.TEXT_FIELD_COLUMNS);
 
-        final JButton saveButton = new JButton(Constants.SAVE_BUTTON_TEXT);
-        final JButton backButton = new JButton(Constants.BACK_BUTTON_TEXT);
+        final JButton saveButton = new JButton(ViewConstants.SAVE_BUTTON_TEXT);
+        final JButton backButton = new JButton(ViewConstants.BACK_BUTTON_TEXT);
 
         final JPanel usernameRow = new JPanel();
         usernameRow.add(usernameLabel);
@@ -63,12 +66,12 @@ public class ProfileView extends JPanel {
         buttonsRow.add(saveButton);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        add(Box.createRigidArea(new Dimension(0, Constants.V_GAP)));
+        add(Box.createRigidArea(new Dimension(0, ViewConstants.V_GAP)));
         add(titleLabel);
-        add(Box.createRigidArea(new Dimension(0, Constants.V_GAP)));
+        add(Box.createRigidArea(new Dimension(0, ViewConstants.V_GAP)));
         add(usernameRow);
         add(emailRow);
-        add(Box.createRigidArea(new Dimension(0, Constants.V_GAP)));
+        add(Box.createRigidArea(new Dimension(0, ViewConstants.V_GAP)));
         add(buttonsRow);
 
         backButton.addActionListener((final ActionEvent evt) -> {
@@ -81,9 +84,10 @@ public class ProfileView extends JPanel {
 
     /**
      * A.
+     * 
      * @return the CardLayout key for this view.
      */
     public String getViewName() {
-        return Constants.PROFILE_VIEW_NAME;
+        return ViewConstants.PROFILE_VIEW_NAME;
     }
 }

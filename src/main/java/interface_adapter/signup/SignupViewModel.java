@@ -1,6 +1,5 @@
 package interface_adapter.signup;
 
-import java.awt.Font;
 import java.awt.Insets;
 import java.awt.Toolkit;
 
@@ -30,9 +29,6 @@ public class SignupViewModel extends ViewModel<SignupState> {
 
     public static final int VIEW_WIDTH = (int) (Toolkit.getDefaultToolkit().getScreenSize().width * 0.5);
     public static final int VIEW_HEIGHT = (int) (Toolkit.getDefaultToolkit().getScreenSize().height * 0.5);
-
-    public static final Font LABEL_FONT = new Font("Inter", Font.PLAIN, 14);
-    public static final Font WELCOME_FONT = new Font("Inter", Font.BOLD, 24);
 
     public static final double RESIZE_WEIGHT = 0.5;
 

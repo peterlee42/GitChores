@@ -156,7 +156,6 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
                 .setFont(ViewConstants.LABEL_FONT)
                 .setBackground(ViewColors.ORANGE)
                 .setForeground(Color.WHITE)
-                .setBorder(LoginViewModel.DEFAULT_TEXT_FIELD_BORDER)
                 .build();
         return button;
     }

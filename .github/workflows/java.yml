@@ -7,8 +7,22 @@ on:
     branches: ['main']
 
 jobs:
+  java-version:
+    name: Java Version Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: maven
+          
   checkstyle:
-    name: Version Check, Checkstyle Validation, and Build
+    name: Checkstyle Validation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -31,8 +45,21 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: checkstyle-report
-          path: target/checkstyle/*
+          path: .github/checkstyle/*
           retention-days: 15
 
-      - name: Build with Maven
+  build:
+    name: Build with Maven
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: maven
+      - name: Build
         run: mvn -B package --file pom.xml

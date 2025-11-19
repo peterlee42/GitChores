@@ -1,5 +1,7 @@
 package use_case.signup;
 
+import data_access.congito.CognitoUserDataAccess;
+
 /**
  * The interactor for the Signup Use Case.
  */
@@ -12,7 +14,11 @@ public class SignupInteractor implements SignupInputBoundary {
 
     @Override
     public void execute(SignupInputData signupInputData) {
-        // TODO: Implement signup logic here
+        // check password are the same
+        // check if username taken
+        // check email valid
+        // create user in cognito
+        // signupPresenter.prepareSuccessView();
     }
 
     @Override

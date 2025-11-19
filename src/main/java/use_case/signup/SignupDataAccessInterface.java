@@ -16,5 +16,5 @@ public interface SignupDataAccessInterface {
      * @param email    The email of the new user.
      * @param password The password of the new user.
      */
-    void saveUserCredentials(String username, String email, String password);
+    void saveUser(String username, String email, String password);
 }

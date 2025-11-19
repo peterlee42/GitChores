@@ -14,6 +14,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupState;
 import interface_adapter.signup.SignupViewModel;
 
@@ -22,8 +23,9 @@ import interface_adapter.signup.SignupViewModel;
  */
 @SuppressWarnings("checkstyle:ClassDataAbstractionCouplingCheck")
 public class SignupView extends JSplitPane implements ActionListener, PropertyChangeListener {
-    private final String viewName = "sign up";
+    private final String viewName = "signup";
 
+    private SignupController signupController;
     private final SignupViewModel signupViewModel;
 
     private final JPanel leftPanel;
@@ -32,6 +34,19 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
     private final JTextField usernameField = new JTextField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
     private final JTextField passwordField = new JTextField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
     private final JTextField repeatPasswordField = new JTextField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
+
+    private final JLabel title;
+    private final JLabel welcomeMessage;
+    private final JLabel usernameLabel;
+    private final JLabel passwordLabel;
+    private final JLabel repeatPasswordLabel;
+    private final JLabel loginMessage;
+
+    private final JButton signupButton;
+    private final JButton cancelButton;
+    private final JButton loginButton;
+
+    private final ImageLabel logoImage;
 
     /**
      * Constructs a SignupView with the given SignupViewModel.
@@ -43,7 +58,26 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         this.signupViewModel = signupViewModel;
         // signupViewModel.addPropertyChangeListener(this);
 
+        // initialize components
+        welcomeMessage = new JLabel(SignupViewModel.WELCOME_MESSAGE);
+        title = new JLabel(SignupViewModel.TITLE_LABEL);
+        usernameLabel = new JLabel(SignupViewModel.USERNAME_LABEL);
+        passwordLabel = new JLabel(SignupViewModel.PASSWORD_LABEL);
+        repeatPasswordLabel = new JLabel(SignupViewModel.REPEAT_PASSWORD_LABEL);
+
+        signupButton = createButton(SignupViewModel.SIGNUP_BUTTON_LABEL);
+        cancelButton = createButton(SignupViewModel.CANCEL_BUTTON_LABEL);
+
         leftPanel = buildLeftPanel(new JPanel());
+
+        // initialize components
+        logoImage = new ImageLabel(SignupViewModel.LOGO_IMAGE_PATH,
+                SignupViewModel.LOGO_IMAGE_WIDTH,
+                SignupViewModel.LOGO_IMAGE_HEIGHT);
+
+        loginMessage = new JLabel(SignupViewModel.LOGIN_MESSAGE);
+        loginButton = createButton(SignupViewModel.LOGIN_BUTTON_LABEL);
+
         rightPanel = buildRightPanel(new JPanel());
 
         this.setLeftComponent(leftPanel);
@@ -59,38 +93,32 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
 
     @SuppressWarnings("checkstyle:ExecutableStatementCountCheck")
     private JPanel buildLeftPanel(JPanel panel) {
-        final JLabel welcomeMessage = new JLabel(SignupViewModel.WELCOME_MESSAGE);
         welcomeMessage.setFont(ViewConstants.WELCOME_FONT);
 
-        final JLabel title = new JLabel(SignupViewModel.TITLE_LABEL);
         title.setFont(ViewConstants.LABEL_FONT);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        final JLabel usernameLabel = new JLabel(SignupViewModel.USERNAME_LABEL);
         usernameLabel.setFont(ViewConstants.LABEL_FONT);
         usernameField.setFont(ViewConstants.LABEL_FONT);
+
         final LabelTextPanel usernameInfo = new LabelTextPanel(usernameLabel, usernameField);
         usernameInfo.setBackground(Color.WHITE);
 
-        final JLabel passwordLabel = new JLabel(SignupViewModel.PASSWORD_LABEL);
         passwordLabel.setFont(ViewConstants.LABEL_FONT);
         passwordField.setFont(ViewConstants.LABEL_FONT);
+
         final LabelTextPanel passwordInfo = new LabelTextPanel(passwordLabel, passwordField);
         passwordInfo.setBackground(Color.WHITE);
 
-        final JLabel repeatPasswordLabel = new JLabel(SignupViewModel.REPEAT_PASSWORD_LABEL);
         repeatPasswordLabel.setFont(ViewConstants.LABEL_FONT);
         repeatPasswordField.setFont(ViewConstants.LABEL_FONT);
+
         final LabelTextPanel repeatPasswordInfo = new LabelTextPanel(repeatPasswordLabel, repeatPasswordField);
         repeatPasswordInfo.setBackground(Color.WHITE);
 
         final JPanel buttons = new JPanel();
         buttons.setBackground(Color.WHITE);
-
-        final JButton signupButton = createButton(SignupViewModel.SIGNUP_BUTTON_LABEL);
         buttons.add(signupButton);
-
-        final JButton cancelButton = createButton(SignupViewModel.CANCEL_BUTTON_LABEL);
         buttons.add(cancelButton);
 
         panel.setLayout(new GridBagLayout());
@@ -127,13 +155,6 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
     }
 
     private JPanel buildRightPanel(JPanel panel) {
-        final ImageLabel logoImage = new ImageLabel(SignupViewModel.LOGO_IMAGE_PATH,
-                SignupViewModel.LOGO_IMAGE_WIDTH,
-                SignupViewModel.LOGO_IMAGE_HEIGHT);
-
-        final JLabel loginMessage = new JLabel(SignupViewModel.LOGIN_MESSAGE);
-        final JButton loginButton = createButton(SignupViewModel.LOGIN_BUTTON_LABEL);
-
         panel.setLayout(new GridBagLayout());
         panel.setBackground(ViewColors.SAND_BACKGROUND);
 
@@ -155,7 +176,12 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         loginButtonConstraint.anchor = GridBagConstraints.CENTER;
         panel.add(loginButton, loginButtonConstraint);
 
-        loginButton.addActionListener(this);
+        // Action Listeners
+        loginButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                signupController.switchToLoginView();
+            }
+        });
         return panel;
     }
 
@@ -265,5 +291,9 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
 
     public String getViewName() {
         return viewName;
+    }
+
+    public void setSignupController(SignupController signupController) {
+        this.signupController = signupController;
     }
 }

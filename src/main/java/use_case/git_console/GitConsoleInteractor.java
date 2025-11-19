@@ -43,10 +43,6 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
         if (command == null || command.isBlank()) {
             output = "Please enter a command.";
         }
-        else if ("?guide".equals(command)) {
-            // Extract outside of file
-            output = "THIS IS THE GUIDE";
-        }
         // Verify the prefix of the command
         else if (!(command.startsWith("git "))) {
             output = "Invalid command. Commands must start with 'git'. Type ?guide for help.";

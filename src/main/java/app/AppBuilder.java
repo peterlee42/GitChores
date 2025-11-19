@@ -4,9 +4,9 @@ import java.awt.*;
 
 import javax.swing.*;
 
-import data_access.CommitDataAccessObject;
-import data_access.DynamoDbClientFactory;
-import data_access.RoomMetadataDataAccessObject;
+import data_access.dynamo_db.CommitDataAccessObject;
+import data_access.dynamo_db.DynamoDbClientFactory;
+import data_access.dynamo_db.RoomMetadataDataAccessObject;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.commit.CommitController;
 import interface_adapter.commit.CommitPresenter;

@@ -6,14 +6,14 @@ import java.awt.Toolkit;
 import interface_adapter.ViewModel;
 
 public class SignupViewModel extends ViewModel<SignupState> {
-    public static final String WELCOME_MESSAGE = "Hello!";
+    public static final String WELCOME_MESSAGE = "Join GitChores!";
     public static final String TITLE_LABEL = "Please Sign Up to Continue";
     public static final String USERNAME_LABEL = "Username";
+    public static final String EMAIL_LABEL = "Email";
     public static final String PASSWORD_LABEL = "Password";
     public static final String REPEAT_PASSWORD_LABEL = "Confirm Password";
 
     public static final String SIGNUP_BUTTON_LABEL = "Sign Up";
-    public static final String CANCEL_BUTTON_LABEL = "Cancel";
 
     public static final String LOGIN_MESSAGE = "Already have an account?";
     public static final String LOGIN_BUTTON_LABEL = "Login";
@@ -30,7 +30,7 @@ public class SignupViewModel extends ViewModel<SignupState> {
     public static final double RESIZE_WEIGHT = 0.5;
 
     public static final Insets TEXT_FIELD_INSETS = new Insets(5, 5, 5, 5);
-    public static final Insets LOGIN_MESSAGE_INSETS = new Insets(0, 0, 5, 0);
+    public static final Insets LOGIN_MESSAGE_INSETS = new Insets(0, 0, 10, 0);
 
     /**
      * Constructor for a SignupViewModel.

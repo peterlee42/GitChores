@@ -14,16 +14,17 @@ public class Main {
     public static void main(String[] args) {
         final AppBuilder appBuilder = new AppBuilder();
         final JFrame application = appBuilder
-                .addViewManager()
+                .addSignupView()
                 .addLoginView()
-                // .addSignupView()
+                // .addMainView()
                 // .addJoinView()
-                .addDashboardView()
-                .addGitConsoleView()
-                .addGitConsoleUseCase()
+                // .addDashboardView()
+                // .addGitConsoleView()
                 // .addLoginView()
-                .addProfileView()
-                .addMainView()
+                // .addProfileView()
+                .addSignupUseCase()
+                .addLoginUseCase()
+                // .addGitConsoleUseCase()
                 .build();
 
         application.setMinimumSize(application.getMinimumSize());

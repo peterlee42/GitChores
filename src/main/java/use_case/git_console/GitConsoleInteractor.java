@@ -1,5 +1,9 @@
 package use_case.git_console;
 
+import java.util.Arrays;
+import java.util.List;
+
+import data_access.RoomMetadataDataAccessObject;
 import interface_adapter.commit.CommitController;
 import interface_adapter.commit.CommitPresenter;
 
@@ -8,19 +12,28 @@ import interface_adapter.commit.CommitPresenter;
  */
 public class GitConsoleInteractor implements GitConsoleInputBoundary {
 
+    private static final String TEMP_ROOM_NAME = "Different room";
     private final GitConsoleOutputBoundary presenter;
     private final CommitController commitController;
     private final CommitPresenter commitPresenter;
+    private final RoomMetadataDataAccessObject roomMetadataDataAccessObject;
 
     public GitConsoleInteractor(GitConsoleOutputBoundary presenter,
                                 CommitController commitController,
-                                CommitPresenter commitPresenter) {
+                                CommitPresenter commitPresenter,
+                                RoomMetadataDataAccessObject roomMetadataDataAccessObject) {
         this.presenter = presenter;
         this.commitPresenter = commitPresenter;
         this.commitController = commitController;
+        this.roomMetadataDataAccessObject = roomMetadataDataAccessObject;
 
     }
 
+    /**
+     * Executes the command given by the user, or provides an error message if it is invalid.
+     * @param command The string command inputted to the console text box.
+     */
+    @SuppressWarnings("checkstyle:MultipleStringLiterals")
     @Override
     public void executeCommand(String command) {
 
@@ -29,10 +42,6 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
         // Reject empty messages
         if (command == null || command.isBlank()) {
             output = "Please enter a command.";
-        }
-        else if ("?guide".equals(command)) {
-            // Extract outside of file
-            output = "THIS IS THE GUIDE";
         }
         // Verify the prefix of the command
         else if (!(command.startsWith("git "))) {
@@ -46,8 +55,8 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
                 final String subcommand = parts[1];
                 output = switch (subcommand) {
                     case "commit" -> handleCommit(command);
-                    case "push" -> handlePush();
-                    case "checkout" -> handleCheckout(command);
+                    case "request_review" -> handleReviewRequest(Arrays.copyOfRange(parts, 2, parts.length));
+                    case "approve_request" -> handleApproveRequest(Arrays.copyOfRange(parts, 2, parts.length));
                     default -> "Unknown subcommand: " + subcommand;
                 };
             }
@@ -57,10 +66,9 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
     }
 
     /**
-     * THESE COMMANDS ARE YET TO BE IMPLEMENTED PROPERLY.
-     *
-     * @param command command
-     * @return PLACEHOLDER
+     * Executes the commit command, or provides an error message if it is invalid.
+     * @param command The string command inputted to the console text box
+     * @return A message presented to the screen
      */
     private String handleCommit(String command) {
         final String output;
@@ -80,7 +88,7 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
             }
             else {
                 // THESE ARE TEMP VARIABLES
-                final String tempRoomId = "Different room";
+                final String tempRoomId = TEMP_ROOM_NAME;
                 final String tempUserId = "PraneethSqw42";
                 commitController.execute(tempRoomId, tempUserId, message);
                 output = commitPresenter.getViewMessage();
@@ -89,15 +97,45 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
         return output;
     }
 
-    // THIS WILL BE REPLACED WITH REQUEST_REVIEW
-    private String handlePush() {
-        // Temporary: Will replace with specific branch name
-        return "Pushed changes to <branch_name>";
+    /**
+     * Executes the review request command, or provides an error message if it is invalid.
+     * @param choreNameParts The name of the chore (could be separate list elements if spaces exist)
+     * @return A message presented to the screen
+     */
+    @SuppressWarnings("checkstyle:ReturnCount")
+    private String handleReviewRequest(String[] choreNameParts) {
+        final String choreName = String.join(" ", choreNameParts);
+        final String tempRoomId = TEMP_ROOM_NAME;
+
+        final boolean added = roomMetadataDataAccessObject.addPendingReview(tempRoomId, choreName);
+        if (!added) {
+            final List<String> current = roomMetadataDataAccessObject.getPendingReviews(tempRoomId);
+            if (current.contains(choreName)) {
+                return "Chore already pending review: " + choreName;
+            }
+            return "Error connecting to database. Contact support.";
+        }
+        return "Review requested for chore: " + choreName;
     }
 
-    // THIS WILL BE REPLACED WITH APPROVE
-    private String handleCheckout(String command) {
-        // Temporary: Will replace with specific branch name
-        return "Switched branch to " + command;
+    /**
+     * Executes the approve request command, or provides an error message if it is invalid.
+     * @param choreNameParts The name of the chore (could be separate list elements if spaces exist)
+     * @return A message presented to the screen
+     */
+    @SuppressWarnings("checkstyle:ReturnCount")
+    private String handleApproveRequest(String[] choreNameParts) {
+        final String choreName = String.join(" ", choreNameParts);
+        final String tempRoomId = TEMP_ROOM_NAME;
+
+        final boolean removed = roomMetadataDataAccessObject.removePendingReview(tempRoomId, choreName);
+        if (!removed) {
+            final List<String> current = roomMetadataDataAccessObject.getPendingReviews(tempRoomId);
+            if (!current.contains(choreName)) {
+                return "This chore does not exist or is not yet pending review: " + choreName;
+            }
+            return "Error connecting to database. Contact support.";
+        }
+        return "Approved request for chore: " + choreName;
     }
 }

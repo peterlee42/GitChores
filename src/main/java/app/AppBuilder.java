@@ -47,11 +47,8 @@ import view.ViewManager;
 /**
  * Class for building the app.
  */
-<<<<<<<HEAD @SuppressWarnings({"checkstyle:ClassDataAbstractionCoupling","checkstyle:SuppressWarnings","checkstyle:ClassFanOutComplexity"})=======
-
 @SuppressWarnings({ "checkstyle:ClassDataAbstractionCoupling", "ClassFanOutComplexityCheck",
         "checkstyle:SuppressWarnings" })
->>>>>>> login-signup-use-case
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -167,13 +164,13 @@ public class AppBuilder {
         final CommitInputBoundary commitInteractor = new CommitInteractor(commitDataAccess,
                 roomMetadataDataAccess, commitPresenter);
         final CommitController commitController = new CommitController(commitInteractor);
-        final RoomMetadataDataAccessObject roomMetadataDataAccessObject =
-                new RoomMetadataDataAccessObject(dynamoDbClient);
+        final RoomMetadataDataAccessObject roomMetadataDataAccessObject = new RoomMetadataDataAccessObject(
+                dynamoDbClient);
 
         // Git Console Use Case Layer
-        final GitConsoleInputBoundary gitConsoleInteractor =
-                new GitConsoleInteractor(gitConsoleOutputBoundary, commitController,
-                        commitPresenter, roomMetadataDataAccessObject);
+        final GitConsoleInputBoundary gitConsoleInteractor = new GitConsoleInteractor(gitConsoleOutputBoundary,
+                commitController,
+                commitPresenter, roomMetadataDataAccessObject);
 
         final GitConsoleController controller = new GitConsoleController(gitConsoleInteractor);
         gitConsoleView.setGitConsoleController(controller);

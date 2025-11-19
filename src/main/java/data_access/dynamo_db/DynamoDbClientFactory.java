@@ -1,4 +1,4 @@
-package data_access;
+package data_access.dynamo_db;
 
 import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -10,6 +10,7 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 public class DynamoDbClientFactory {
     /**
      * Initialize a client.
+     * 
      * @return the initialized DynamoDb Client.
      */
     public static DynamoDbClient createClient() {

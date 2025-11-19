@@ -33,8 +33,7 @@ public class RoomMetadataDataAccessObject implements RoomMetadataDataAccessInter
                 .updateExpression("SET latestCommitId = if_not_exists(latestCommitId, :zero) + :inc")
                 .expressionAttributeValues(Map.of(
                         ":zero", AttributeValue.fromN("0"),
-                        ":inc", AttributeValue.fromN("1")
-                ))
+                        ":inc", AttributeValue.fromN("1")))
                 .returnValues(ReturnValue.UPDATED_NEW)
                 .build();
 
@@ -43,11 +42,12 @@ public class RoomMetadataDataAccessObject implements RoomMetadataDataAccessInter
         return Integer.parseInt(response.attributes().get("latestCommitId").n());
     }
 
-    @SuppressWarnings({"checkstyle:ReturnCount", "checkstyle:LambdaParameterName"})
+    @SuppressWarnings("checkstyle:ReturnCount")
     @Override
     public List<String> getPendingReviews(String roomId) {
         final Map<String, AttributeValue> key = Map.of(ROOM_ID, AttributeValue.fromS(roomId));
-        final Map<String, AttributeValue> item = client.getItem(b -> b.tableName(TABLE_NAME).key(key)).item();
+        final Map<String, AttributeValue> item = client.getItem(request -> request.tableName(TABLE_NAME).key(key))
+                .item();
 
         if (item == null || !item.containsKey("pendingReviews")) {
             return List.of();
@@ -74,8 +74,7 @@ public class RoomMetadataDataAccessObject implements RoomMetadataDataAccessInter
 
             client.updateItem(update);
             return true;
-        }
-        catch (DynamoDbException | SdkClientException ex) {
+        } catch (DynamoDbException | SdkClientException ex) {
             System.err.println("AWS error during addPendingReview: " + ex.getMessage());
             return false;
         }
@@ -100,8 +99,7 @@ public class RoomMetadataDataAccessObject implements RoomMetadataDataAccessInter
 
             client.updateItem(update);
             return true;
-        }
-        catch (DynamoDbException | SdkClientException ex) {
+        } catch (DynamoDbException | SdkClientException ex) {
             System.err.println("AWS error during removePendingReview: " + ex.getMessage());
             return false;
         }

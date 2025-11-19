@@ -161,10 +161,13 @@ public class AppBuilder {
         final CommitInputBoundary commitInteractor = new CommitInteractor(commitDataAccess,
                 roomMetadataDataAccess, commitPresenter);
         final CommitController commitController = new CommitController(commitInteractor);
+        final RoomMetadataDataAccessObject roomMetadataDataAccessObject =
+                new RoomMetadataDataAccessObject(dynamoDbClient);
 
         // Git Console Use Case Layer
         final GitConsoleInputBoundary gitConsoleInteractor =
-                new GitConsoleInteractor(gitConsoleOutputBoundary, commitController, commitPresenter);
+                new GitConsoleInteractor(gitConsoleOutputBoundary, commitController,
+                        commitPresenter, roomMetadataDataAccessObject);
 
         final GitConsoleController controller = new GitConsoleController(gitConsoleInteractor);
         gitConsoleView.setGitConsoleController(controller);

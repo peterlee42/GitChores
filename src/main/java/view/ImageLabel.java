@@ -1,6 +1,5 @@
 package view;
 
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -8,6 +7,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+
+import org.imgscalr.Scalr;
 
 /**
  * A JLabel that displays an image from a given file path, scaled to the
@@ -25,7 +26,10 @@ class ImageLabel extends JLabel {
         } catch (IOException ioException) {
             throw new RuntimeException(ioException);
         }
-        final Image scaledImage = logoImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        final BufferedImage scaledImage = Scalr.resize(logoImage, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, width,
+                height, Scalr.OP_ANTIALIAS);
+        // final Image scaledImage = logoImage.getScaledInstance(width, height,
+        // Image.SCALE_SMOOTH);
         return new ImageIcon(scaledImage);
     }
 }

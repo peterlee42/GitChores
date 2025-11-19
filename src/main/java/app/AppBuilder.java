@@ -14,7 +14,11 @@ import interface_adapter.git_console.GitConsoleController;
 import interface_adapter.git_console.GitConsolePresenter;
 import interface_adapter.git_console.GitConsoleViewModel;
 import interface_adapter.join.JoinViewModel;
+import interface_adapter.login.LoginController;
+import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.signup.SignupController;
+import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import use_case.commit.CommitDataAccessInterface;
@@ -24,6 +28,12 @@ import use_case.commit.RoomMetadataDataAccessInterface;
 import use_case.git_console.GitConsoleInputBoundary;
 import use_case.git_console.GitConsoleInteractor;
 import use_case.git_console.GitConsoleOutputBoundary;
+import use_case.login.LoginInputBoundary;
+import use_case.login.LoginInteractor;
+import use_case.login.LoginOutputBoundary;
+import use_case.signup.SignupInputBoundary;
+import use_case.signup.SignupInteractor;
+import use_case.signup.SignupOutputBoundary;
 import view.DashboardView;
 import view.GitConsoleView;
 import view.JoinView;
@@ -37,28 +47,35 @@ import view.ViewManager;
 /**
  * Class for building the app.
  */
-@SuppressWarnings({"checkstyle:ClassDataAbstractionCoupling", "checkstyle:SuppressWarnings",
-        "checkstyle:ClassFanOutComplexity"})
+<<<<<<<HEAD @SuppressWarnings({"checkstyle:ClassDataAbstractionCoupling","checkstyle:SuppressWarnings","checkstyle:ClassFanOutComplexity"})=======
+
+@SuppressWarnings({ "checkstyle:ClassDataAbstractionCoupling", "ClassFanOutComplexityCheck",
+        "checkstyle:SuppressWarnings" })
+>>>>>>> login-signup-use-case
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
+    private final ViewManagerModel viewManagerModel = new ViewManagerModel();
+    private final ViewManager viewManager = new ViewManager(cardPanel, cardLayout);
 
     private MainView mainView;
     private JoinView joinView;
+    private JoinViewModel joinViewModel;
     private SignupView signupView;
+    private SignupViewModel signupViewModel;
     private LoginView loginView;
+    private LoginViewModel loginViewModel;
     private DashboardView dashboardView;
     private GitConsoleView gitConsoleView;
     private GitConsoleViewModel gitConsoleViewModel;
     private ProfileView profileView;
-
-    private ViewManagerModel viewManagerModel;
 
     /**
      * Constructor for AppBuilder.
      */
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
+        viewManagerModel.addPropertyChangeListener(viewManager);
     }
 
     /**
@@ -83,23 +100,12 @@ public class AppBuilder {
     }
 
     /**
-     * Wires the ViewManager engine so views can switch via a shared model.
-     *
-     * @return AppBuilder
-     */
-    public AppBuilder addViewManager() {
-        viewManagerModel = new ViewManagerModel();
-        new ViewManager(cardPanel, cardLayout, viewManagerModel);
-        return this;
-    }
-
-    /**
      * Adds join view.
      *
      * @return AppBuilder
      */
     public AppBuilder addJoinView() {
-        final JoinViewModel joinViewModel = new JoinViewModel();
+        joinViewModel = new JoinViewModel();
         joinView = new JoinView(joinViewModel);
         cardPanel.add(joinView, joinView.getViewName());
         return this;
@@ -111,7 +117,7 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addSignupView() {
-        final SignupViewModel signupViewModel = new SignupViewModel();
+        signupViewModel = new SignupViewModel();
         signupView = new SignupView(signupViewModel);
         cardPanel.add(signupView, signupView.getViewName());
 
@@ -124,7 +130,7 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addLoginView() {
-        final LoginViewModel loginViewModel = new LoginViewModel();
+        loginViewModel = new LoginViewModel();
         loginView = new LoginView(loginViewModel);
         cardPanel.add(loginView, loginView.getViewName());
 
@@ -199,6 +205,38 @@ public class AppBuilder {
         };
 
         profileView = new ProfileView(viewManagerModel, backTarget, navigator);
+        return this;
+    }
+
+    /**
+     * Adds Signup use case.
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addSignupUseCase() {
+        // To be implemented
+        final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel, signupViewModel,
+                loginViewModel);
+        final SignupInputBoundary signupInteractor = new SignupInteractor(signupOutputBoundary);
+
+        final SignupController controller = new SignupController(signupInteractor);
+        signupView.setSignupController(controller);
+        return this;
+    }
+
+    /**
+     * Adds Login use case.
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addLoginUseCase() {
+        // To be implemented
+        final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel, loginViewModel,
+                signupViewModel);
+        final LoginInputBoundary loginInteractor = new LoginInteractor(loginOutputBoundary);
+
+        final LoginController controller = new LoginController(loginInteractor);
+        loginView.setLoginController(controller);
         return this;
     }
 

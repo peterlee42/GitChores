@@ -14,6 +14,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
 
@@ -25,12 +26,25 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
     private final String viewName = "login";
 
     private final LoginViewModel loginViewModel;
+    private LoginController loginController;
 
     private final JPanel leftPanel;
     private final JPanel rightPanel;
 
     private final JTextField usernameField = new JTextField(LoginViewModel.MAX_TEXT_FIELD_LENGTH);
     private final JTextField passwordField = new JTextField(LoginViewModel.MAX_TEXT_FIELD_LENGTH);
+
+    private final JLabel welcomeMessage;
+    private final JLabel title;
+    private final JLabel usernameLabel;
+    private final JLabel passwordLabel;
+    private final JLabel signupMessage;
+
+    private final JButton loginButton;
+    private final JButton cancelButton;
+    private final JButton signupButton;
+
+    private final ImageLabel logoImage;
 
     /**
      * Constructs a LoginView with the given LoginViewModel.
@@ -42,8 +56,24 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
         this.loginViewModel = loginViewModel;
         // loginViewModel.addPropertyChangeListener(this);
 
-        leftPanel = buildLeftPanel(new JPanel());
+        // initialize components
+        welcomeMessage = new JLabel(LoginViewModel.WELCOME_MESSAGE);
+        title = new JLabel(LoginViewModel.TITLE_LABEL);
+        usernameLabel = new JLabel(LoginViewModel.USERNAME_LABEL);
+        passwordLabel = new JLabel(LoginViewModel.PASSWORD_LABEL);
+        loginButton = createButton(LoginViewModel.LOGIN_BUTTON_LABEL);
+        cancelButton = createButton(LoginViewModel.CANCEL_BUTTON_LABEL);
+        logoImage = new ImageLabel(LoginViewModel.LOGO_IMAGE_PATH,
+                LoginViewModel.LOGO_IMAGE_WIDTH,
+                LoginViewModel.LOGO_IMAGE_HEIGHT);
+        // build right panel
         rightPanel = buildRightPanel(new JPanel());
+
+        // initialize components
+        signupMessage = new JLabel(LoginViewModel.SIGNUP_MESSAGE);
+        signupButton = createButton(LoginViewModel.SIGNUP_BUTTON_LABEL);
+        // build left panel
+        leftPanel = buildLeftPanel(new JPanel());
 
         this.setLeftComponent(leftPanel);
         this.setRightComponent(rightPanel);
@@ -58,20 +88,17 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
 
     @SuppressWarnings("checkstyle:ExecutableStatementCountCheck")
     private JPanel buildRightPanel(JPanel panel) {
-        final JLabel welcomeMessage = new JLabel(LoginViewModel.WELCOME_MESSAGE);
         welcomeMessage.setFont(ViewConstants.WELCOME_FONT);
 
-        final JLabel title = new JLabel(LoginViewModel.TITLE_LABEL);
         title.setFont(ViewConstants.LABEL_FONT);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        final JLabel usernameLabel = new JLabel(LoginViewModel.USERNAME_LABEL);
         usernameLabel.setFont(ViewConstants.LABEL_FONT);
         usernameField.setFont(ViewConstants.LABEL_FONT);
+
         final LabelTextPanel usernameInfo = new LabelTextPanel(usernameLabel, usernameField);
         usernameInfo.setBackground(Color.WHITE);
 
-        final JLabel passwordLabel = new JLabel(LoginViewModel.PASSWORD_LABEL);
         passwordLabel.setFont(ViewConstants.LABEL_FONT);
         passwordField.setFont(ViewConstants.LABEL_FONT);
         final LabelTextPanel passwordInfo = new LabelTextPanel(passwordLabel, passwordField);
@@ -79,11 +106,7 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
 
         final JPanel buttons = new JPanel();
         buttons.setBackground(Color.WHITE);
-
-        final JButton loginButton = createButton(LoginViewModel.LOGIN_BUTTON_LABEL);
         buttons.add(loginButton);
-
-        final JButton cancelButton = createButton(LoginViewModel.CANCEL_BUTTON_LABEL);
         buttons.add(cancelButton);
 
         panel.setLayout(new GridBagLayout());
@@ -118,12 +141,6 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
     }
 
     private JPanel buildLeftPanel(JPanel panel) {
-        final ImageLabel logoImage = new ImageLabel(LoginViewModel.LOGO_IMAGE_PATH,
-                LoginViewModel.LOGO_IMAGE_WIDTH,
-                LoginViewModel.LOGO_IMAGE_HEIGHT);
-
-        final JLabel loginMessage = new JLabel(LoginViewModel.SIGNUP_MESSAGE);
-        final JButton loginButton = createButton(LoginViewModel.SIGNUP_BUTTON_LABEL);
 
         panel.setLayout(new GridBagLayout());
         panel.setBackground(ViewColors.SAND_BACKGROUND);
@@ -133,20 +150,25 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
         logoConstraints.gridx = 0;
         logoConstraints.gridy = 0;
         panel.add(logoImage, logoConstraints);
-        final GridBagConstraints loginMessageConstraints = new GridBagConstraints();
-        loginMessageConstraints.gridx = 0;
-        loginMessageConstraints.gridy = 1;
-        loginMessageConstraints.insets = LoginViewModel.LOGIN_MESSAGE_INSETS;
-        loginMessageConstraints.anchor = GridBagConstraints.CENTER;
-        panel.add(loginMessage, loginMessageConstraints);
+        final GridBagConstraints signupMessageConstraints = new GridBagConstraints();
+        signupMessageConstraints.gridx = 0;
+        signupMessageConstraints.gridy = 1;
+        signupMessageConstraints.insets = LoginViewModel.SIGNUP_MESSAGE_INSETS;
+        signupMessageConstraints.anchor = GridBagConstraints.CENTER;
+        panel.add(signupMessage, signupMessageConstraints);
 
-        final GridBagConstraints loginButtonConstraint = new GridBagConstraints();
-        loginButtonConstraint.gridx = 0;
-        loginButtonConstraint.gridy = 2;
-        loginButtonConstraint.anchor = GridBagConstraints.CENTER;
-        panel.add(loginButton, loginButtonConstraint);
+        final GridBagConstraints signupButtonConstraint = new GridBagConstraints();
+        signupButtonConstraint.gridx = 0;
+        signupButtonConstraint.gridy = 2;
+        signupButtonConstraint.anchor = GridBagConstraints.CENTER;
+        panel.add(signupButton, signupButtonConstraint);
 
-        loginButton.addActionListener(this);
+        signupButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loginController.switchToSignupView();
+            }
+        });
         return panel;
     }
 
@@ -156,7 +178,6 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
                 .setFont(ViewConstants.LABEL_FONT)
                 .setBackground(ViewColors.ORANGE)
                 .setForeground(Color.WHITE)
-                .setBorder(LoginViewModel.DEFAULT_TEXT_FIELD_BORDER)
                 .build();
         return button;
     }
@@ -167,7 +188,7 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
 
             private void documentListenerHelper() {
                 final LoginState currentState = loginViewModel.getState();
-                currentState.setCurrentUsername(usernameField.getText());
+                currentState.setUsername(usernameField.getText());
                 loginViewModel.setState(currentState);
             }
 
@@ -230,5 +251,9 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
 
     public String getViewName() {
         return viewName;
+    }
+
+    public void setLoginController(LoginController loginController) {
+        this.loginController = loginController;
     }
 }

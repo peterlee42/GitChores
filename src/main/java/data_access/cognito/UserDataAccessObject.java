@@ -9,7 +9,6 @@ import java.util.List;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIdentityProviderException;
@@ -17,6 +16,10 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpReque
 import use_case.signup.SignupDataAccessInterface;
 
 public class UserDataAccessObject implements SignupDataAccessInterface {
+    private static final CognitoIdentityProviderClient IDENTITY_PROVIDER_CLIENT = IdentityProviderClientFactory
+            .createClient();
+    private static final String HMAC_SHA256_ALGORITHM = "HmacSHA256";
+
     @Override
     public boolean usernameExists(String username) {
         // Implementation to check if username is taken in Cognito
@@ -25,7 +28,33 @@ public class UserDataAccessObject implements SignupDataAccessInterface {
 
     @Override
     public void createUser(String username, String email, String password) {
-        // Implementation to create a new user in Cognito
+        final AttributeType attributeType = AttributeType.builder()
+                .name("email")
+                .value(email)
+                .build();
+
+        userAttributes.add(attributeType);
+        try {
+
+            SignUpRequest signUpRequest = SignUpRequest.builder()
+                    .clientId(System.getenv("COGNITO_USER_POOL_CLIENT_ID"))
+                    .username(username)
+                    .password(password)
+                    .userAttributes(userAttributes)
+                    .secretHash(calculateSecretHash(
+                            System.getenv("COGNITO_USER_POOL_CLIENT_ID"),
+                            System.getenv("COGNITO_USER_POOL_CLIENT_SECRET"),
+                            username))
+                    .build();
+
+            IdentityProviderClientFactory.createClient().signUp(signUpRequest);
+        } catch (CognitoIdentityProviderException err) {
+            System.err.println(err.awsErrorDetails().errorMessage());
+            throw err;
+        } catch (NoSuchAlgorithmException | InvalidKeyException err) {
+            System.err.println("Error calculating secret hash: " + err.getMessage());
+            throw new RuntimeException(err);
+        }
     }
 
     /**

@@ -104,18 +104,67 @@ public class ActivityTilesPanel extends JPanel {
         return null;
     }
 
-    private String generateTooltipText(LocalDate date) {}
+    private String generateTooltipText(LocalDate date) {
+        final Integer count =  activityData.get(date);
+        final List<String> messages = commitMessages.get(date);
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, yyyy");
 
-    private void addCommit(LocalDate date, String message) {}
+        if (count == null || count == 0) {
+            return String.format("<html><b>%s</b><br/>No chores completed</html>",
+                    date.format(formatter));
+        }
 
-    public void setActivityData(Map<LocalDate, Integer> activityData) {}
+        final StringBuilder tooltip = new StringBuilder("<html>");
+        tooltip.append(String.format("<b>%s</b><br/>", date.format(formatter)));
+        tooltip.append(String.format("<b>%d chore%s completed</b><br/><br/>",
+                count, count == 1 ? "" : "s"));
+
+        if (messages != null && !messages.isEmpty()) {
+            for (int i = 0; i < messages.size(); i++) {
+                tooltip.append(String.format("• %s<br/>", messages.get(i)));
+            }
+        }
+
+        tooltip.append("</html>");
+        return tooltip.toString();
+    }
+
+    private void addCommit(LocalDate date, String message) {
+        activityData.put(date, activityData.getOrDefault(date, 0) + 1);
+        commitMessages.computeIfAbsent(date, k -> new ArrayList<>()).add(message);
+    }
+
+    public void setActivityData(Map<LocalDate, Integer> activityData) {
+        this.activityData.clear();
+
+        if (activityData != null) {
+            this.activityData.putAll(activityData);
+        }
+        repaint();
+    }
 
     public void setDetailedActivityData(Map<LocalDate, Integer> activityData,
-                                        Map<LocalDate, List<String>> commitMessages) {}
+                                        Map<LocalDate, List<String>> commitMessages) {
+        this.activityData.clear();
+        this.commitMessages.clear();
+        if (activityData != null) {
+            this.activityData.putAll(activityData);
+        }
+        if (commitMessages != null) {
+            this.commitMessages.putAll(commitMessages);
+        }
+        repaint();
+    }
 
-    public void setActivityForDate(LocalDate date, int count) {}
+    public void setActivityForDate(LocalDate date, int count) {
+        activityData.put(date, count);
+        repaint();
+    }
 
-    public void addCommitForDate(LocalDate date, String message) {}
+    public void addCommitForDate(LocalDate date, String message) {
+        addCommit(date, message);
+        repaint();
+    }
 
     @Override
     protected void paintComponent(Graphics graphics) {

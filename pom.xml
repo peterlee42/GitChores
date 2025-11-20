@@ -39,7 +39,7 @@
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
-            <artifactId>cognitoidentity</artifactId>
+            <artifactId>cognitoidentityprovider</artifactId>
         </dependency>
 
         <dependency>

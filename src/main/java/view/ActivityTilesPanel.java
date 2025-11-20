@@ -81,7 +81,28 @@ public class ActivityTilesPanel extends JPanel {
         }
     }
 
-    private LocalDate getDateAtPoint(Point point) {}
+    private LocalDate getDateAtPoint(Point point) {
+        final LocalDate today = LocalDate.now();
+        final LocalDate startDate = today.minusWeeks(WEEKS_TO_SHOW - 1);
+
+        for (int week = 0; week < WEEKS_TO_SHOW; week++) {
+            for (int day = 0; day < DAYS_PER_WEEK; day++) {
+                final LocalDate currentDate = startDate.plusWeeks(week).plusDays(day);
+
+                if (!currentDate.isAfter(today)) {
+                    final int xPosition = week * (TILE_SIZE + TILE_GAP) + TILE_GAP;
+                    final int yPosition = day * (TILE_SIZE + TILE_GAP) + TILE_GAP;
+
+                    if (point.x >= xPosition && point.x <= xPosition + TILE_SIZE
+                            && point.y >= yPosition && point.y <= yPosition + TILE_SIZE) {
+                        return currentDate;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
 
     private String generateTooltipText(LocalDate date) {}
 

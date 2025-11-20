@@ -4,6 +4,7 @@ import java.awt.*;
 
 import javax.swing.*;
 
+import data_access.cognito.UserDataAccessObject;
 import data_access.dynamo_db.CommitDataAccessObject;
 import data_access.dynamo_db.DynamoDbClientFactory;
 import data_access.dynamo_db.RoomMetadataDataAccessObject;
@@ -31,6 +32,7 @@ import use_case.git_console.GitConsoleOutputBoundary;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
+import use_case.signup.SignupDataAccessInterface;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
@@ -211,10 +213,10 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addSignupUseCase() {
-        // To be implemented
+        final SignupDataAccessInterface signupDataAccess = new UserDataAccessObject();
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel, signupViewModel,
-                loginViewModel);
-        final SignupInputBoundary signupInteractor = new SignupInteractor(signupOutputBoundary);
+                loginViewModel, gitConsoleViewModel);
+        final SignupInputBoundary signupInteractor = new SignupInteractor(signupOutputBoundary, signupDataAccess);
 
         final SignupController controller = new SignupController(signupInteractor);
         signupView.setSignupController(controller);

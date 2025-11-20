@@ -27,6 +27,8 @@ public class Main {
                 // .addGitConsoleUseCase()
                 .build();
 
+        application.setFocusable(true);
+        application.requestFocus();
         application.setMinimumSize(application.getMinimumSize());
 
         application.pack();

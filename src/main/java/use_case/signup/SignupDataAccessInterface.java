@@ -1,6 +1,8 @@
 package use_case.signup;
 
 public interface SignupDataAccessInterface {
+    String HMAC_SHA256_ALGORITHM = "HmacSHA256";
+
     /**
      * Checks if a username already exists in the data source.
      *
@@ -16,5 +18,6 @@ public interface SignupDataAccessInterface {
      * @param email    The email of the new user.
      * @param password The password of the new user.
      */
-    void saveUser(String username, String email, String password);
+    void createUser(String username, String email, String password);
+
 }

@@ -6,6 +6,8 @@ import java.util.UUID;
  * Utility class for generating unique domain entity IDs.
  */
 public final class DomainIdGenerator {
+    private static final int SHORT_UUID_LENGTH = 8;
+
     private DomainIdGenerator() {
 
     }
@@ -24,12 +26,13 @@ public final class DomainIdGenerator {
      *
      * @param prefix the prefix to add before the ID ("user", "room", "chore")
      * @return a unique identifier string with entity prefix
+     * @throws IllegalArgumentException if any of the parameters are null or empty
      */
     public static String generateIdWithPrefix(String prefix) {
         if (prefix == null || prefix.trim().isEmpty()) {
             throw new IllegalArgumentException("Prefix cannot be null or empty");
         }
-        return prefix + "-" + UUID.randomUUID().toString();
+        return prefix + "-" + UUID.randomUUID();
     }
 
     /**
@@ -39,6 +42,6 @@ public final class DomainIdGenerator {
      * @return a shortened 8-digit unique identifier string
      */
     public static String generateShortId() {
-        return UUID.randomUUID().toString().substring(0, 8);
+        return UUID.randomUUID().toString().substring(0, SHORT_UUID_LENGTH);
     }
 }

@@ -1,6 +1,6 @@
 package data_access.cognito;
 
-import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 
@@ -16,7 +16,7 @@ public class IdentityProviderClientFactory {
     public static CognitoIdentityProviderClient createClient() {
         return CognitoIdentityProviderClient.builder()
                 .region(Region.US_EAST_2)
-                .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
+                .credentialsProvider(ProfileCredentialsProvider.create("default"))
                 .build();
     }
 }

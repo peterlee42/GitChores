@@ -9,7 +9,6 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIden
  * The interactor for the Signup Use Case.
  */
 public class SignupInteractor implements SignupInputBoundary {
-    private final int minimumPasswordLength = 8;
     private final SignupOutputBoundary signupPresenter;
     private final SignupDataAccessInterface signupDataAccess;
 

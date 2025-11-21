@@ -13,8 +13,6 @@ import io.github.cdimascio.dotenv.Dotenv;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIdentityProviderException;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.ListUsersRequest;
-import software.amazon.awssdk.services.cognitoidentityprovider.model.ListUsersResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpRequest;
 import use_case.signup.SignupDataAccessInterface;
 
@@ -25,25 +23,6 @@ public class UserDataAccessObject implements SignupDataAccessInterface {
             .createClient();
 
     private final Dotenv dotenv = Dotenv.load();
-
-    @SuppressWarnings("checkstyle:ReturnCount")
-    @Override
-    public boolean usernameExists(String username) {
-        // Implementation to check if username is taken in Cognito
-        // try {
-        // final String usernameFilter = "username = \"" + username + "\"";
-        // final ListUsersRequest request = ListUsersRequest.builder()
-        // .userPoolId(dotenv.get("COGNITO_USER_POOL_CLIENT_ID"))
-        // .filter(usernameFilter)
-        // .build();
-        // final ListUsersResponse response = identityProviderClient.listUsers(request);
-        // return !response.users().isEmpty();
-
-        // } catch (CognitoIdentityProviderException ex) {
-        // return false;
-        // }
-        return false;
-    }
 
     @Override
     public void createUser(String username, String email, String password) {
@@ -72,7 +51,7 @@ public class UserDataAccessObject implements SignupDataAccessInterface {
             identityProviderClient.signUp(signUpRequest);
 
         } catch (CognitoIdentityProviderException ex) {
-            System.err.println(ex.awsErrorDetails().errorMessage());
+            throw ex;
         } catch (NoSuchAlgorithmException ex) {
             ex.printStackTrace();
         } catch (InvalidKeyException ex) {

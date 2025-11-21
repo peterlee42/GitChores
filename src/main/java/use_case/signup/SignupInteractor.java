@@ -3,6 +3,8 @@ package use_case.signup;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
+import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIdentityProviderException;
+
 /**
  * The interactor for the Signup Use Case.
  */
@@ -28,14 +30,14 @@ public class SignupInteractor implements SignupInputBoundary {
             signupPresenter.prepareFailView("All fields must be non-empty.");
         } else if (password.length() < minimumPasswordLength || !password.matches(".*[A-Z].*")
                 || !password.matches(".*[a-z].*") || !password.matches(".*[0-9].*")
-                || !password.matches(".*[!@#$%^&*()_+\\-=[\\]{};':\"\\\\|,.<>/?].*")) {
+                || !password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*")) {
             signupPresenter.prepareFailView(
-                    "Passwords must be \n"
+                    "Passwords must contain: \n"
                             + "At least 8 characters long, \n"
-                            + "Contain at least one uppercase letter \n"
-                            + "Contain at least one lowercase letter \n"
-                            + "Contain at least one digit \n"
-                            + "Contain at least one special character.");
+                            + "At least one uppercase letter \n"
+                            + "At least one lowercase letter \n"
+                            + "At least one digit \n"
+                            + "At least one special character.");
         }
         // check password are the same
         else if (!password.equals(confirmPassword)) {
@@ -44,14 +46,33 @@ public class SignupInteractor implements SignupInputBoundary {
         // check email valid
         else if (!isValidEmail(email)) {
             signupPresenter.prepareFailView("Invalid email address.");
-        }
-        // check if username taken
-        else if (signupDataAccess.usernameExists(username)) {
-            signupPresenter.prepareFailView("Username is already taken.");
         } else {
-            // create user in cognito
-            signupDataAccess.createUser(username, email, password);
-            signupPresenter.prepareSuccessView(new SignupOutputData(username));
+            try {
+                signupDataAccess.createUser(username, email, password);
+                signupPresenter.prepareSuccessView(new SignupOutputData(username));
+            } catch (CognitoIdentityProviderException ex) {
+                final String errorMessage;
+                switch (ex.awsErrorDetails().errorCode()) {
+                    case "UsernameExistsException":
+                        errorMessage = "User already exists.";
+                        break;
+                    case "InvalidPasswordException":
+                        errorMessage = "Password does not meet complexity requirements.";
+                        break;
+                    case "InvalidParameterException":
+                        errorMessage = "Passwords must contain: \n"
+                                + "At least 8 characters long, \n"
+                                + "At least one uppercase letter \n"
+                                + "At least one lowercase letter \n"
+                                + "At least one digit \n"
+                                + "At least one special character.";
+                        break;
+                    default:
+                        errorMessage = "An error occurred during signup.";
+                }
+                System.out.println("Error during signup: " + ex.awsErrorDetails().errorMessage());
+                signupPresenter.prepareFailView(errorMessage);
+            }
         }
     }
 

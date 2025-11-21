@@ -296,7 +296,7 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        JOptionPane.showMessageDialog(this, "Cancel not implemented yet.");
+        JOptionPane.showMessageDialog(this, "Not implemented yet.");
     }
 
     @Override

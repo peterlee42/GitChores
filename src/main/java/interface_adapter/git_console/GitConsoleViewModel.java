@@ -19,7 +19,7 @@ public class GitConsoleViewModel extends ViewModel<GitConsoleState> {
     private GitConsoleState state = new GitConsoleState();
 
     public GitConsoleViewModel() {
-        super("git console");
+        super("console");
         setState(new GitConsoleState());
     }
 

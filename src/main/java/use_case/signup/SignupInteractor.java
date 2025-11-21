@@ -7,6 +7,7 @@ import javax.mail.internet.InternetAddress;
  * The interactor for the Signup Use Case.
  */
 public class SignupInteractor implements SignupInputBoundary {
+    private final int minimumPasswordLength = 8;
     private final SignupOutputBoundary signupPresenter;
     private final SignupDataAccessInterface signupDataAccess;
 
@@ -16,32 +17,37 @@ public class SignupInteractor implements SignupInputBoundary {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:CyclomaticComplexityCheck")
     public void execute(SignupInputData signupInputData) {
         final String username = signupInputData.getUsername();
         final String email = signupInputData.getEmail();
         final String password = signupInputData.getPassword();
         final String confirmPassword = signupInputData.getConfirmPassword();
 
-        if ("".equals(username)) {
-            signupPresenter.prepareFailView("Username must be non-empty.");
-        } else if ("".equals(password)) {
-            signupPresenter.prepareFailView("Password must be non-empty.");
-        } else if ("".equals(email)) {
-            signupPresenter.prepareFailView("Email must be non-empty.");
-        } else if ("".equals(confirmPassword)) {
-            signupPresenter.prepareFailView("Repeat password must be non-empty.");
+        if ("".equals(username) || "".equals(password) || "".equals(email) || "".equals(confirmPassword)) {
+            signupPresenter.prepareFailView("All fields must be non-empty.");
+        } else if (password.length() < minimumPasswordLength || !password.matches(".*[A-Z].*")
+                || !password.matches(".*[a-z].*") || !password.matches(".*[0-9].*")
+                || !password.matches(".*[!@#$%^&*()_+\\-=[\\]{};':\"\\\\|,.<>/?].*")) {
+            signupPresenter.prepareFailView(
+                    "Passwords must be \n"
+                            + "At least 8 characters long, \n"
+                            + "Contain at least one uppercase letter \n"
+                            + "Contain at least one lowercase letter \n"
+                            + "Contain at least one digit \n"
+                            + "Contain at least one special character.");
         }
         // check password are the same
         else if (!password.equals(confirmPassword)) {
             signupPresenter.prepareFailView("Passwords do not match.");
         }
-        // check if username taken
-        else if (signupDataAccess.usernameExists(username)) {
-            signupPresenter.prepareFailView("Username is already taken.");
-        }
         // check email valid
         else if (!isValidEmail(email)) {
             signupPresenter.prepareFailView("Invalid email address.");
+        }
+        // check if username taken
+        else if (signupDataAccess.usernameExists(username)) {
+            signupPresenter.prepareFailView("Username is already taken.");
         } else {
             // create user in cognito
             signupDataAccess.createUser(username, email, password);

@@ -40,3 +40,6 @@ Thumbs.db
 
 # Checkstyle
 checkstyle.xml
+
+# aws
+.aws/*

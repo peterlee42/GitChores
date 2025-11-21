@@ -57,6 +57,8 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
     public SignupView(SignupViewModel signupViewModel) {
         super(JSplitPane.HORIZONTAL_SPLIT);
         this.signupViewModel = signupViewModel;
+        signupViewModel.addPropertyChangeListener(this);
+
         // signupViewModel.addPropertyChangeListener(this);
 
         // initialize components
@@ -157,7 +159,15 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         addPasswordListener();
         addRepeatPasswordListener();
 
-        signupButton.addActionListener(this);
+        signupButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                signupController.execute(
+                        usernameField.getText(),
+                        emailField.getText(),
+                        passwordField.getText(),
+                        repeatPasswordField.getText());
+            }
+        });
 
         return panel;
     }
@@ -292,8 +302,8 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         final SignupState state = (SignupState) evt.getNewValue();
-        if (state.getUsernameError() != null) {
-            JOptionPane.showMessageDialog(this, state.getUsernameError());
+        if (state.getSignupError() != null) {
+            JOptionPane.showMessageDialog(this, state.getSignupError());
         }
     }
 

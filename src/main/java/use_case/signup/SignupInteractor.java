@@ -28,16 +28,6 @@ public class SignupInteractor implements SignupInputBoundary {
 
         if ("".equals(username) || "".equals(password) || "".equals(email) || "".equals(confirmPassword)) {
             signupPresenter.prepareFailView("All fields must be non-empty.");
-        } else if (password.length() < minimumPasswordLength || !password.matches(".*[A-Z].*")
-                || !password.matches(".*[a-z].*") || !password.matches(".*[0-9].*")
-                || !password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*")) {
-            signupPresenter.prepareFailView(
-                    "Passwords must contain: \n"
-                            + "At least 8 characters long, \n"
-                            + "At least one uppercase letter \n"
-                            + "At least one lowercase letter \n"
-                            + "At least one digit \n"
-                            + "At least one special character.");
         }
         // check password are the same
         else if (!password.equals(confirmPassword)) {
@@ -57,8 +47,6 @@ public class SignupInteractor implements SignupInputBoundary {
                         errorMessage = "User already exists.";
                         break;
                     case "InvalidPasswordException":
-                        errorMessage = "Password does not meet complexity requirements.";
-                        break;
                     case "InvalidParameterException":
                         errorMessage = "Passwords must contain: \n"
                                 + "At least 8 characters long, \n"

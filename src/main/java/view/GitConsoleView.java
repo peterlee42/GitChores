@@ -20,7 +20,7 @@ import interface_adapter.git_console.GitConsoleViewModel;
 @SuppressWarnings("checkstyle:ClassDataAbstractionCouplingCheck")
 public class GitConsoleView extends JPanel implements ActionListener, PropertyChangeListener {
 
-    private final String viewName = "Git Console";
+    private final String viewName = "console";
     private final GitConsoleViewModel gitConsoleViewModel;
     private final JPanel previousCommands;
     private final JTextField commandInputField = new JTextField(20);

@@ -4,13 +4,23 @@ import java.awt.*;
 
 import javax.swing.*;
 
+import data_access.CommitDataAccessObject;
+import data_access.DynamoDbClientFactory;
+import data_access.RoomMetadataDataAccessObject;
 import interface_adapter.ViewManagerModel;
+import interface_adapter.commit.CommitController;
+import interface_adapter.commit.CommitPresenter;
 import interface_adapter.git_console.GitConsoleController;
 import interface_adapter.git_console.GitConsolePresenter;
 import interface_adapter.git_console.GitConsoleViewModel;
 import interface_adapter.join.JoinViewModel;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.signup.SignupViewModel;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import use_case.commit.CommitDataAccessInterface;
+import use_case.commit.CommitInputBoundary;
+import use_case.commit.CommitInteractor;
+import use_case.commit.RoomMetadataDataAccessInterface;
 import interface_adapter.chore_creation.ChoreCreationViewModel;
 import use_case.git_console.GitConsoleInputBoundary;
 import use_case.git_console.GitConsoleInteractor;
@@ -29,7 +39,8 @@ import view.ChoreCreationView;
 /**
  * Class for building the app.
  */
-@SuppressWarnings({ "checkstyle:ClassDataAbstractionCoupling", "checkstyle:SuppressWarnings" })
+@SuppressWarnings({"checkstyle:ClassDataAbstractionCoupling", "checkstyle:SuppressWarnings",
+        "checkstyle:ClassFanOutComplexity"})
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
@@ -140,9 +151,26 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addGitConsoleUseCase() {
-        // To be implemented
+
         final GitConsoleOutputBoundary gitConsoleOutputBoundary = new GitConsolePresenter(gitConsoleViewModel);
-        final GitConsoleInputBoundary gitConsoleInteractor = new GitConsoleInteractor(gitConsoleOutputBoundary);
+
+        // Commit Use case Layer (backend logic)
+        // MIGHT NEED TO MOVE THIS LINE EXTERNALLY TO INITIALIZE ONE CLIENT
+        final DynamoDbClient dynamoDbClient = DynamoDbClientFactory.createClient();
+
+        final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(dynamoDbClient);
+        final RoomMetadataDataAccessInterface roomMetadataDataAccess = new RoomMetadataDataAccessObject(dynamoDbClient);
+        final CommitPresenter commitPresenter = new CommitPresenter();
+        final CommitInputBoundary commitInteractor = new CommitInteractor(commitDataAccess,
+                roomMetadataDataAccess, commitPresenter);
+        final CommitController commitController = new CommitController(commitInteractor);
+        final RoomMetadataDataAccessObject roomMetadataDataAccessObject =
+                new RoomMetadataDataAccessObject(dynamoDbClient);
+
+        // Git Console Use Case Layer
+        final GitConsoleInputBoundary gitConsoleInteractor =
+                new GitConsoleInteractor(gitConsoleOutputBoundary, commitController,
+                        commitPresenter, roomMetadataDataAccessObject);
 
         final GitConsoleController controller = new GitConsoleController(gitConsoleInteractor);
         gitConsoleView.setGitConsoleController(controller);

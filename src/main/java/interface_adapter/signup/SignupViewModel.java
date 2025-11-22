@@ -3,9 +3,6 @@ package interface_adapter.signup;
 import java.awt.Insets;
 import java.awt.Toolkit;
 
-import javax.swing.BorderFactory;
-import javax.swing.border.Border;
-
 import interface_adapter.ViewModel;
 
 public class SignupViewModel extends ViewModel<SignupState> {
@@ -34,8 +31,6 @@ public class SignupViewModel extends ViewModel<SignupState> {
 
     public static final Insets TEXT_FIELD_INSETS = new Insets(5, 5, 5, 5);
     public static final Insets LOGIN_MESSAGE_INSETS = new Insets(0, 0, 5, 0);
-
-    public static final Border DEFAULT_TEXT_FIELD_BORDER = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 
     /**
      * Constructor for a SignupViewModel.

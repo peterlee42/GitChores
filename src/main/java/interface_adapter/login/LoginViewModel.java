@@ -29,7 +29,7 @@ public class LoginViewModel extends ViewModel<LoginState> {
     public static final double RESIZE_WEIGHT = 0.5;
 
     public static final Insets TEXT_FIELD_INSETS = new Insets(5, 5, 5, 5);
-    public static final Insets LOGIN_MESSAGE_INSETS = new Insets(0, 0, 5, 0);
+    public static final Insets SIGNUP_MESSAGE_INSETS = new Insets(0, 0, 5, 0);
 
     /**
      * Constructor for a SignupViewModel.

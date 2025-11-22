@@ -6,29 +6,23 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 
-import interface_adapter.ViewManagerModel;
-
 /**
  * Manages switching between different views in the application.
  */
 public class ViewManager implements PropertyChangeListener {
     private final CardLayout cardLayout;
     private final JPanel views;
-    private final ViewManagerModel viewManagerModel;
 
     /**
      * Constructs a ViewManager with the given views panel, card layout, and view
      * manager model.
      * 
-     * @param views            the panel containing all views
-     * @param cardLayout       the CardLayout managing the views
-     * @param viewManagerModel the ViewManagerModel
+     * @param views      the panel containing all views
+     * @param cardLayout the CardLayout managing the views
      */
-    public ViewManager(JPanel views, CardLayout cardLayout, ViewManagerModel viewManagerModel) {
+    public ViewManager(JPanel views, CardLayout cardLayout) {
         this.views = views;
         this.cardLayout = cardLayout;
-        this.viewManagerModel = viewManagerModel;
-        this.viewManagerModel.addPropertyChangeListener(this);
     }
 
     @Override

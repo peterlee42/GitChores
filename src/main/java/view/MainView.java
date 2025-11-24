@@ -28,6 +28,14 @@ public class MainView extends JPanel implements ActionListener {
         setLayout(new BorderLayout());
         final JToolBar navBar = new JToolBar();
         navBar.setFloatable(false);
+        navBar.setRollover(true);
+        navBar.setBackground(ViewColors.ORANGE);
+        navBar.setOpaque(true);
+
+        navBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
+
+        final Dimension navSize = navBar.getPreferredSize();
+        navBar.setPreferredSize(new Dimension(navSize.width, 48));
 
         navBar.add(dashboardButton);
         navBar.add(consoleButton);

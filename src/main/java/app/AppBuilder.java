@@ -247,6 +247,17 @@ public class AppBuilder {
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         application.add(cardPanel);
 
+        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        final int defaultWidth = (int) (screenSize.getWidth() * 0.7);
+        final int defaultHeight = (int) (screenSize.getHeight() * 0.7);
+        final int minWidth = (int) (screenSize.getWidth() * 0.5);
+        final int minHeight = (int) (screenSize.getHeight() * 0.5);
+
+        cardPanel.setPreferredSize(new Dimension(defaultWidth, defaultHeight));
+        application.setMinimumSize(new Dimension(minWidth, minHeight));
+
+        application.pack();
+
         // Start on a sensible screen if the ViewManager is wired.
         if (viewManagerModel != null) {
             if (mainView != null) {

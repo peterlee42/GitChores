@@ -16,7 +16,7 @@ public class IdentityProviderClientFactory {
     public static CognitoIdentityProviderClient createClient() {
         return CognitoIdentityProviderClient.builder()
                 .region(Region.US_EAST_2)
-                .credentialsProvider(ProfileCredentialsProvider.create("default"))
+                .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
                 .build();
     }
 }

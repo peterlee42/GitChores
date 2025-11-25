@@ -19,6 +19,7 @@ import interface_adapter.git_console.GitConsoleViewModel;
  */
 @SuppressWarnings("checkstyle:ClassDataAbstractionCouplingCheck")
 public class GitConsoleView extends JPanel implements ActionListener, PropertyChangeListener {
+    private static final int TITLE_FONT_SIZE = 16;
 
     private final String viewName = "console";
     private final GitConsoleViewModel gitConsoleViewModel;
@@ -27,17 +28,17 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
     private final JButton submitCommand;
     private final JLabel outOperator;
     private GitConsoleController gitConsoleController;
+    private final int fontSize = 14;
+    private Font monospacedFont = new Font(Font.MONOSPACED, Font.PLAIN, fontSize);
 
     public GitConsoleView(GitConsoleViewModel gitConsoleViewModel) {
         this.gitConsoleViewModel = gitConsoleViewModel;
         gitConsoleViewModel.addPropertyChangeListener(this);
 
         // Title
-        final JLabel title = new JLabel(GitConsoleViewModel.TITLE_LABEL);
-        final Font largeFont = new Font(title.getFont().getName(), title.getFont().getSize(),
-                GitConsoleViewModel.INPUT_WIDTH);
-        title.setFont(largeFont);
-        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        final JLabel title = new JLabel("Git Console");
+        final Font largeFont = title.getFont();
+        title.setFont(largeFont.deriveFont(Font.BOLD, TITLE_FONT_SIZE));
 
         // Creating previous text area
         previousCommands = new JPanel();
@@ -50,14 +51,9 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         // Command entry box
-        final JPanel commandPanel = new JPanel();
-        commandPanel.setLayout(new BoxLayout(commandPanel, BoxLayout.X_AXIS));
         outOperator = new JLabel(GitConsoleViewModel.OPERATOR_LABEL);
         submitCommand = new JButton(GitConsoleViewModel.PROMPT_LABEL);
-        commandInputField.setMaximumSize(new Dimension(Integer.MAX_VALUE, commandInputField.getPreferredSize().height));
-        commandPanel.add(outOperator);
-        commandPanel.add(commandInputField);
-        commandPanel.add(submitCommand);
+        final JPanel commandPanel = createCommandPanel();
 
         // May have to expand on this based on the ca-lab
         submitCommand.addActionListener(this);
@@ -68,6 +64,24 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
         this.add(title);
         this.add(scrollPane);
         this.add(commandPanel);
+    }
+
+    private JPanel createCommandPanel() {
+        final JPanel commandPanel = new JPanel();
+        commandPanel.setLayout(new BoxLayout(commandPanel, BoxLayout.X_AXIS));
+        outOperator.setFont(monospacedFont);
+        submitCommand.setBackground(ViewColors.ORANGE);
+        submitCommand.setForeground(Color.WHITE);
+        submitCommand.setFocusPainted(false);
+        submitCommand.setBorderPainted(false);
+        submitCommand.setOpaque(true);
+        commandInputField.setMaximumSize(new Dimension(Integer.MAX_VALUE, commandInputField.getPreferredSize().height));
+        commandInputField.setFont(monospacedFont);
+        commandPanel.add(outOperator);
+        commandPanel.add(commandInputField);
+        commandPanel.add(submitCommand);
+
+        return commandPanel;
     }
 
     @SuppressWarnings({ "checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings" })
@@ -117,7 +131,9 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
             if (currentState.getLastResponse() != null && currentState.getLastCommand() != null) {
                 final JLabel commandLabel = new JLabel(GitConsoleViewModel.OPERATOR_LABEL
                         + " " + currentState.getLastCommand());
+                commandLabel.setFont(monospacedFont.deriveFont(Font.BOLD));
                 final JLabel responseLabel = new JLabel(currentState.getLastResponse());
+                responseLabel.setFont(monospacedFont.deriveFont(Font.BOLD));
 
                 previousCommands.add(commandLabel);
                 previousCommands.add(responseLabel);

@@ -8,6 +8,8 @@ import javax.swing.*;
 import javax.swing.border.Border;
 
 public class MainView extends JPanel implements ActionListener {
+    private static final int NAV_BUTTON_BORDER = 8;
+
     private final String viewName = "main";
 
     private final CardLayout contentLayout = new CardLayout();
@@ -79,16 +81,14 @@ public class MainView extends JPanel implements ActionListener {
     }
 
     private void styleNavButton(JButton button) {
-        final int navButtonBorder = 8;
-
         button.setContentAreaFilled(false);
         button.setBorderPainted(false);
         button.setFocusPainted(false);
         button.setOpaque(false);
         button.setForeground(Color.WHITE);
         button.setBorderPainted(true);
-        button.setBorder(BorderFactory.createEmptyBorder(navButtonBorder, 2 * navButtonBorder, navButtonBorder,
-                2 * navButtonBorder));
+        button.setBorder(BorderFactory.createEmptyBorder(NAV_BUTTON_BORDER, 2 * NAV_BUTTON_BORDER, NAV_BUTTON_BORDER,
+                2 * NAV_BUTTON_BORDER));
     }
 
     private void setActiveTab(JButton button) {

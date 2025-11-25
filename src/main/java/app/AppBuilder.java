@@ -4,9 +4,10 @@ import java.awt.*;
 
 import javax.swing.*;
 
-import data_access.CommitDataAccessObject;
-import data_access.DynamoDbClientFactory;
-import data_access.RoomMetadataDataAccessObject;
+import data_access.cognito.UserDataAccessObject;
+import data_access.dynamo_db.CommitDataAccessObject;
+import data_access.dynamo_db.DynamoDbClientFactory;
+import data_access.dynamo_db.RoomMetadataDataAccessObject;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.commit.CommitController;
 import interface_adapter.commit.CommitPresenter;
@@ -32,6 +33,7 @@ import use_case.git_console.GitConsoleOutputBoundary;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
+import use_case.signup.SignupDataAccessInterface;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
@@ -149,6 +151,38 @@ public class AppBuilder {
     }
 
     /**
+     * Adds Git Console use case.
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addGitConsoleUseCase() {
+
+        final GitConsoleOutputBoundary gitConsoleOutputBoundary = new GitConsolePresenter(gitConsoleViewModel);
+
+        // Commit Use case Layer (backend logic)
+        // MIGHT NEED TO MOVE THIS LINE EXTERNALLY TO INITIALIZE ONE CLIENT
+        final DynamoDbClient dynamoDbClient = DynamoDbClientFactory.createClient();
+
+        final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(dynamoDbClient);
+        final RoomMetadataDataAccessInterface roomMetadataDataAccess = new RoomMetadataDataAccessObject(dynamoDbClient);
+        final CommitPresenter commitPresenter = new CommitPresenter();
+        final CommitInputBoundary commitInteractor = new CommitInteractor(commitDataAccess,
+                roomMetadataDataAccess, commitPresenter);
+        final CommitController commitController = new CommitController(commitInteractor);
+        final RoomMetadataDataAccessObject roomMetadataDataAccessObject = new RoomMetadataDataAccessObject(
+                dynamoDbClient);
+
+        // Git Console Use Case Layer
+        final GitConsoleInputBoundary gitConsoleInteractor = new GitConsoleInteractor(gitConsoleOutputBoundary,
+                commitController,
+                commitPresenter, roomMetadataDataAccessObject);
+
+        final GitConsoleController controller = new GitConsoleController(gitConsoleInteractor);
+        gitConsoleView.setGitConsoleController(controller);
+        return this;
+    }
+
+    /**
      * Adds Profile view (your screen). Does not modify teammates' views.
      *
      * @return AppBuilder
@@ -182,10 +216,10 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addSignupUseCase() {
-        // To be implemented
+        final SignupDataAccessInterface signupDataAccess = new UserDataAccessObject();
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel, signupViewModel,
-                loginViewModel);
-        final SignupInputBoundary signupInteractor = new SignupInteractor(signupOutputBoundary);
+                loginViewModel, gitConsoleViewModel);
+        final SignupInputBoundary signupInteractor = new SignupInteractor(signupOutputBoundary, signupDataAccess);
 
         final SignupController controller = new SignupController(signupInteractor);
         signupView.setSignupController(controller);

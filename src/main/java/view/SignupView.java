@@ -162,10 +162,10 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         signupButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 signupController.execute(
-                        usernameField.getText(),
-                        emailField.getText(),
-                        passwordField.getText(),
-                        repeatPasswordField.getText());
+                        usernameField.getText().strip(),
+                        emailField.getText().strip(),
+                        passwordField.getText().strip(),
+                        repeatPasswordField.getText().strip());
             }
         });
 

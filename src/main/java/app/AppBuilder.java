@@ -146,7 +146,7 @@ public class AppBuilder {
         gitConsoleView = new GitConsoleView(gitConsoleViewModel);
         return this;
     }
-
+  
     /**
      * Adds Git Console use case.
      *

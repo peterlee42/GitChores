@@ -3,7 +3,7 @@ package use_case.git_console;
 import java.util.Arrays;
 import java.util.List;
 
-import data_access.RoomMetadataDataAccessObject;
+import data_access.dynamo_db.RoomMetadataDataAccessObject;
 import interface_adapter.commit.CommitController;
 import interface_adapter.commit.CommitPresenter;
 
@@ -19,9 +19,9 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
     private final RoomMetadataDataAccessObject roomMetadataDataAccessObject;
 
     public GitConsoleInteractor(GitConsoleOutputBoundary presenter,
-                                CommitController commitController,
-                                CommitPresenter commitPresenter,
-                                RoomMetadataDataAccessObject roomMetadataDataAccessObject) {
+            CommitController commitController,
+            CommitPresenter commitPresenter,
+            RoomMetadataDataAccessObject roomMetadataDataAccessObject) {
         this.presenter = presenter;
         this.commitPresenter = commitPresenter;
         this.commitController = commitController;
@@ -30,7 +30,9 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
     }
 
     /**
-     * Executes the command given by the user, or provides an error message if it is invalid.
+     * Executes the command given by the user, or provides an error message if it is
+     * invalid.
+     * 
      * @param command The string command inputted to the console text box.
      */
     @SuppressWarnings("checkstyle:MultipleStringLiterals")
@@ -67,6 +69,7 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
 
     /**
      * Executes the commit command, or provides an error message if it is invalid.
+     * 
      * @param command The string command inputted to the console text box
      * @return A message presented to the screen
      */
@@ -85,8 +88,7 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
             }
             if (message.isEmpty()) {
                 output = "Error: empty commit message";
-            }
-            else {
+            } else {
                 // THESE ARE TEMP VARIABLES
                 final String tempRoomId = TEMP_ROOM_NAME;
                 final String tempUserId = "PraneethSqw42";
@@ -98,8 +100,11 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
     }
 
     /**
-     * Executes the review request command, or provides an error message if it is invalid.
-     * @param choreNameParts The name of the chore (could be separate list elements if spaces exist)
+     * Executes the review request command, or provides an error message if it is
+     * invalid.
+     * 
+     * @param choreNameParts The name of the chore (could be separate list elements
+     *                       if spaces exist)
      * @return A message presented to the screen
      */
     @SuppressWarnings("checkstyle:ReturnCount")
@@ -119,8 +124,11 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
     }
 
     /**
-     * Executes the approve request command, or provides an error message if it is invalid.
-     * @param choreNameParts The name of the chore (could be separate list elements if spaces exist)
+     * Executes the approve request command, or provides an error message if it is
+     * invalid.
+     * 
+     * @param choreNameParts The name of the chore (could be separate list elements
+     *                       if spaces exist)
      * @return A message presented to the screen
      */
     @SuppressWarnings("checkstyle:ReturnCount")

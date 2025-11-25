@@ -19,6 +19,7 @@ import interface_adapter.git_console.GitConsoleViewModel;
  */
 @SuppressWarnings("checkstyle:ClassDataAbstractionCouplingCheck")
 public class GitConsoleView extends JPanel implements ActionListener, PropertyChangeListener {
+    private static final int TITLE_FONT_SIZE = 16;
 
     private final String viewName = "console";
     private final GitConsoleViewModel gitConsoleViewModel;
@@ -37,8 +38,7 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
         // Title
         final JLabel title = new JLabel("Git Console");
         final Font largeFont = title.getFont();
-        final int titleFontSize = 16;
-        title.setFont(largeFont.deriveFont(Font.BOLD, titleFontSize));
+        title.setFont(largeFont.deriveFont(Font.BOLD, TITLE_FONT_SIZE));
 
         // Creating previous text area
         previousCommands = new JPanel();

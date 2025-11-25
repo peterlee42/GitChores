@@ -14,13 +14,14 @@ public class Main {
     public static void main(String[] args) {
         final AppBuilder appBuilder = new AppBuilder();
         final JFrame application = appBuilder
+                .addDashboardView()
+                .addGitConsoleView()
+                .addProfileView()
+                .addMainView()
                 .addLoginView()
                 .addSignupView()
-                // .addMainView()
                 // .addJoinView()
                 // .addDashboardView()
-                .addGitConsoleView()
-                // .addProfileView()
                 .addSignupUseCase()
                 .addLoginUseCase()
                 .addGitConsoleUseCase()

@@ -9,6 +9,7 @@ import javax.swing.border.Border;
 
 public class MainView extends JPanel implements ActionListener {
     private static final int NAV_BUTTON_BORDER = 8;
+    private static final int NAV_BAR_HEIGHT = 32;
 
     private final String viewName = "main";
 
@@ -66,7 +67,6 @@ public class MainView extends JPanel implements ActionListener {
 
     private JToolBar createNavBar() {
         final JToolBar navBar = new JToolBar();
-        final int navBarHeight = 32;
 
         navBar.setFloatable(false);
         navBar.setRollover(true);
@@ -75,7 +75,7 @@ public class MainView extends JPanel implements ActionListener {
         navBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
 
         final Dimension navSize = navBar.getPreferredSize();
-        navBar.setPreferredSize(new Dimension(navSize.width, navBarHeight));
+        navBar.setPreferredSize(new Dimension(navSize.width, NAV_BAR_HEIGHT));
 
         return navBar;
     }
@@ -87,15 +87,16 @@ public class MainView extends JPanel implements ActionListener {
         button.setOpaque(false);
         button.setForeground(Color.WHITE);
         button.setBorderPainted(true);
-        button.setBorder(BorderFactory.createEmptyBorder(NAV_BUTTON_BORDER, 2 * NAV_BUTTON_BORDER, NAV_BUTTON_BORDER,
-                2 * NAV_BUTTON_BORDER));
+        button.setBorder(BorderFactory.createEmptyBorder(NAV_BUTTON_BORDER, 2 * NAV_BUTTON_BORDER,
+                NAV_BUTTON_BORDER, 2 * NAV_BUTTON_BORDER));
     }
 
     private void setActiveTab(JButton button) {
         activeButton = button;
 
         final JButton[] buttons = {dashboardButton, consoleButton, profileButton};
-        final Border padding = BorderFactory.createEmptyBorder(8, 16, 8, 16);
+        final Border padding = BorderFactory.createEmptyBorder(NAV_BUTTON_BORDER, 2 * NAV_BUTTON_BORDER,
+                NAV_BUTTON_BORDER, 2 * NAV_BUTTON_BORDER);
 
         for (JButton b : buttons) {
             final boolean isActive = b == activeButton;

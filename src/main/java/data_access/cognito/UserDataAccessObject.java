@@ -61,9 +61,7 @@ public class UserDataAccessObject implements SignupDataAccessInterface, LoginDat
 
             final InitiateAuthResponse authResponse = identityProviderClient.initiateAuth(authRequest);
             final AuthenticationResultType resultType = authResponse.authenticationResult();
-
-            System.out.println("Login successful for user: " + username + ". Token: " + resultType.idToken());
-
+            
             return resultType;
         } catch (CognitoIdentityProviderException ex) {
             System.err.println(ex.awsErrorDetails().errorMessage());

@@ -41,7 +41,6 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
     private final JLabel signupMessage;
 
     private final JButton loginButton;
-    private final JButton cancelButton;
     private final JButton signupButton;
 
     private final ImageLabel logoImage;
@@ -62,7 +61,6 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
         usernameLabel = new JLabel(LoginViewModel.USERNAME_LABEL);
         passwordLabel = new JLabel(LoginViewModel.PASSWORD_LABEL);
         loginButton = createButton(LoginViewModel.LOGIN_BUTTON_LABEL);
-        cancelButton = createButton(LoginViewModel.CANCEL_BUTTON_LABEL);
         logoImage = new ImageLabel(LoginViewModel.LOGO_IMAGE_PATH,
                 LoginViewModel.LOGO_IMAGE_WIDTH,
                 LoginViewModel.LOGO_IMAGE_HEIGHT);
@@ -104,10 +102,12 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
         final LabelTextPanel passwordInfo = new LabelTextPanel(passwordLabel, passwordField);
         passwordInfo.setBackground(Color.WHITE);
 
-        final JPanel buttons = new JPanel();
+        final JPanel buttons = new JPanel(new GridBagLayout());
+        final GridBagConstraints btnConstraints = new GridBagConstraints();
+        btnConstraints.fill = GridBagConstraints.HORIZONTAL;
+        btnConstraints.weightx = 1.0;
         buttons.setBackground(Color.WHITE);
-        buttons.add(loginButton);
-        buttons.add(cancelButton);
+        buttons.add(loginButton, btnConstraints);
 
         panel.setLayout(new GridBagLayout());
         panel.setBackground(Color.WHITE);
@@ -135,7 +135,6 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
         addPasswordListener();
 
         loginButton.addActionListener(this);
-        cancelButton.addActionListener(this);
 
         return panel;
     }

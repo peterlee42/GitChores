@@ -1,4 +1,4 @@
-package data_access;
+package data_access.dynamo_db;
 
 import java.util.List;
 import java.util.Map;

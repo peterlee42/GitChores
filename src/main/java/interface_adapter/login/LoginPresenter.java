@@ -24,6 +24,7 @@ public class LoginPresenter implements LoginOutputBoundary {
         loginState.setUsername(response.getUsername());
         loginViewModel.firePropertyChange();
 
+        // TODO: Make it switch to main view or join view. The code below is temporary.
         viewManagerModel.setState(loginViewModel.getViewName());
         viewManagerModel.firePropertyChange();
     }

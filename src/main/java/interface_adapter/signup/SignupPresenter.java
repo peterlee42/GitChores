@@ -1,7 +1,6 @@
 package interface_adapter.signup;
 
 import interface_adapter.ViewManagerModel;
-import interface_adapter.git_console.GitConsoleViewModel;
 import interface_adapter.login.LoginViewModel;
 import use_case.signup.SignupOutputBoundary;
 import use_case.signup.SignupOutputData;
@@ -30,9 +29,7 @@ public class SignupPresenter implements SignupOutputBoundary {
         signupState.setUsername(response.getUsername());
         signupViewModel.firePropertyChange();
 
-        // TODO: Make it switch to main view or join view. This is temporary to get it
-        // started.
-        viewManagerModel.setState(gitConsoleViewModel.getViewName());
+        viewManagerModel.setState(signupViewModel.getViewName());
         viewManagerModel.firePropertyChange();
     }
 

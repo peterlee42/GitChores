@@ -146,66 +146,6 @@ public class AppBuilder {
         gitConsoleView = new GitConsoleView(gitConsoleViewModel);
         return this;
     }
-
-    /**
-     * Adds Profile view (your screen). Does not modify teammates' views.
-     *
-     * @return AppBuilder
-     */
-    public AppBuilder addProfileView() {
-        // Prefer going back to Signup; else Join; else default name
-        final String backTarget;
-        if (signupView != null) {
-            backTarget = signupView.getViewName();
-        } else if (joinView != null) {
-            backTarget = joinView.getViewName();
-        } else {
-            backTarget = ViewConstants.JOIN_VIEW_NAME;
-        }
-
-        // Navigation callback: always show the card; also drive CA engine if wired
-        final java.util.function.Consumer<String> navigator = (String name) -> {
-            if (viewManagerModel != null) {
-                viewManagerModel.setActiveViewName(name);
-            }
-            cardLayout.show(cardPanel, name);
-        };
-
-        profileView = new ProfileView(viewManagerModel, backTarget, navigator);
-        return this;
-    }
-
-    /**
-     * Adds Signup use case.
-     *
-     * @return AppBuilder
-     */
-    public AppBuilder addSignupUseCase() {
-        // To be implemented
-        final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel, signupViewModel,
-                loginViewModel);
-        final SignupInputBoundary signupInteractor = new SignupInteractor(signupOutputBoundary);
-
-        final SignupController controller = new SignupController(signupInteractor);
-        signupView.setSignupController(controller);
-        return this;
-    }
-
-    /**
-     * Adds Login use case.
-     *
-     * @return AppBuilder
-     */
-    public AppBuilder addLoginUseCase() {
-        // To be implemented
-        final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel, loginViewModel,
-                signupViewModel);
-        final LoginInputBoundary loginInteractor = new LoginInteractor(loginOutputBoundary);
-
-        final LoginController controller = new LoginController(loginInteractor);
-        loginView.setLoginController(controller);
-        return this;
-    }
   
     /**
      * Adds Git Console use case.

@@ -29,6 +29,7 @@ import use_case.commit.RoomMetadataDataAccessInterface;
 import use_case.git_console.GitConsoleInputBoundary;
 import use_case.git_console.GitConsoleInteractor;
 import use_case.git_console.GitConsoleOutputBoundary;
+import use_case.login.LoginDataAccessInterface;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -215,7 +216,7 @@ public class AppBuilder {
     public AppBuilder addSignupUseCase() {
         final SignupDataAccessInterface signupDataAccess = new UserDataAccessObject();
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel, signupViewModel,
-                loginViewModel, gitConsoleViewModel);
+                loginViewModel);
         final SignupInputBoundary signupInteractor = new SignupInteractor(signupOutputBoundary, signupDataAccess);
 
         final SignupController controller = new SignupController(signupInteractor);
@@ -230,9 +231,10 @@ public class AppBuilder {
      */
     public AppBuilder addLoginUseCase() {
         // To be implemented
+        final LoginDataAccessInterface loginDataAccess = new UserDataAccessObject();
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel, loginViewModel,
                 signupViewModel);
-        final LoginInputBoundary loginInteractor = new LoginInteractor(loginOutputBoundary);
+        final LoginInputBoundary loginInteractor = new LoginInteractor(loginOutputBoundary, loginDataAccess);
 
         final LoginController controller = new LoginController(loginInteractor);
         loginView.setLoginController(controller);

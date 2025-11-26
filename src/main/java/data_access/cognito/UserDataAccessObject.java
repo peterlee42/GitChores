@@ -4,7 +4,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -12,17 +14,60 @@ import javax.crypto.spec.SecretKeySpec;
 import io.github.cdimascio.dotenv.Dotenv;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthFlowType;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthenticationResultType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIdentityProviderException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.InitiateAuthRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.InitiateAuthResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpRequest;
+import use_case.login.LoginDataAccessInterface;
 import use_case.signup.SignupDataAccessInterface;
 
-public class UserDataAccessObject implements SignupDataAccessInterface {
+public class UserDataAccessObject implements SignupDataAccessInterface, LoginDataAccessInterface {
     private static final String HMAC_SHA256_ALGORITHM = "HmacSHA256";
+    private final Dotenv dotenv = Dotenv.load();
+    private final String clientId = dotenv.get("COGNITO_USER_POOL_CLIENT_ID");
+    private final String clientSecret = dotenv.get("COGNITO_USER_POOL_CLIENT_SECRET");
 
     private final CognitoIdentityProviderClient identityProviderClient = IdentityProviderClientFactory
             .createClient();
 
-    private final Dotenv dotenv = Dotenv.load();
+    @Override
+    public AuthenticationResultType login(String username, String password) {
+        final Map<String, String> authParameters = new LinkedHashMap<String, String>();
+        authParameters.put("USERNAME", username);
+        authParameters.put("PASSWORD", password);
+
+        try {
+            // calculate hash
+            final String secretVal = calculateSecretHash(
+                    clientId,
+                    clientSecret,
+                    username);
+            authParameters.put("SECRET_HASH", secretVal);
+        } catch (NoSuchAlgorithmException ex) {
+            ex.printStackTrace();
+        } catch (InvalidKeyException ex) {
+            ex.printStackTrace();
+        }
+
+        try {
+
+            final InitiateAuthRequest authRequest = InitiateAuthRequest.builder()
+                    .clientId(clientId)
+                    .authParameters(authParameters)
+                    .authFlow(AuthFlowType.USER_PASSWORD_AUTH)
+                    .build();
+
+            final InitiateAuthResponse authResponse = identityProviderClient.initiateAuth(authRequest);
+            final AuthenticationResultType resultType = authResponse.authenticationResult();
+            
+            return resultType;
+        } catch (CognitoIdentityProviderException ex) {
+            System.err.println(ex.awsErrorDetails().errorMessage());
+            throw ex;
+        }
+    }
 
     @Override
     public void createUser(String username, String email, String password) {
@@ -36,13 +81,13 @@ public class UserDataAccessObject implements SignupDataAccessInterface {
         try {
             // calculate hash
             final String secretVal = calculateSecretHash(
-                    dotenv.get("COGNITO_USER_POOL_CLIENT_ID"),
-                    dotenv.get("COGNITO_USER_POOL_CLIENT_SECRET"),
+                    clientId,
+                    clientSecret,
                     username);
 
             // request sign up
             final SignUpRequest signUpRequest = SignUpRequest.builder()
-                    .clientId(dotenv.get("COGNITO_USER_POOL_CLIENT_ID"))
+                    .clientId(clientId)
                     .userAttributes(attributes).username(username)
                     .password(password)
                     .secretHash(secretVal)
@@ -51,7 +96,7 @@ public class UserDataAccessObject implements SignupDataAccessInterface {
             identityProviderClient.signUp(signUpRequest);
 
         } catch (CognitoIdentityProviderException ex) {
-            throw ex;
+            System.err.println(ex.awsErrorDetails().errorMessage());
         } catch (NoSuchAlgorithmException ex) {
             ex.printStackTrace();
         } catch (InvalidKeyException ex) {

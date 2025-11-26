@@ -1,7 +1,6 @@
 package interface_adapter.signup;
 
 import interface_adapter.ViewManagerModel;
-import interface_adapter.git_console.GitConsoleViewModel;
 import interface_adapter.login.LoginViewModel;
 import use_case.signup.SignupOutputBoundary;
 import use_case.signup.SignupOutputData;
@@ -14,14 +13,12 @@ public class SignupPresenter implements SignupOutputBoundary {
     private final SignupViewModel signupViewModel;
     private final LoginViewModel loginViewModel;
     private final ViewManagerModel viewManagerModel;
-    private final GitConsoleViewModel gitConsoleViewModel;
 
     public SignupPresenter(ViewManagerModel viewManagerModel, SignupViewModel signupViewModel,
-            LoginViewModel loginViewModel, GitConsoleViewModel gitConsoleViewModel) {
+            LoginViewModel loginViewModel) {
         this.signupViewModel = signupViewModel;
         this.loginViewModel = loginViewModel;
         this.viewManagerModel = viewManagerModel;
-        this.gitConsoleViewModel = gitConsoleViewModel;
     }
 
     @Override
@@ -30,7 +27,9 @@ public class SignupPresenter implements SignupOutputBoundary {
         signupState.setUsername(response.getUsername());
         signupViewModel.firePropertyChange();
 
-        viewManagerModel.setState(signupViewModel.getViewName());
+        // TODO: Make it switch to main view or join view. This is temporary to get it
+        // started.
+        viewManagerModel.setState("main");
         viewManagerModel.firePropertyChange();
     }
 

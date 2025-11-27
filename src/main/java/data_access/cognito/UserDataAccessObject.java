@@ -11,7 +11,6 @@ import java.util.Map;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import entity.Token;
 import entity.User;
 import io.github.cdimascio.dotenv.Dotenv;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
@@ -19,6 +18,8 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeTy
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthFlowType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthenticationResultType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIdentityProviderException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.GetUserRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.GetUserResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.InitiateAuthRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.InitiateAuthResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpRequest;
@@ -37,7 +38,7 @@ public class UserDataAccessObject
             .createClient();
 
     @Override
-    public AuthenticationResultType login(String username, String password) {
+    public User login(String username, String password) {
         final Map<String, String> authParameters = new LinkedHashMap<String, String>();
         authParameters.put("USERNAME", username);
         authParameters.put("PASSWORD", password);
@@ -66,7 +67,27 @@ public class UserDataAccessObject
             final InitiateAuthResponse authResponse = identityProviderClient.initiateAuth(authRequest);
             final AuthenticationResultType resultType = authResponse.authenticationResult();
 
-            return resultType;
+            // request user information from Cognito
+            final GetUserRequest request = GetUserRequest.builder()
+                    .accessToken(resultType.accessToken())
+                    .build();
+            final GetUserResponse response = identityProviderClient.getUser(request);
+
+            // Get userId and email
+            String userId = null;
+            String email = null;
+
+            for (AttributeType attr : response.userAttributes()) {
+                if ("sub".equals(attr.name())) {
+                    userId = attr.value();
+                } else if ("email".equals(attr.name())) {
+                    email = attr.value();
+                }
+            }
+
+            // return User entity
+            final User user = new User(userId, response.username(), email);
+            return user;
         } catch (CognitoIdentityProviderException ex) {
             System.err.println(ex.awsErrorDetails().errorMessage());
             throw ex;
@@ -106,12 +127,6 @@ public class UserDataAccessObject
         } catch (InvalidKeyException ex) {
             ex.printStackTrace();
         }
-    }
-
-    @Override
-    public User getUser(Token token) {
-        // Cognito tokens expire automatically; no action needed to log out.
-        return null;
     }
 
     /**

@@ -68,11 +68,24 @@ public class CreateRoomInteractor implements CreateRoomInputBoundary {
     }
 
     private String generateInviteCode() {
-        final StringBuilder code = new StringBuilder(INVITE_CODE_LENGTH);
-        for (int i = 0; i < INVITE_CODE_LENGTH; i++) {
-            final int index = random.nextInt(INVITE_CODE_CHARS.length());
-            code.append(INVITE_CODE_CHARS.charAt(index));
-        }
-        return code.toString();
+        String code;
+        int attempts = 0;
+        final int maxAttempts = 100;
+
+        do {
+            final StringBuilder codeBuilder = new StringBuilder(INVITE_CODE_LENGTH);
+            for (int i = 0; i < INVITE_CODE_LENGTH; i++) {
+                final int index = random.nextInt(INVITE_CODE_CHARS.length());
+                codeBuilder.append(INVITE_CODE_CHARS.charAt(index));
+            }
+            code = codeBuilder.toString();
+            attempts++;
+
+            if (attempts >= maxAttempts) {
+                throw new RuntimeException("Failed to generate unique invite code after " + maxAttempts + " attempts");
+            }
+        } while (roomDataAccess.getRoomByInviteCode(code) != null);
+
+        return code;
     }
 }

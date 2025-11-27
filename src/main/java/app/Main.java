@@ -25,6 +25,7 @@ public class Main {
                 // .addLoginUseCase()
                 .addGitConsoleUseCase()
                 .addMainView()
+                .addRoomUseCases()
                 .build();
 
         application.setMinimumSize(application.getMinimumSize());

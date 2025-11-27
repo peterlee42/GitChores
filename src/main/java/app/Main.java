@@ -14,8 +14,8 @@ public class Main {
     public static void main(String[] args) {
         final AppBuilder appBuilder = new AppBuilder();
         final JFrame application = appBuilder
-                .addSignupView()
                 .addLoginView()
+                .addSignupView()
                 .addDashboardView()
                 .addGitConsoleView()
                 .addProfileView()
@@ -27,7 +27,6 @@ public class Main {
 
         application.setFocusable(true);
         application.requestFocus();
-        application.setMinimumSize(application.getMinimumSize());
 
         application.pack();
         application.setLocationRelativeTo(null);

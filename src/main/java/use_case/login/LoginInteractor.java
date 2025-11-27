@@ -24,12 +24,10 @@ public class LoginInteractor implements LoginInputBoundary {
 
         try {
             // Get tokens from Cognito
-            System.err.println("Attempting to log in user: " + username);
             final AuthenticationResultType result = userDataAccessObject.login(username, password);
 
-            System.out.println("Login successful for user: " + username + ". Token: " + result.idToken());
-
-            final LoginOutputData output = new LoginOutputData(username);
+            final LoginOutputData output = new LoginOutputData(username, result.idToken(),
+                    result.accessToken(), result.refreshToken());
             loginPresenter.prepareSuccessView(output);
 
         } catch (NotAuthorizedException ex) {

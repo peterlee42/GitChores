@@ -1,24 +1,14 @@
-package use_case.login;
+package entity;
 
-/**
- * Output Data for the Login Use Case.
- */
-public class LoginOutputData {
-
-    private final String username;
+public class Token {
     private final String idToken;
     private final String accessToken;
     private final String refreshToken;
 
-    public LoginOutputData(String username, String idToken, String accessToken, String refreshToken) {
-        this.username = username;
+    public Token(String idToken, String accessToken, String refreshToken) {
         this.idToken = idToken;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     public String getIdToken() {
@@ -32,5 +22,4 @@ public class LoginOutputData {
     public String getRefreshToken() {
         return refreshToken;
     }
-
 }

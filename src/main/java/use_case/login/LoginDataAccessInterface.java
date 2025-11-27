@@ -1,6 +1,5 @@
 package use_case.login;
 
-// import entity.User;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthenticationResultType;
 
 public interface LoginDataAccessInterface {

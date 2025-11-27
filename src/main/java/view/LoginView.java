@@ -2,7 +2,6 @@ package view;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -53,7 +52,7 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
     public LoginView(LoginViewModel loginViewModel) {
         super(JSplitPane.HORIZONTAL_SPLIT);
         this.loginViewModel = loginViewModel;
-        // loginViewModel.addPropertyChangeListener(this);
+        this.loginViewModel.addPropertyChangeListener(this);
 
         // initialize components
         welcomeMessage = new JLabel(LoginViewModel.WELCOME_MESSAGE);
@@ -64,6 +63,7 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
         logoImage = new ImageLabel(LoginViewModel.LOGO_IMAGE_PATH,
                 LoginViewModel.LOGO_IMAGE_WIDTH,
                 LoginViewModel.LOGO_IMAGE_HEIGHT);
+
         // build right panel
         rightPanel = buildRightPanel(new JPanel());
 
@@ -80,8 +80,6 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
         this.setContinuousLayout(true);
         this.setDividerSize(0);
         this.setBorder(null);
-
-        this.setMinimumSize(new Dimension(LoginViewModel.VIEW_WIDTH, LoginViewModel.VIEW_HEIGHT));
     }
 
     @SuppressWarnings("checkstyle:ExecutableStatementCountCheck")

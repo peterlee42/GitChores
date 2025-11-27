@@ -11,19 +11,32 @@ import java.util.Map;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import entity.User;
 import io.github.cdimascio.dotenv.Dotenv;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthFlowType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthenticationResultType;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIdentityProviderException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.GetUserRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.GetUserResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.InitiateAuthRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.InitiateAuthResponse;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.InvalidParameterException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.InvalidPasswordException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.NotAuthorizedException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.UserNotFoundException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.UsernameExistsException;
+import use_case.logged_in.LoggedInDataAccessInterface;
 import use_case.login.LoginDataAccessInterface;
+import use_case.login.LoginFailedException;
 import use_case.signup.SignupDataAccessInterface;
+import use_case.signup.SignupFailedException;
 
-public class UserDataAccessObject implements SignupDataAccessInterface, LoginDataAccessInterface {
+@SuppressWarnings("ClassFanOutComplexityCheck")
+public class UserDataAccessObject
+        implements SignupDataAccessInterface, LoginDataAccessInterface, LoggedInDataAccessInterface {
     private static final String HMAC_SHA256_ALGORITHM = "HmacSHA256";
     private final Dotenv dotenv = Dotenv.load();
     private final String clientId = dotenv.get("COGNITO_USER_POOL_CLIENT_ID");
@@ -33,7 +46,7 @@ public class UserDataAccessObject implements SignupDataAccessInterface, LoginDat
             .createClient();
 
     @Override
-    public AuthenticationResultType login(String username, String password) {
+    public User login(String username, String password) {
         final Map<String, String> authParameters = new LinkedHashMap<String, String>();
         authParameters.put("USERNAME", username);
         authParameters.put("PASSWORD", password);
@@ -61,11 +74,34 @@ public class UserDataAccessObject implements SignupDataAccessInterface, LoginDat
 
             final InitiateAuthResponse authResponse = identityProviderClient.initiateAuth(authRequest);
             final AuthenticationResultType resultType = authResponse.authenticationResult();
-            
-            return resultType;
+
+            // request user information from Cognito
+            final GetUserRequest request = GetUserRequest.builder()
+                    .accessToken(resultType.accessToken())
+                    .build();
+            final GetUserResponse response = identityProviderClient.getUser(request);
+
+            // Get userId and email
+            String userId = null;
+            String email = null;
+
+            for (AttributeType attr : response.userAttributes()) {
+                if ("sub".equals(attr.name())) {
+                    userId = attr.value();
+                } else if ("email".equals(attr.name())) {
+                    email = attr.value();
+                }
+            }
+
+            // return User entity
+            final User user = new User(userId, response.username(), email);
+            return user;
+        } catch (NotAuthorizedException ex) {
+            throw new LoginFailedException("Incorrect username or password.");
+        } catch (UserNotFoundException ex) {
+            throw new LoginFailedException("Account does not exist.");
         } catch (CognitoIdentityProviderException ex) {
-            System.err.println(ex.awsErrorDetails().errorMessage());
-            throw ex;
+            throw new LoginFailedException("Login failed. Please try again.");
         }
     }
 
@@ -78,13 +114,22 @@ public class UserDataAccessObject implements SignupDataAccessInterface, LoginDat
                 .build();
         final List<AttributeType> attributes = new ArrayList<>();
         attributes.add(attributeType);
+
+        String secretVal = null;
+
         try {
             // calculate hash
-            final String secretVal = calculateSecretHash(
+            secretVal = calculateSecretHash(
                     clientId,
                     clientSecret,
                     username);
+        } catch (NoSuchAlgorithmException ex) {
+            ex.printStackTrace();
+        } catch (InvalidKeyException ex) {
+            ex.printStackTrace();
+        }
 
+        try {
             // request sign up
             final SignUpRequest signUpRequest = SignUpRequest.builder()
                     .clientId(clientId)
@@ -95,12 +140,18 @@ public class UserDataAccessObject implements SignupDataAccessInterface, LoginDat
 
             identityProviderClient.signUp(signUpRequest);
 
+        } catch (UsernameExistsException ex) {
+            throw new SignupFailedException("User already exists.");
+        } catch (InvalidPasswordException | InvalidParameterException ex) {
+            final String errorMessage = "Passwords must contain:\n"
+                    + "At least 8 characters\n"
+                    + "One uppercase letter\n"
+                    + "One lowercase letter\n"
+                    + "One digit\n"
+                    + "One special character.";
+            throw new SignupFailedException(errorMessage);
         } catch (CognitoIdentityProviderException ex) {
-            System.err.println(ex.awsErrorDetails().errorMessage());
-        } catch (NoSuchAlgorithmException ex) {
-            ex.printStackTrace();
-        } catch (InvalidKeyException ex) {
-            ex.printStackTrace();
+            throw new SignupFailedException("An error occurred during signup.");
         }
     }
 

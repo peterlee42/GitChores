@@ -22,8 +22,8 @@ public class LoginViewModel extends ViewModel<LoginState> {
     public static final int LOGO_IMAGE_WIDTH = (int) (Toolkit.getDefaultToolkit().getScreenSize().width * 0.15);
     public static final int LOGO_IMAGE_HEIGHT = (int) (Toolkit.getDefaultToolkit().getScreenSize().width * 0.15);
 
-    public static final int VIEW_WIDTH = (int) (Toolkit.getDefaultToolkit().getScreenSize().width * 0.5);
-    public static final int VIEW_HEIGHT = (int) (Toolkit.getDefaultToolkit().getScreenSize().height * 0.5);
+    public static final int VIEW_WIDTH = (int) (Toolkit.getDefaultToolkit().getScreenSize().width * 0.7);
+    public static final int VIEW_HEIGHT = (int) (Toolkit.getDefaultToolkit().getScreenSize().height * 0.7);
 
     public static final double RESIZE_WEIGHT = 0.5;
 

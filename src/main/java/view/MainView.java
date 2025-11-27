@@ -3,14 +3,16 @@ package view;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 
-public class MainView extends JPanel implements ActionListener {
-    private static final int NAV_BUTTON_BORDER = 8;
-    private static final int NAV_BAR_HEIGHT = 32;
+import interface_adapter.logged_in.LoggedInState;
+import interface_adapter.logged_in.MainViewModel;
 
+public class MainView extends JPanel implements ActionListener, PropertyChangeListener {
     private final String viewName = "main";
 
     private final CardLayout contentLayout = new CardLayout();
@@ -24,12 +26,18 @@ public class MainView extends JPanel implements ActionListener {
     private final GitConsoleView consoleView;
     private final ProfileView profileView;
 
+    private final MainViewModel mainViewModel;
+
     private JButton activeButton;
 
-    public MainView(DashboardView dashboardPanel, GitConsoleView consolePanel, ProfileView profilePanel) {
+    public MainView(MainViewModel mainViewModel, DashboardView dashboardPanel, GitConsoleView consolePanel,
+            ProfileView profilePanel) {
         this.dashboardView = dashboardPanel;
         this.consoleView = consolePanel;
         this.profileView = profilePanel;
+
+        this.mainViewModel = mainViewModel;
+        this.mainViewModel.addPropertyChangeListener(this);
 
         setLayout(new BorderLayout());
         final JToolBar navBar = createNavBar();
@@ -75,7 +83,7 @@ public class MainView extends JPanel implements ActionListener {
         navBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
 
         final Dimension navSize = navBar.getPreferredSize();
-        navBar.setPreferredSize(new Dimension(navSize.width, NAV_BAR_HEIGHT));
+        navBar.setPreferredSize(new Dimension(navSize.width, MainViewModel.NAV_BAR_HEIGHT));
 
         return navBar;
     }
@@ -87,21 +95,23 @@ public class MainView extends JPanel implements ActionListener {
         button.setOpaque(false);
         button.setForeground(Color.WHITE);
         button.setBorderPainted(true);
-        button.setBorder(BorderFactory.createEmptyBorder(NAV_BUTTON_BORDER, 2 * NAV_BUTTON_BORDER,
-                NAV_BUTTON_BORDER, 2 * NAV_BUTTON_BORDER));
+        button.setBorder(
+                BorderFactory.createEmptyBorder(MainViewModel.NAV_BUTTON_BORDER, 2 * MainViewModel.NAV_BUTTON_BORDER,
+                        MainViewModel.NAV_BUTTON_BORDER, 2 * MainViewModel.NAV_BUTTON_BORDER));
     }
 
     private void setActiveTab(JButton button) {
         activeButton = button;
 
-        final JButton[] buttons = {dashboardButton, consoleButton, profileButton};
-        final Border padding = BorderFactory.createEmptyBorder(NAV_BUTTON_BORDER, 2 * NAV_BUTTON_BORDER,
-                NAV_BUTTON_BORDER, 2 * NAV_BUTTON_BORDER);
+        final JButton[] buttons = { dashboardButton, consoleButton, profileButton };
+        final Border padding = BorderFactory.createEmptyBorder(MainViewModel.NAV_BUTTON_BORDER,
+                2 * MainViewModel.NAV_BUTTON_BORDER,
+                MainViewModel.NAV_BUTTON_BORDER, 2 * MainViewModel.NAV_BUTTON_BORDER);
 
         for (JButton b : buttons) {
             final boolean isActive = b == activeButton;
 
-            final Font baseFont = b.getFont();
+            final Font baseFont = ViewConstants.LABEL_FONT;
             final Font derivedFont;
             if (isActive) {
                 derivedFont = baseFont.deriveFont(Font.BOLD);
@@ -124,6 +134,7 @@ public class MainView extends JPanel implements ActionListener {
         final Object source = e.getSource();
 
         if (source == dashboardButton) {
+            // TODO: Use ViewModel constant
             contentLayout.show(contentPanel, "dashboard");
             setActiveTab(dashboardButton);
         } else if (source == consoleButton) {
@@ -132,6 +143,14 @@ public class MainView extends JPanel implements ActionListener {
         } else if (source == profileButton) {
             contentLayout.show(contentPanel, profileView.getViewName());
             setActiveTab(profileButton);
+        }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        final LoggedInState state = (LoggedInState) evt.getNewValue();
+        if (state.getLoggedInError() != null) {
+            JOptionPane.showMessageDialog(this, state.getLoggedInError());
         }
     }
 

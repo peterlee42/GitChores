@@ -44,40 +44,12 @@ public class UserDataAccessObject
 
     private final CognitoIdentityProviderClient identityProviderClient;
 
-    private String currentUserId;
-    private String currentUsername;
-    private String currentEmail;
-
     public UserDataAccessObject(CognitoIdentityProviderClient identityProviderClient) {
         final Dotenv dotenv = Dotenv.load();
         this.clientId = dotenv.get("COGNITO_USER_POOL_CLIENT_ID");
         this.clientSecret = dotenv.get("COGNITO_USER_POOL_CLIENT_SECRET");
 
         this.identityProviderClient = identityProviderClient;
-    }
-
-    public void setCurrentUserId(String currentUserId) {
-        this.currentUserId = currentUserId;
-    }
-
-    public void setCurrentUsername(String currentUsername) {
-        this.currentUsername = currentUsername;
-    }
-
-    public void setCurrentEmail(String currentEmail) {
-        this.currentEmail = currentEmail;
-    }
-
-    public String getCurrentUserId() {
-        return currentUserId;
-    }
-
-    public String getCurrentUsername() {
-        return currentUsername;
-    }
-
-    public String getCurrentEmail() {
-        return currentEmail;
     }
 
     @Override

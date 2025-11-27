@@ -19,14 +19,20 @@ public class LoginInteractor implements LoginInputBoundary {
         final String username = loginInputData.getUsername();
         final String password = loginInputData.getPassword();
 
-        try {
-            final User user = userDataAccessObject.login(username, password);
+        if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
+            loginPresenter.prepareFailView("Username and password cannot be empty.");
+            return;
+        } else {
 
-            final LoginOutputData output = new LoginOutputData(user.getUsername());
-            loginPresenter.prepareSuccessView(output);
+            try {
+                final User user = userDataAccessObject.login(username, password);
 
-        } catch (LoginFailedException ex) {
-            loginPresenter.prepareFailView(ex.getMessage());
+                final LoginOutputData output = new LoginOutputData(user.getUsername());
+                loginPresenter.prepareSuccessView(output);
+
+            } catch (LoginFailedException ex) {
+                loginPresenter.prepareFailView(ex.getMessage());
+            }
         }
     }
 

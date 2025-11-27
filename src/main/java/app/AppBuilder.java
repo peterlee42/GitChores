@@ -4,6 +4,7 @@ import java.awt.*;
 
 import javax.swing.*;
 
+import data_access.cognito.IdentityProviderClientFactory;
 import data_access.cognito.UserDataAccessObject;
 import data_access.dynamo_db.CommitDataAccessObject;
 import data_access.dynamo_db.DynamoDbClientFactory;
@@ -29,6 +30,7 @@ import interface_adapter.room.join.JoinRoomPresenter;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import use_case.commit.CommitDataAccessInterface;
 import use_case.commit.CommitInputBoundary;
@@ -261,9 +263,11 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addSignupUseCase() {
-        final SignupDataAccessInterface signupDataAccess = new UserDataAccessObject();
+        final CognitoIdentityProviderClient identityProviderClient = IdentityProviderClientFactory.createClient();
+
+        final SignupDataAccessInterface signupDataAccess = new UserDataAccessObject(identityProviderClient);
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel, signupViewModel,
-                loginViewModel, mainViewModel);
+                loginViewModel);
         final SignupInputBoundary signupInteractor = new SignupInteractor(signupOutputBoundary, signupDataAccess);
 
         final SignupController controller = new SignupController(signupInteractor);
@@ -277,7 +281,9 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addLoginUseCase() {
-        final LoginDataAccessInterface loginDataAccess = new UserDataAccessObject();
+        final CognitoIdentityProviderClient identityProviderClient = IdentityProviderClientFactory.createClient();
+
+        final LoginDataAccessInterface loginDataAccess = new UserDataAccessObject(identityProviderClient);
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel, loginViewModel,
                 signupViewModel, mainViewModel);
         final LoginInputBoundary loginInteractor = new LoginInteractor(loginOutputBoundary, loginDataAccess);

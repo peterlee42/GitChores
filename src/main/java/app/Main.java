@@ -14,15 +14,18 @@ public class Main {
     public static void main(String[] args) {
         final AppBuilder appBuilder = new AppBuilder();
         final JFrame application = appBuilder
-                .addLoginView()
-                .addSignupView()
+                // .addSignupView()
+                // .addLoginView()
+                // .addJoinView()
                 .addDashboardView()
                 .addGitConsoleView()
+                // .addLoginView()
                 .addProfileView()
-                .addMainView()
-                .addSignupUseCase()
-                .addLoginUseCase()
+                // .addSignupUseCase()
+                // .addLoginUseCase()
                 .addGitConsoleUseCase()
+                .addMainView()
+                .addRoomUseCases()
                 .build();
 
         application.setFocusable(true);

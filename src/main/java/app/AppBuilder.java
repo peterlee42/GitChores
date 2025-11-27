@@ -8,7 +8,9 @@ import data_access.cognito.IdentityProviderClientFactory;
 import data_access.cognito.UserDataAccessObject;
 import data_access.dynamo_db.CommitDataAccessObject;
 import data_access.dynamo_db.DynamoDbClientFactory;
+import data_access.dynamo_db.RoomDataAccessObject;
 import data_access.dynamo_db.RoomMetadataDataAccessObject;
+import interface_adapter.SessionModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.commit.CommitController;
 import interface_adapter.commit.CommitPresenter;
@@ -20,6 +22,11 @@ import interface_adapter.logged_in.MainViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.room.create.CreateRoomController;
+import interface_adapter.room.create.CreateRoomPresenter;
+import interface_adapter.room.create.CreateRoomViewModel;
+import interface_adapter.room.join.JoinRoomController;
+import interface_adapter.room.join.JoinRoomPresenter;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
@@ -36,6 +43,11 @@ import use_case.login.LoginDataAccessInterface;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
+import use_case.room.RoomDataAccessInterface;
+import use_case.room.create.CreateRoomInputBoundary;
+import use_case.room.create.CreateRoomInteractor;
+import use_case.room.join.JoinRoomInputBoundary;
+import use_case.room.join.JoinRoomInteractor;
 import use_case.signup.SignupDataAccessInterface;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
@@ -59,11 +71,12 @@ public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
-    private final ViewManager viewManager = new ViewManager(cardPanel, cardLayout);
+    private final DynamoDbClient dynamoDbClient = DynamoDbClientFactory.createClient();
 
     private MainView mainView;
     private JoinView joinView;
     private JoinViewModel joinViewModel;
+    private SessionModel sessionModel;
     private SignupView signupView;
     private SignupViewModel signupViewModel;
     private LoginView loginView;
@@ -79,6 +92,7 @@ public class AppBuilder {
      */
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
+        final ViewManager viewManager = new ViewManager(cardPanel, cardLayout);
         viewManagerModel.addPropertyChangeListener(viewManager);
     }
 
@@ -111,7 +125,8 @@ public class AppBuilder {
      */
     public AppBuilder addJoinView() {
         joinViewModel = new JoinViewModel();
-        joinView = new JoinView(joinViewModel);
+        sessionModel = new SessionModel();
+        joinView = new JoinView(joinViewModel, sessionModel);
         cardPanel.add(joinView, joinView.getViewName());
         return this;
     }
@@ -163,9 +178,6 @@ public class AppBuilder {
         final GitConsoleOutputBoundary gitConsoleOutputBoundary = new GitConsolePresenter(gitConsoleViewModel);
 
         // Commit Use case Layer (backend logic)
-        // MIGHT NEED TO MOVE THIS LINE EXTERNALLY TO INITIALIZE ONE CLIENT
-        final DynamoDbClient dynamoDbClient = DynamoDbClientFactory.createClient();
-
         final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(dynamoDbClient);
         final RoomMetadataDataAccessInterface roomMetadataDataAccess = new RoomMetadataDataAccessObject(dynamoDbClient);
         final CommitPresenter commitPresenter = new CommitPresenter();
@@ -210,6 +222,38 @@ public class AppBuilder {
         };
 
         profileView = new ProfileView(viewManagerModel, backTarget, navigator);
+        return this;
+    }
+
+    /**
+     * Adds room use cases (Create and Join).
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addRoomUseCases() {
+        if (joinView == null || joinViewModel == null) {
+            return this;
+        }
+
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
+
+        // Create Room use case
+        final CreateRoomViewModel createRoomViewModel = new CreateRoomViewModel();
+        final CreateRoomPresenter createRoomPresenter = new CreateRoomPresenter(createRoomViewModel,
+                viewManagerModel, sessionModel);
+        final CreateRoomInputBoundary createRoomInteractor = new CreateRoomInteractor(roomDataAccess,
+                createRoomPresenter);
+        final CreateRoomController createRoomController = new CreateRoomController(createRoomInteractor);
+
+        // Join Room use case (reuse existing JoinViewModel)
+        final JoinRoomPresenter joinRoomPresenter = new JoinRoomPresenter(joinViewModel, viewManagerModel,
+                sessionModel);
+        final JoinRoomInputBoundary joinRoomInteractor = new JoinRoomInteractor(roomDataAccess, joinRoomPresenter);
+        final JoinRoomController joinRoomController = new JoinRoomController(joinRoomInteractor);
+
+        joinView.setCreateRoomController(createRoomController);
+        joinView.setJoinRoomController(joinRoomController);
+
         return this;
     }
 

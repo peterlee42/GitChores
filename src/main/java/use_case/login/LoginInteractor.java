@@ -1,6 +1,6 @@
 package use_case.login;
 
-import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthenticationResultType;
+import entity.User;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIdentityProviderException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.NotAuthorizedException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.UserNotFoundException;
@@ -23,11 +23,12 @@ public class LoginInteractor implements LoginInputBoundary {
         final String password = loginInputData.getPassword();
 
         try {
-            // Get tokens from Cognito
-            final AuthenticationResultType result = userDataAccessObject.login(username, password);
+            final User user = userDataAccessObject.login(username, password);
 
-            final LoginOutputData output = new LoginOutputData(username, result.idToken(),
-                    result.accessToken(), result.refreshToken());
+            System.err.println("Successful login." + "Username" + user.getUsername() + "UserID: " + user.getId()
+                    + "Email: " + user.getEmail());
+
+            final LoginOutputData output = new LoginOutputData(user.getUsername());
             loginPresenter.prepareSuccessView(output);
 
         } catch (NotAuthorizedException ex) {

@@ -1,6 +1,6 @@
 package use_case.login;
 
-import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthenticationResultType;
+import entity.User;
 
 public interface LoginDataAccessInterface {
     /**
@@ -8,7 +8,7 @@ public interface LoginDataAccessInterface {
      *
      * @param username The username of the new user.
      * @param password The password of the new user.
-     * @return AuthenticationResultType containing tokens
+     * @return User object containing user information.
      */
-    AuthenticationResultType login(String username, String password);
+    User login(String username, String password);
 }

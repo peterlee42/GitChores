@@ -2,6 +2,7 @@ package interface_adapter.signup;
 
 import interface_adapter.ViewManagerModel;
 import interface_adapter.logged_in.MainViewModel;
+import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
 import use_case.signup.SignupOutputBoundary;
 import use_case.signup.SignupOutputData;
@@ -26,12 +27,9 @@ public class SignupPresenter implements SignupOutputBoundary {
 
     @Override
     public void prepareSuccessView(SignupOutputData response) {
-        final SignupState signupState = signupViewModel.getState();
-        signupState.setUsername(response.getUsername());
-        signupViewModel.firePropertyChange();
-
-        // clear statew
-        signupViewModel.setState(new SignupState());
+        final LoginState loginState = loginViewModel.getState();
+        loginState.setUsername(response.getUsername());
+        loginViewModel.firePropertyChange();
 
         viewManagerModel.setState(mainViewModel.getViewName());
         viewManagerModel.firePropertyChange();

@@ -9,8 +9,8 @@ import java.beans.PropertyChangeListener;
 import javax.swing.*;
 import javax.swing.border.Border;
 
+import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.MainViewModel;
-import interface_adapter.logged_in.TokenState;
 
 public class MainView extends JPanel implements ActionListener, PropertyChangeListener {
     private final String viewName = "main";
@@ -148,10 +148,9 @@ public class MainView extends JPanel implements ActionListener, PropertyChangeLi
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        final TokenState state = (TokenState) evt.getNewValue();
-        if (state.getTokenError() != null) {
-            JOptionPane.showMessageDialog(this, state.getTokenError());
-            // TODO: switch to login view
+        final LoggedInState state = (LoggedInState) evt.getNewValue();
+        if (state.getLoggedInError() != null) {
+            JOptionPane.showMessageDialog(this, state.getLoggedInError());
         }
     }
 

@@ -6,31 +6,12 @@ package use_case.login;
 public class LoginOutputData {
 
     private final String username;
-    private final String idToken;
-    private final String accessToken;
-    private final String refreshToken;
 
-    public LoginOutputData(String username, String idToken, String accessToken, String refreshToken) {
+    public LoginOutputData(String username) {
         this.username = username;
-        this.idToken = idToken;
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
     }
 
     public String getUsername() {
         return username;
     }
-
-    public String getIdToken() {
-        return idToken;
-    }
-
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public String getRefreshToken() {
-        return refreshToken;
-    }
-
 }

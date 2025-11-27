@@ -15,6 +15,7 @@ import interface_adapter.git_console.GitConsoleController;
 import interface_adapter.git_console.GitConsolePresenter;
 import interface_adapter.git_console.GitConsoleViewModel;
 import interface_adapter.join.JoinViewModel;
+import interface_adapter.logged_in.MainViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
@@ -69,6 +70,7 @@ public class AppBuilder {
     private GitConsoleView gitConsoleView;
     private GitConsoleViewModel gitConsoleViewModel;
     private ProfileView profileView;
+    private MainViewModel mainViewModel;
 
     /**
      * Constructor for AppBuilder.
@@ -84,7 +86,8 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addMainView() {
-        mainView = new MainView(dashboardView, gitConsoleView, profileView);
+        mainViewModel = new MainViewModel();
+        mainView = new MainView(mainViewModel, dashboardView, gitConsoleView, profileView);
         cardPanel.add(mainView, mainView.getViewName());
         return this;
     }
@@ -147,7 +150,7 @@ public class AppBuilder {
         gitConsoleView = new GitConsoleView(gitConsoleViewModel);
         return this;
     }
-  
+
     /**
      * Adds Git Console use case.
      *
@@ -216,7 +219,7 @@ public class AppBuilder {
     public AppBuilder addSignupUseCase() {
         final SignupDataAccessInterface signupDataAccess = new UserDataAccessObject();
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel, signupViewModel,
-                loginViewModel);
+                loginViewModel, mainViewModel);
         final SignupInputBoundary signupInteractor = new SignupInteractor(signupOutputBoundary, signupDataAccess);
 
         final SignupController controller = new SignupController(signupInteractor);
@@ -230,10 +233,9 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addLoginUseCase() {
-        // To be implemented
         final LoginDataAccessInterface loginDataAccess = new UserDataAccessObject();
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel, loginViewModel,
-                signupViewModel);
+                signupViewModel, mainViewModel);
         final LoginInputBoundary loginInteractor = new LoginInteractor(loginOutputBoundary, loginDataAccess);
 
         final LoginController controller = new LoginController(loginInteractor);
@@ -257,7 +259,7 @@ public class AppBuilder {
         final int minWidth = (int) (screenSize.getWidth() * 0.5);
         final int minHeight = (int) (screenSize.getHeight() * 0.5);
 
-        cardPanel.setPreferredSize(new Dimension(defaultWidth, defaultHeight));
+        application.setPreferredSize(new Dimension(defaultWidth, defaultHeight));
         application.setMinimumSize(new Dimension(minWidth, minHeight));
 
         application.pack();

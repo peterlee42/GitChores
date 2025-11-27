@@ -2,7 +2,6 @@ package view;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -59,8 +58,6 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         this.signupViewModel = signupViewModel;
         signupViewModel.addPropertyChangeListener(this);
 
-        // signupViewModel.addPropertyChangeListener(this);
-
         // initialize components
         welcomeMessage = new JLabel(SignupViewModel.WELCOME_MESSAGE);
         title = new JLabel(SignupViewModel.TITLE_LABEL);
@@ -90,8 +87,6 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         this.setContinuousLayout(true);
         this.setDividerSize(0);
         this.setBorder(null);
-
-        this.setMinimumSize(new Dimension(SignupViewModel.VIEW_WIDTH, SignupViewModel.VIEW_HEIGHT));
     }
 
     @SuppressWarnings("checkstyle:ExecutableStatementCountCheck")

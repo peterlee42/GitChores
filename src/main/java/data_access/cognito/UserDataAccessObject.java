@@ -11,6 +11,8 @@ import java.util.Map;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import entity.Token;
+import entity.User;
 import io.github.cdimascio.dotenv.Dotenv;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
@@ -20,10 +22,12 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.CognitoIden
 import software.amazon.awssdk.services.cognitoidentityprovider.model.InitiateAuthRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.InitiateAuthResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpRequest;
+import use_case.logged_in.LoggedInDataAccessInterface;
 import use_case.login.LoginDataAccessInterface;
 import use_case.signup.SignupDataAccessInterface;
 
-public class UserDataAccessObject implements SignupDataAccessInterface, LoginDataAccessInterface {
+public class UserDataAccessObject
+        implements SignupDataAccessInterface, LoginDataAccessInterface, LoggedInDataAccessInterface {
     private static final String HMAC_SHA256_ALGORITHM = "HmacSHA256";
     private final Dotenv dotenv = Dotenv.load();
     private final String clientId = dotenv.get("COGNITO_USER_POOL_CLIENT_ID");
@@ -61,7 +65,7 @@ public class UserDataAccessObject implements SignupDataAccessInterface, LoginDat
 
             final InitiateAuthResponse authResponse = identityProviderClient.initiateAuth(authRequest);
             final AuthenticationResultType resultType = authResponse.authenticationResult();
-            
+
             return resultType;
         } catch (CognitoIdentityProviderException ex) {
             System.err.println(ex.awsErrorDetails().errorMessage());
@@ -102,6 +106,12 @@ public class UserDataAccessObject implements SignupDataAccessInterface, LoginDat
         } catch (InvalidKeyException ex) {
             ex.printStackTrace();
         }
+    }
+
+    @Override
+    public User getUser(Token token) {
+        // Cognito tokens expire automatically; no action needed to log out.
+        return null;
     }
 
     /**

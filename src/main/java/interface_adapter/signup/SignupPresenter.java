@@ -1,7 +1,8 @@
 package interface_adapter.signup;
 
 import interface_adapter.ViewManagerModel;
-import interface_adapter.git_console.GitConsoleViewModel;
+import interface_adapter.logged_in.MainViewModel;
+import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
 import use_case.signup.SignupOutputBoundary;
 import use_case.signup.SignupOutputData;
@@ -14,25 +15,23 @@ public class SignupPresenter implements SignupOutputBoundary {
     private final SignupViewModel signupViewModel;
     private final LoginViewModel loginViewModel;
     private final ViewManagerModel viewManagerModel;
-    private final GitConsoleViewModel gitConsoleViewModel;
+    private final MainViewModel mainViewModel;
 
     public SignupPresenter(ViewManagerModel viewManagerModel, SignupViewModel signupViewModel,
-            LoginViewModel loginViewModel, GitConsoleViewModel gitConsoleViewModel) {
+            LoginViewModel loginViewModel, MainViewModel mainViewModel) {
         this.signupViewModel = signupViewModel;
         this.loginViewModel = loginViewModel;
         this.viewManagerModel = viewManagerModel;
-        this.gitConsoleViewModel = gitConsoleViewModel;
+        this.mainViewModel = mainViewModel;
     }
 
     @Override
     public void prepareSuccessView(SignupOutputData response) {
-        final SignupState signupState = signupViewModel.getState();
-        signupState.setUsername(response.getUsername());
-        signupViewModel.firePropertyChange();
+        final LoginState loginState = loginViewModel.getState();
+        loginState.setUsername(response.getUsername());
+        loginViewModel.firePropertyChange();
 
-        // TODO: Make it switch to main view or join view. This is temporary to get it
-        // started.
-        viewManagerModel.setState(gitConsoleViewModel.getViewName());
+        viewManagerModel.setState(mainViewModel.getViewName());
         viewManagerModel.firePropertyChange();
     }
 

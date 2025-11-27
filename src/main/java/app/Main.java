@@ -28,7 +28,8 @@ public class Main {
                 .addRoomUseCases()
                 .build();
 
-        application.setMinimumSize(application.getMinimumSize());
+        application.setFocusable(true);
+        application.requestFocus();
 
         application.pack();
         application.setLocationRelativeTo(null);

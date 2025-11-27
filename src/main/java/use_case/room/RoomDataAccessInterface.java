@@ -1,9 +1,8 @@
 package use_case.room;
 
-import entity.Room;
-import entity.User;
-
 import java.util.List;
+
+import entity.Room;
 
 public interface RoomDataAccessInterface {
     /**

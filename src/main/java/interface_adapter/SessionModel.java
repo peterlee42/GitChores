@@ -16,8 +16,14 @@ public class SessionModel extends ViewModel<String> {
     public String getRoomId() {
         return roomId;
     }
-    public String getUserId() { return userId; }
-    public String getUsername() { return username; }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
 
     /**
      * Sets the current room ID.

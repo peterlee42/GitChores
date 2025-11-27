@@ -26,6 +26,7 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.InvalidPara
 import software.amazon.awssdk.services.cognitoidentityprovider.model.InvalidPasswordException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.NotAuthorizedException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.UserNotConfirmedException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.UserNotFoundException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.UsernameExistsException;
 import use_case.logged_in.LoggedInDataAccessInterface;
@@ -38,12 +39,46 @@ import use_case.signup.SignupFailedException;
 public class UserDataAccessObject
         implements SignupDataAccessInterface, LoginDataAccessInterface, LoggedInDataAccessInterface {
     private static final String HMAC_SHA256_ALGORITHM = "HmacSHA256";
-    private final Dotenv dotenv = Dotenv.load();
-    private final String clientId = dotenv.get("COGNITO_USER_POOL_CLIENT_ID");
-    private final String clientSecret = dotenv.get("COGNITO_USER_POOL_CLIENT_SECRET");
+    private final String clientId;
+    private final String clientSecret;
 
-    private final CognitoIdentityProviderClient identityProviderClient = IdentityProviderClientFactory
-            .createClient();
+    private final CognitoIdentityProviderClient identityProviderClient;
+
+    private String currentUserId;
+    private String currentUsername;
+    private String currentEmail;
+
+    public UserDataAccessObject(CognitoIdentityProviderClient identityProviderClient) {
+        final Dotenv dotenv = Dotenv.load();
+        this.clientId = dotenv.get("COGNITO_USER_POOL_CLIENT_ID");
+        this.clientSecret = dotenv.get("COGNITO_USER_POOL_CLIENT_SECRET");
+
+        this.identityProviderClient = identityProviderClient;
+    }
+
+    public void setCurrentUserId(String currentUserId) {
+        this.currentUserId = currentUserId;
+    }
+
+    public void setCurrentUsername(String currentUsername) {
+        this.currentUsername = currentUsername;
+    }
+
+    public void setCurrentEmail(String currentEmail) {
+        this.currentEmail = currentEmail;
+    }
+
+    public String getCurrentUserId() {
+        return currentUserId;
+    }
+
+    public String getCurrentUsername() {
+        return currentUsername;
+    }
+
+    public String getCurrentEmail() {
+        return currentEmail;
+    }
 
     @Override
     public User login(String username, String password) {
@@ -94,12 +129,13 @@ public class UserDataAccessObject
             }
 
             // return User entity
-            final User user = new User(userId, response.username(), email);
-            return user;
+            return new User(userId, response.username(), email);
         } catch (NotAuthorizedException ex) {
             throw new LoginFailedException("Incorrect username or password.");
         } catch (UserNotFoundException ex) {
             throw new LoginFailedException("Account does not exist.");
+        } catch (UserNotConfirmedException ex) {
+            throw new LoginFailedException("Login failed. Please verify your account.");
         } catch (CognitoIdentityProviderException ex) {
             throw new LoginFailedException("Login failed. Please try again.");
         }

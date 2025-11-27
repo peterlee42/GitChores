@@ -22,11 +22,19 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.GetUserRequ
 import software.amazon.awssdk.services.cognitoidentityprovider.model.GetUserResponse;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.InitiateAuthRequest;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.InitiateAuthResponse;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.InvalidParameterException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.InvalidPasswordException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.NotAuthorizedException;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.SignUpRequest;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.UserNotFoundException;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.UsernameExistsException;
 import use_case.logged_in.LoggedInDataAccessInterface;
 import use_case.login.LoginDataAccessInterface;
+import use_case.login.LoginFailedException;
 import use_case.signup.SignupDataAccessInterface;
+import use_case.signup.SignupFailedException;
 
+@SuppressWarnings("ClassFanOutComplexityCheck")
 public class UserDataAccessObject
         implements SignupDataAccessInterface, LoginDataAccessInterface, LoggedInDataAccessInterface {
     private static final String HMAC_SHA256_ALGORITHM = "HmacSHA256";
@@ -88,9 +96,12 @@ public class UserDataAccessObject
             // return User entity
             final User user = new User(userId, response.username(), email);
             return user;
+        } catch (NotAuthorizedException ex) {
+            throw new LoginFailedException("Incorrect username or password.");
+        } catch (UserNotFoundException ex) {
+            throw new LoginFailedException("Account does not exist.");
         } catch (CognitoIdentityProviderException ex) {
-            System.err.println(ex.awsErrorDetails().errorMessage());
-            throw ex;
+            throw new LoginFailedException("Login failed. Please try again.");
         }
     }
 
@@ -103,13 +114,22 @@ public class UserDataAccessObject
                 .build();
         final List<AttributeType> attributes = new ArrayList<>();
         attributes.add(attributeType);
+
+        String secretVal = null;
+
         try {
             // calculate hash
-            final String secretVal = calculateSecretHash(
+            secretVal = calculateSecretHash(
                     clientId,
                     clientSecret,
                     username);
+        } catch (NoSuchAlgorithmException ex) {
+            ex.printStackTrace();
+        } catch (InvalidKeyException ex) {
+            ex.printStackTrace();
+        }
 
+        try {
             // request sign up
             final SignUpRequest signUpRequest = SignUpRequest.builder()
                     .clientId(clientId)
@@ -120,12 +140,18 @@ public class UserDataAccessObject
 
             identityProviderClient.signUp(signUpRequest);
 
+        } catch (UsernameExistsException ex) {
+            throw new SignupFailedException("User already exists.");
+        } catch (InvalidPasswordException | InvalidParameterException ex) {
+            final String errorMessage = "Passwords must contain:\n"
+                    + "At least 8 characters\n"
+                    + "One uppercase letter\n"
+                    + "One lowercase letter\n"
+                    + "One digit\n"
+                    + "One special character.";
+            throw new SignupFailedException(errorMessage);
         } catch (CognitoIdentityProviderException ex) {
-            System.err.println(ex.awsErrorDetails().errorMessage());
-        } catch (NoSuchAlgorithmException ex) {
-            ex.printStackTrace();
-        } catch (InvalidKeyException ex) {
-            ex.printStackTrace();
+            throw new SignupFailedException("An error occurred during signup.");
         }
     }
 

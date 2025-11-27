@@ -1,10 +1,10 @@
 package use_case.room.create;
 
+import java.security.SecureRandom;
+
 import entity.DomainIdGenerator;
 import entity.Room;
 import use_case.room.RoomDataAccessInterface;
-
-import java.security.SecureRandom;
 
 public class CreateRoomInteractor implements CreateRoomInputBoundary {
     private static final int INVITE_CODE_LENGTH = 6;
@@ -29,48 +29,42 @@ public class CreateRoomInteractor implements CreateRoomInputBoundary {
 
     @Override
     public void execute(CreateRoomInputData inputData) {
-        try {
-            if (inputData.getRoomName() == null || inputData.getRoomName().trim().isEmpty()) {
-                outputBoundary.presentFailure("Room name cannot be empty");
-                return;
-            }
-
-            if (inputData.getOwnerId() == null || inputData.getOwnerId().trim().isEmpty()) {
-                outputBoundary.presentFailure("Owner ID cannot be empty");
-                return;
-            }
-
-            // Generate room ID, invite code
-            final String roomId = DomainIdGenerator.generateIdWithPrefix("room");
-            final String inviteCode = generateInviteCode();
-
-            // Create room entity
-            final Room room = new Room(
-                    roomId,
-                    inputData.getRoomName(),
-                    inputData.getDescription(),
-                    inputData.getOwnerId(),
-                    inviteCode
-            );
-
-            roomDataAccess.saveRoom(room);
-
-            // Add owner to room
-            roomDataAccess.addUserToRoom(roomId, inputData.getOwnerId());
-
-            // Success Confirmation
-            final CreateRoomOutputData outputData = new CreateRoomOutputData(
-                    roomId,
-                    inputData.getRoomName(),
-                    inviteCode,
-                    true
-            );
-            outputBoundary.presentSuccess(outputData);
-
+        if (inputData.getRoomName() == null || inputData.getRoomName().trim().isEmpty()) {
+            outputBoundary.presentFailure("Room name cannot be empty");
+            return;
         }
-        catch (Exception exception) {
-            outputBoundary.presentFailure("Failed to create room: " + exception.getMessage());
+
+        if (inputData.getOwnerId() == null || inputData.getOwnerId().trim().isEmpty()) {
+            outputBoundary.presentFailure("Owner ID cannot be empty");
+            return;
         }
+
+        // Generate room ID, invite code
+        final String roomId = DomainIdGenerator.generateIdWithPrefix("room");
+        final String inviteCode = generateInviteCode();
+
+        // Create room entity
+        final Room room = new Room(
+                roomId,
+                inputData.getRoomName(),
+                inputData.getDescription(),
+                inputData.getOwnerId(),
+                inviteCode
+        );
+
+        roomDataAccess.saveRoom(room);
+
+        // Add owner to room
+        roomDataAccess.addUserToRoom(roomId, inputData.getOwnerId());
+
+        // Success Confirmation
+        final CreateRoomOutputData outputData = new CreateRoomOutputData(
+                roomId,
+                inputData.getRoomName(),
+                inviteCode,
+                true
+        );
+        outputBoundary.presentSuccess(outputData);
     }
 
     private String generateInviteCode() {

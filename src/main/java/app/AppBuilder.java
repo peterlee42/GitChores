@@ -210,6 +210,11 @@ public class AppBuilder {
         };
 
         profileView = new ProfileView(viewManagerModel, backTarget, navigator);
+
+        // TEMP: populate profile with user info.
+        // Later, replace these with the real logged-in user’s data.
+        profileView.setUserInfo("Demo User", "demo@example.com");
+
         return this;
     }
 

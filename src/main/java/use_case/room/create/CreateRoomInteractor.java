@@ -11,31 +11,31 @@ public class CreateRoomInteractor implements CreateRoomInputBoundary {
     private static final String INVITE_CODE_CHARS = "0123456789";
 
     private final RoomDataAccessInterface roomDataAccess;
-    private final CreateRoomOutputBoundary outputBoundary;
+    private final CreateRoomOutputBoundary createRoomPresenter;
     private final SecureRandom random;
 
     /**
      * Constructs a CreateRoomInteractor.
      *
-     * @param roomDataAccess the room data access
-     * @param outputBoundary the output boundary
+     * @param roomDataAccess      the room data access
+     * @param createRoomPresenter the output boundary
      */
     public CreateRoomInteractor(RoomDataAccessInterface roomDataAccess,
-                                CreateRoomOutputBoundary outputBoundary) {
+            CreateRoomOutputBoundary createRoomPresenter) {
         this.roomDataAccess = roomDataAccess;
-        this.outputBoundary = outputBoundary;
+        this.createRoomPresenter = createRoomPresenter;
         this.random = new SecureRandom();
     }
 
     @Override
     public void execute(CreateRoomInputData inputData) {
         if (inputData.getRoomName() == null || inputData.getRoomName().trim().isEmpty()) {
-            outputBoundary.presentFailure("Room name cannot be empty");
+            createRoomPresenter.presentFailure("Room name cannot be empty");
             return;
         }
 
         if (inputData.getOwnerId() == null || inputData.getOwnerId().trim().isEmpty()) {
-            outputBoundary.presentFailure("Owner ID cannot be empty");
+            createRoomPresenter.presentFailure("Owner ID cannot be empty");
             return;
         }
 
@@ -49,8 +49,7 @@ public class CreateRoomInteractor implements CreateRoomInputBoundary {
                 inputData.getRoomName(),
                 inputData.getDescription(),
                 inputData.getOwnerId(),
-                inviteCode
-        );
+                inviteCode);
 
         roomDataAccess.saveRoom(room);
 
@@ -62,9 +61,18 @@ public class CreateRoomInteractor implements CreateRoomInputBoundary {
                 roomId,
                 inputData.getRoomName(),
                 inviteCode,
-                true
-        );
-        outputBoundary.presentSuccess(outputData);
+                true);
+        createRoomPresenter.presentSuccess(outputData);
+    }
+
+    @Override
+    public void switchToJoinView() {
+        createRoomPresenter.switchToJoinView();
+    }
+
+    @Override
+    public void switchToLoginView() {
+        createRoomPresenter.switchToLoginView();
     }
 
     private String generateInviteCode() {

@@ -21,9 +21,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import interface_adapter.room.join.JoinRoomController;
-import interface_adapter.room.join.JoinState;
-import interface_adapter.room.join.JoinViewModel;
+import interface_adapter.room.create.CreateRoomController;
+import interface_adapter.room.create.CreateRoomState;
+import interface_adapter.room.create.CreateRoomViewModel;
 import interface_adapter.session.SessionState;
 import interface_adapter.session.SessionViewModel;
 
@@ -31,33 +31,35 @@ import interface_adapter.session.SessionViewModel;
  * The view for joining or creating a room.
  */
 @SuppressWarnings("checkstyle:ClassDataAbstractionCoupling")
-public class JoinView extends JPanel implements ActionListener, PropertyChangeListener {
-    private static final String VIEW_NAME = "join_room";
+public class CreateRoomView extends JPanel implements ActionListener,
+        PropertyChangeListener {
+    private static final String VIEW_NAME = "create_room";
 
-    private final JoinViewModel joinViewModel;
+    private final CreateRoomViewModel createRoomViewModel;
     private final SessionViewModel sessionViewModel;
 
-    private final JTextField inviteCodeField;
+    private final JTextField roomNameField;
+    private final JTextField roomDescriptionField;
 
-    private final JButton joinButton;
+    private final JButton createButton;
     private final JButton backToLoginButton;
+    private final JButton toJoinButton;
 
-    private JoinRoomController joinRoomController;
+    private CreateRoomController createRoomController;
     private String currentUserId;
 
-    private JButton toCreateButton;
-
     /**
-     * Constructs a JoinView with the given JoinViewModel and SessionModel.
+     * Constructs a CreateRoomView with the given CreateRoomViewModel and
+     * SessionModel.
      *
-     * @param joinViewModel    the JoinViewModel
-     * @param sessionViewModel the SessionModel
+     * @param createRoomViewModel the CreateRoomViewModel
+     * @param sessionViewModel    the SessionModel
      */
     @SuppressWarnings("checkstyle:ExecutableStatementCountCheck")
-    public JoinView(JoinViewModel joinViewModel, SessionViewModel sessionViewModel) {
-        this.joinViewModel = joinViewModel;
+    public CreateRoomView(CreateRoomViewModel createRoomViewModel, SessionViewModel sessionViewModel) {
+        this.createRoomViewModel = createRoomViewModel;
         this.sessionViewModel = sessionViewModel;
-        this.joinViewModel.addPropertyChangeListener(this);
+        this.createRoomViewModel.addPropertyChangeListener(this);
         this.sessionViewModel.addPropertyChangeListener(this);
 
         setLayout(new BorderLayout());
@@ -66,12 +68,14 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
         // Main panel
         final JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBackground(Color.WHITE);
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(ViewConstants.PANEL_PADDING, ViewConstants.PANEL_PADDING,
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(ViewConstants.PANEL_PADDING,
+                ViewConstants.PANEL_PADDING,
                 ViewConstants.PANEL_PADDING, ViewConstants.PANEL_PADDING));
 
         final GridBagConstraints constraints = new GridBagConstraints();
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.insets = new Insets(ViewConstants.COMPONENT_SPACING / 2, 0, ViewConstants.COMPONENT_SPACING / 2, 0);
+        constraints.insets = new Insets(ViewConstants.COMPONENT_SPACING / 2, 0,
+                ViewConstants.COMPONENT_SPACING / 2, 0);
         constraints.gridx = 0;
         constraints.gridy = 0;
 
@@ -85,35 +89,37 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
 
         // Spacing
         constraints.gridy++;
-        mainPanel.add(Box.createRigidArea(new Dimension(0, ViewConstants.SPACING_20)), constraints);
+        mainPanel.add(Box.createRigidArea(new Dimension(0,
+                ViewConstants.SPACING_20)), constraints);
 
         // Initialize fields
-        inviteCodeField = new JTextField(ViewConstants.INVITE_CODE_COLUMNS);
-        joinButton = new ButtonBuilder()
-                .setText(ViewConstants.JOIN_BUTTON_TEXT)
+        roomNameField = new JTextField(ViewConstants.TEXT_FIELD_COLUMNS);
+        roomDescriptionField = new JTextField(ViewConstants.TEXT_FIELD_COLUMNS);
+        createButton = new ButtonBuilder()
+                .setText("Create " + ViewConstants.CREATE_BUTTON_TEXT)
                 .setFont(ViewConstants.BUTTON_FONT)
-                .setBackground(ViewColors.ORANGE)
+                .setBackground(ViewColors.DARK_BLUE)
                 .setForeground(Color.WHITE)
                 .build();
 
-        // Join Section
-        final JPanel joinSection = buildJoinSection();
+        // Create Section
+        final JPanel createSection = buildCreateSection();
         constraints.gridy++;
-        mainPanel.add(joinSection, constraints);
+        mainPanel.add(createSection, constraints);
 
         // Separator
         constraints.gridy++;
         mainPanel.add(buildSeparator(), constraints);
 
-        // Create Room button
-        toCreateButton = new ButtonBuilder()
-                .setText("Create Room")
+        // Join Room button
+        toJoinButton = new ButtonBuilder()
+                .setText("Join Room")
                 .setFont(ViewConstants.LABEL_FONT)
-                .setBackground(ViewColors.DARK_BLUE)
+                .setBackground(ViewColors.ORANGE)
                 .setForeground(Color.WHITE)
                 .build();
         constraints.gridy++;
-        mainPanel.add(toCreateButton, constraints);
+        mainPanel.add(toJoinButton, constraints);
 
         // Back button
         constraints.gridy++;
@@ -129,54 +135,68 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
 
         add(mainPanel, BorderLayout.CENTER);
 
-        joinButton.addActionListener(this);
-        toCreateButton.addActionListener(new ActionListener() {
+        createButton.addActionListener(this);
+        toJoinButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                // Switch to create room view
-                joinRoomController.switchToCreateView();
+                createRoomController.switchToJoinView();
             }
         });
         backToLoginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                // Switch to login view
-                joinRoomController.switchToLoginView();
+                createRoomController.switchToLoginView();
             }
         });
     }
 
-    private JPanel buildJoinSection() {
+    @SuppressWarnings("checkstyle:ExecutableStatementCountCheck")
+    private JPanel buildCreateSection() {
         final JPanel section = new JPanel();
         section.setLayout(new BoxLayout(section, BoxLayout.Y_AXIS));
         section.setBackground(Color.WHITE);
         section.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(ViewConstants.BORDER_COLOR, ViewConstants.BORDER_COLOR,
+                BorderFactory.createLineBorder(new Color(ViewConstants.BORDER_COLOR,
+                        ViewConstants.BORDER_COLOR,
                         ViewConstants.BORDER_COLOR), ViewConstants.BORDER_WIDTH),
-                BorderFactory.createEmptyBorder(ViewConstants.SPACING_20, ViewConstants.SPACING_20,
+                BorderFactory.createEmptyBorder(ViewConstants.SPACING_20,
+                        ViewConstants.SPACING_20,
                         ViewConstants.SPACING_20, ViewConstants.SPACING_20)));
 
-        final JLabel sectionTitle = new JLabel("Join Existing Room");
+        final JLabel sectionTitle = new JLabel("Create New Room");
         sectionTitle.setFont(ViewConstants.TITLE_FONT);
         sectionTitle.setForeground(ViewColors.DARK_BLUE);
         sectionTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        inviteCodeField.setFont(ViewConstants.LABEL_FONT);
-        inviteCodeField.setMaximumSize(new Dimension(ViewConstants.CODE_FIELD_WIDTH, ViewConstants.FIELD_HEIGHT));
+        roomNameField.setFont(ViewConstants.LABEL_FONT);
+        roomNameField.setMaximumSize(new Dimension(ViewConstants.FIELD_WIDTH,
+                ViewConstants.FIELD_HEIGHT));
 
-        final JLabel codeLabel = new JLabel("Enter Invite Code:");
-        codeLabel.setFont(ViewConstants.LABEL_FONT);
-        codeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        roomDescriptionField.setFont(ViewConstants.LABEL_FONT);
+        roomDescriptionField.setMaximumSize(new Dimension(ViewConstants.FIELD_WIDTH,
+                ViewConstants.FIELD_HEIGHT));
 
-        joinButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        final JLabel nameLabel = new JLabel("Room Name:");
+        nameLabel.setFont(ViewConstants.LABEL_FONT);
+        nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        final JLabel descLabel = new JLabel("Description (optional):");
+        descLabel.setFont(ViewConstants.LABEL_FONT);
+        descLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        createButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         section.add(sectionTitle);
         section.add(Box.createRigidArea(new Dimension(0, ViewConstants.SPACING_15)));
-        section.add(codeLabel);
+        section.add(nameLabel);
         section.add(Box.createRigidArea(new Dimension(0, ViewConstants.SPACING_5)));
-        section.add(inviteCodeField);
+        section.add(roomNameField);
+        section.add(Box.createRigidArea(new Dimension(0, ViewConstants.SPACING_10)));
+        section.add(descLabel);
+        section.add(Box.createRigidArea(new Dimension(0, ViewConstants.SPACING_5)));
+        section.add(roomDescriptionField);
         section.add(Box.createRigidArea(new Dimension(0, ViewConstants.SPACING_15)));
-        section.add(joinButton);
+        section.add(createButton);
 
         return section;
     }
@@ -192,29 +212,31 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
         orLabel.setHorizontalAlignment(JLabel.CENTER);
 
         separator.add(orLabel, BorderLayout.CENTER);
-        separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, ViewConstants.SEPARATOR_HEIGHT));
+        separator.setMaximumSize(new Dimension(Integer.MAX_VALUE,
+                ViewConstants.SEPARATOR_HEIGHT));
 
         return separator;
     }
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        if (evt.getSource() == joinButton) {
-            final String inviteCode = inviteCodeField.getText().trim();
-            if (inviteCode.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please enter an invite code",
+        if (evt.getSource() == createButton) {
+            final String roomName = roomNameField.getText().trim();
+            if (roomName.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Please enter a room name",
                         ViewConstants.ERROR_PREFIX, JOptionPane.ERROR_MESSAGE);
             } else if (currentUserId == null) {
                 JOptionPane.showMessageDialog(this, "User not logged in",
                         ViewConstants.ERROR_PREFIX, JOptionPane.ERROR_MESSAGE);
-            } else if (joinRoomController != null) {
-                joinRoomController.execute(inviteCode, currentUserId);
+            } else if (createRoomController != null) {
+                final String description = roomDescriptionField.getText().trim();
+                createRoomController.execute(roomName, description, currentUserId);
             }
         }
     }
 
-    public void setJoinRoomController(JoinRoomController joinRoomController) {
-        this.joinRoomController = joinRoomController;
+    public void setCreateRoomController(CreateRoomController createRoomController) {
+        this.createRoomController = createRoomController;
     }
 
     public void setCurrentUserId(String userId) {
@@ -231,13 +253,13 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
             return;
         }
 
-        // join view model
-        if (evt.getSource() == joinViewModel) {
-            final JoinState joinState = (JoinState) evt.getNewValue();
+        // create room view model
+        if (evt.getSource() == createRoomViewModel) {
+            final CreateRoomState createRoomState = (CreateRoomState) evt.getNewValue();
 
-            if (joinState.getJoinError() != null) {
+            if (createRoomState.getError() != null) {
                 JOptionPane.showMessageDialog(this,
-                        joinState.getJoinError(),
+                        createRoomState.getError(),
                         ViewConstants.ERROR_PREFIX,
                         JOptionPane.ERROR_MESSAGE);
             }

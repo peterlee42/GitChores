@@ -21,4 +21,18 @@ public class JoinRoomController {
         final JoinRoomInputData inputData = new JoinRoomInputData(inviteCode, userId);
         interactor.execute(inputData);
     }
+
+    /**
+     * Executes the "switch to createView" Use Case.
+     */
+    public void switchToCreateView() {
+        interactor.switchToCreateView();
+    }
+
+    /**
+     * Executes the "switch to loginView" Use Case.
+     */
+    public void switchToLoginView() {
+        interactor.switchToLoginView();
+    }
 }

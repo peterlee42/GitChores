@@ -57,4 +57,15 @@ public class SessionState {
                 + ", sessionError='" + sessionError + '\''
                 + '}';
     }
+
+    /**
+     * Clears the session state.
+     */
+    public void clear() {
+        this.username = null;
+        this.userId = null;
+        this.email = null;
+        this.roomId = null;
+        this.sessionError = null;
+    }
 }

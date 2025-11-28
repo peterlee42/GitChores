@@ -51,6 +51,7 @@ import use_case.signup.SignupDataAccessInterface;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
+import view.CreateRoomView;
 import view.DashboardView;
 import view.GitConsoleView;
 import view.JoinView;
@@ -83,6 +84,8 @@ public class AppBuilder {
     private GitConsoleView gitConsoleView;
     private GitConsoleViewModel gitConsoleViewModel;
     private ProfileView profileView;
+    private CreateRoomView createRoomView;
+    private CreateRoomViewModel createRoomViewModel;
 
     private SessionViewModel sessionViewModel;
 
@@ -128,6 +131,18 @@ public class AppBuilder {
         joinViewModel = new JoinViewModel();
         joinView = new JoinView(joinViewModel, sessionViewModel);
         cardPanel.add(joinView, joinView.getViewName());
+        return this;
+    }
+
+    /**
+     * Adds create room view.
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addCreateRoomView() {
+        createRoomViewModel = new CreateRoomViewModel();
+        createRoomView = new CreateRoomView(createRoomViewModel, sessionViewModel);
+        cardPanel.add(createRoomView, createRoomView.getViewName());
         return this;
     }
 
@@ -234,24 +249,27 @@ public class AppBuilder {
         if (joinView == null || joinViewModel == null) {
             return this;
         }
+        if (createRoomView == null || createRoomViewModel == null) {
+            return this;
+        }
 
         final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
 
         // Create Room use case
-        final CreateRoomViewModel createRoomViewModel = new CreateRoomViewModel();
         final CreateRoomPresenter createRoomPresenter = new CreateRoomPresenter(createRoomViewModel,
-                viewManagerModel, sessionViewModel);
+                viewManagerModel, sessionViewModel, loginViewModel, joinViewModel);
         final CreateRoomInputBoundary createRoomInteractor = new CreateRoomInteractor(roomDataAccess,
                 createRoomPresenter);
         final CreateRoomController createRoomController = new CreateRoomController(createRoomInteractor);
 
+        createRoomView.setCreateRoomController(createRoomController);
+
         // Join Room use case (reuse existing JoinViewModel)
         final JoinRoomPresenter joinRoomPresenter = new JoinRoomPresenter(joinViewModel, viewManagerModel,
-                sessionViewModel);
+                sessionViewModel, loginViewModel, createRoomViewModel);
         final JoinRoomInputBoundary joinRoomInteractor = new JoinRoomInteractor(roomDataAccess, joinRoomPresenter);
         final JoinRoomController joinRoomController = new JoinRoomController(joinRoomInteractor);
 
-        joinView.setCreateRoomController(createRoomController);
         joinView.setJoinRoomController(joinRoomController);
 
         return this;

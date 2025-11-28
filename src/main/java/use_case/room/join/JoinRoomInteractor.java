@@ -6,22 +6,22 @@ import use_case.room.RoomDataAccessInterface;
 public class JoinRoomInteractor implements JoinRoomInputBoundary {
 
     private final RoomDataAccessInterface roomDataAccess;
-    private final JoinRoomOutputBoundary outputBoundary;
+    private final JoinRoomOutputBoundary joinRoomPresenter;
 
-    public JoinRoomInteractor(RoomDataAccessInterface roomDataAccess, JoinRoomOutputBoundary outputBoundary) {
+    public JoinRoomInteractor(RoomDataAccessInterface roomDataAccess, JoinRoomOutputBoundary joinRoomPresenter) {
         this.roomDataAccess = roomDataAccess;
-        this.outputBoundary = outputBoundary;
+        this.joinRoomPresenter = joinRoomPresenter;
     }
 
     @Override
     public void execute(JoinRoomInputData inputData) {
         if (inputData.getInviteCode() == null || inputData.getInviteCode().trim().isEmpty()) {
-            outputBoundary.presentFailure("Invite code cannot be empty");
+            joinRoomPresenter.presentFailure("Invite code cannot be empty");
             return;
         }
 
         if (inputData.getUserId() == null || inputData.getUserId().trim().isEmpty()) {
-            outputBoundary.presentFailure("User ID cannot be empty");
+            joinRoomPresenter.presentFailure("User ID cannot be empty");
             return;
         }
 
@@ -29,13 +29,13 @@ public class JoinRoomInteractor implements JoinRoomInputBoundary {
         final Room room = roomDataAccess.getRoomByInviteCode(inputData.getInviteCode());
 
         if (room == null) {
-            outputBoundary.presentFailure("Invalid invite code");
+            joinRoomPresenter.presentFailure("Invalid invite code");
             return;
         }
 
         // Check if user is already in the room
         if (roomDataAccess.isUserInRoom(room.getId(), inputData.getUserId())) {
-            outputBoundary.presentFailure("You are already a member of this room");
+            joinRoomPresenter.presentFailure("You are already a member of this room");
             return;
         }
 
@@ -48,6 +48,16 @@ public class JoinRoomInteractor implements JoinRoomInputBoundary {
                 room.getName(),
                 true,
                 null);
-        outputBoundary.presentSuccess(outputData);
+        joinRoomPresenter.presentSuccess(outputData);
+    }
+
+    @Override
+    public void switchToCreateView() {
+        joinRoomPresenter.switchToCreateView();
+    }
+
+    @Override
+    public void switchToLoginView() {
+        joinRoomPresenter.switchToLoginView();
     }
 }

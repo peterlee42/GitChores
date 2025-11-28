@@ -1,4 +1,4 @@
-package interface_adapter.logged_in;
+package interface_adapter.session;
 
 import interface_adapter.ViewModel;
 

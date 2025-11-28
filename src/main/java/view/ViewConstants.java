@@ -24,6 +24,8 @@ public final class ViewConstants {
     public static final String JOIN_BUTTON_TEXT = "Join Room";
     public static final String CREATE_BUTTON_TEXT = "Room";
     public static final String PROFILE_BUTTON_TEXT = "Profile";
+    public static final String CHANGE_PHOTO_BUTTON_TEXT = "Change Photo";
+    public static final String LEAVE_ROOM_BUTTON_TEXT = "Leave Room";
 
     // ---- Error Labels ----
     public static final String ERROR_PREFIX = "Error: ";
@@ -31,6 +33,12 @@ public final class ViewConstants {
     // ---- Layout ----
     public static final int TEXT_FIELD_COLUMNS = 24;
     public static final int V_GAP = 16;
+    public static final int PROFILE_MAIN_CENTER_GAP = V_GAP * 3;
+
+    // ---- Profile photo ----
+    public static final int PROFILE_PHOTO_WIDTH = 140;
+    public static final int PROFILE_PHOTO_HEIGHT = 140;
+    public static final int PROFILE_PHOTO_BORDER_THICKNESS = 2;
 
     // ---- Font ----
     public static final String FONT_FAMILY = "Inter";

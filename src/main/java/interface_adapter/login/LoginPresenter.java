@@ -40,9 +40,6 @@ public class LoginPresenter implements LoginOutputBoundary {
         loginViewModel.setState(new LoginState());
         loginViewModel.firePropertyChange();
 
-        final SessionState newSessionState = sessionViewModel.getState();
-        System.out.println(newSessionState.toString());
-
         // TODO: switch to screen based on user status
         viewManagerModel.setState(joinViewModel.getViewName());
         viewManagerModel.firePropertyChange();

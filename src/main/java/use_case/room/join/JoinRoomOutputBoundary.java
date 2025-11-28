@@ -15,4 +15,14 @@ public interface JoinRoomOutputBoundary {
      * @param errorMessage the error message
      */
     void presentFailure(String errorMessage);
+
+    /**
+     * Executes the switch to login view use case.
+     */
+    void switchToLoginView();
+
+    /**
+     * Executes the switch to create view use case.
+     */
+    void switchToCreateView();
 }

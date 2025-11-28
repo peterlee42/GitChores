@@ -1,4 +1,4 @@
-package interface_adapter.join;
+package interface_adapter.room.join;
 
 import interface_adapter.ViewModel;
 

@@ -21,21 +21,22 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import interface_adapter.SessionModel;
-import interface_adapter.join.JoinState;
-import interface_adapter.join.JoinViewModel;
+import interface_adapter.logged_in.SessionState;
+import interface_adapter.logged_in.SessionViewModel;
 import interface_adapter.room.create.CreateRoomController;
 import interface_adapter.room.join.JoinRoomController;
+import interface_adapter.room.join.JoinState;
+import interface_adapter.room.join.JoinViewModel;
 
 /**
  * The view for joining or creating a room.
  */
 @SuppressWarnings("checkstyle:ClassDataAbstractionCoupling")
 public class JoinView extends JPanel implements ActionListener, PropertyChangeListener {
-    private static final String VIEW_NAME = "join/create";
+    private static final String VIEW_NAME = "join";
 
     private final JoinViewModel joinViewModel;
-    private final SessionModel sessionModel;
+    private final SessionViewModel sessionViewModel;
 
     private final JTextField roomNameField;
     private final JTextField roomDescriptionField;
@@ -52,15 +53,15 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
     /**
      * Constructs a JoinView with the given JoinViewModel and SessionModel.
      *
-     * @param joinViewModel the JoinViewModel
-     * @param sessionModel  the SessionModel
+     * @param joinViewModel    the JoinViewModel
+     * @param sessionViewModel the SessionModel
      */
     @SuppressWarnings("checkstyle:ExecutableStatementCountCheck")
-    public JoinView(JoinViewModel joinViewModel, SessionModel sessionModel) {
+    public JoinView(JoinViewModel joinViewModel, SessionViewModel sessionViewModel) {
         this.joinViewModel = joinViewModel;
-        this.sessionModel = sessionModel;
+        this.sessionViewModel = sessionViewModel;
         this.joinViewModel.addPropertyChangeListener(this);
-        this.sessionModel.addPropertyChangeListener(this);
+        this.sessionViewModel.addPropertyChangeListener(this);
 
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
@@ -148,8 +149,7 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
                 BorderFactory.createLineBorder(new Color(ViewConstants.BORDER_COLOR, ViewConstants.BORDER_COLOR,
                         ViewConstants.BORDER_COLOR), ViewConstants.BORDER_WIDTH),
                 BorderFactory.createEmptyBorder(ViewConstants.SPACING_20, ViewConstants.SPACING_20,
-                        ViewConstants.SPACING_20, ViewConstants.SPACING_20)
-        ));
+                        ViewConstants.SPACING_20, ViewConstants.SPACING_20)));
 
         final JLabel sectionTitle = new JLabel("Join Existing Room");
         sectionTitle.setFont(ViewConstants.TITLE_FONT);
@@ -185,8 +185,7 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
                 BorderFactory.createLineBorder(new Color(ViewConstants.BORDER_COLOR, ViewConstants.BORDER_COLOR,
                         ViewConstants.BORDER_COLOR), ViewConstants.BORDER_WIDTH),
                 BorderFactory.createEmptyBorder(ViewConstants.SPACING_20, ViewConstants.SPACING_20,
-                        ViewConstants.SPACING_20, ViewConstants.SPACING_20)
-        ));
+                        ViewConstants.SPACING_20, ViewConstants.SPACING_20)));
 
         final JLabel sectionTitle = new JLabel("Create New Room");
         sectionTitle.setFont(ViewConstants.TITLE_FONT);
@@ -247,31 +246,25 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
             if (inviteCode.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please enter an invite code",
                         ViewConstants.ERROR_PREFIX, JOptionPane.ERROR_MESSAGE);
-            }
-            else if (currentUserId == null) {
+            } else if (currentUserId == null) {
                 JOptionPane.showMessageDialog(this, "User not logged in",
                         ViewConstants.ERROR_PREFIX, JOptionPane.ERROR_MESSAGE);
-            }
-            else if (joinRoomController != null) {
+            } else if (joinRoomController != null) {
                 joinRoomController.execute(inviteCode, currentUserId);
             }
-        }
-        else if (evt.getSource() == createButton) {
+        } else if (evt.getSource() == createButton) {
             final String roomName = roomNameField.getText().trim();
             if (roomName.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please enter a room name",
                         ViewConstants.ERROR_PREFIX, JOptionPane.ERROR_MESSAGE);
-            }
-            else if (currentUserId == null) {
+            } else if (currentUserId == null) {
                 JOptionPane.showMessageDialog(this, "User not logged in",
                         ViewConstants.ERROR_PREFIX, JOptionPane.ERROR_MESSAGE);
-            }
-            else if (createRoomController != null) {
+            } else if (createRoomController != null) {
                 final String description = roomDescriptionField.getText().trim();
                 createRoomController.execute(roomName, description, currentUserId);
             }
-        }
-        else if (evt.getSource() == backToSignupButton) {
+        } else if (evt.getSource() == backToSignupButton) {
             JOptionPane.showMessageDialog(this, "Please sign up or login first");
         }
     }
@@ -290,15 +283,23 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource() == sessionModel) {
-            // Update currentUserId from session when user logs in
-            this.currentUserId = sessionModel.getUserId();
+
+        // session view model
+        if (evt.getSource() == sessionViewModel) {
+            final SessionState sessionState = (SessionState) evt.getNewValue();
+            this.currentUserId = sessionState.getUserId();
+            return;
         }
-        else if (evt.getSource() == joinViewModel) {
-            final JoinState state = (JoinState) evt.getNewValue();
-            if (state.getJoinError() != null) {
-                JOptionPane.showMessageDialog(this, state.getJoinError(),
-                        ViewConstants.ERROR_PREFIX, JOptionPane.ERROR_MESSAGE);
+
+        // join view model
+        if (evt.getSource() == joinViewModel) {
+            final JoinState joinState = (JoinState) evt.getNewValue();
+
+            if (joinState.getJoinError() != null) {
+                JOptionPane.showMessageDialog(this,
+                        joinState.getJoinError(),
+                        ViewConstants.ERROR_PREFIX,
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }

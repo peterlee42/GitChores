@@ -47,8 +47,7 @@ public class JoinRoomInteractor implements JoinRoomInputBoundary {
                 room.getId(),
                 room.getName(),
                 true,
-                null
-        );
+                null);
         outputBoundary.presentSuccess(outputData);
     }
 }

@@ -10,15 +10,13 @@ import data_access.dynamo_db.CommitDataAccessObject;
 import data_access.dynamo_db.DynamoDbClientFactory;
 import data_access.dynamo_db.RoomDataAccessObject;
 import data_access.dynamo_db.RoomMetadataDataAccessObject;
-import interface_adapter.SessionModel;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.commit.CommitController;
 import interface_adapter.commit.CommitPresenter;
 import interface_adapter.git_console.GitConsoleController;
 import interface_adapter.git_console.GitConsolePresenter;
 import interface_adapter.git_console.GitConsoleViewModel;
-import interface_adapter.join.JoinViewModel;
-import interface_adapter.logged_in.MainViewModel;
+import interface_adapter.logged_in.SessionViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
@@ -27,6 +25,7 @@ import interface_adapter.room.create.CreateRoomPresenter;
 import interface_adapter.room.create.CreateRoomViewModel;
 import interface_adapter.room.join.JoinRoomController;
 import interface_adapter.room.join.JoinRoomPresenter;
+import interface_adapter.room.join.JoinViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
@@ -76,7 +75,6 @@ public class AppBuilder {
     private MainView mainView;
     private JoinView joinView;
     private JoinViewModel joinViewModel;
-    private SessionModel sessionModel;
     private SignupView signupView;
     private SignupViewModel signupViewModel;
     private LoginView loginView;
@@ -85,7 +83,8 @@ public class AppBuilder {
     private GitConsoleView gitConsoleView;
     private GitConsoleViewModel gitConsoleViewModel;
     private ProfileView profileView;
-    private MainViewModel mainViewModel;
+
+    private SessionViewModel sessionViewModel;
 
     /**
      * Constructor for AppBuilder.
@@ -94,6 +93,9 @@ public class AppBuilder {
         cardPanel.setLayout(cardLayout);
         final ViewManager viewManager = new ViewManager(cardPanel, cardLayout);
         viewManagerModel.addPropertyChangeListener(viewManager);
+
+        // Session
+        this.sessionViewModel = new SessionViewModel();
     }
 
     /**
@@ -102,15 +104,14 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addMainView() {
-        mainViewModel = new MainViewModel();
-        mainView = new MainView(mainViewModel, dashboardView, gitConsoleView, profileView);
+        mainView = new MainView(dashboardView, gitConsoleView, profileView, sessionViewModel);
         cardPanel.add(mainView, mainView.getViewName());
         return this;
     }
 
     /**
      * Adds dashboard view - incomplete.
-     *
+     * 
      * @return AppBuilder
      */
     public AppBuilder addDashboardView() {
@@ -125,8 +126,7 @@ public class AppBuilder {
      */
     public AppBuilder addJoinView() {
         joinViewModel = new JoinViewModel();
-        sessionModel = new SessionModel();
-        joinView = new JoinView(joinViewModel, sessionModel);
+        joinView = new JoinView(joinViewModel, sessionViewModel);
         cardPanel.add(joinView, joinView.getViewName());
         return this;
     }
@@ -240,14 +240,14 @@ public class AppBuilder {
         // Create Room use case
         final CreateRoomViewModel createRoomViewModel = new CreateRoomViewModel();
         final CreateRoomPresenter createRoomPresenter = new CreateRoomPresenter(createRoomViewModel,
-                viewManagerModel, sessionModel);
+                viewManagerModel, sessionViewModel);
         final CreateRoomInputBoundary createRoomInteractor = new CreateRoomInteractor(roomDataAccess,
                 createRoomPresenter);
         final CreateRoomController createRoomController = new CreateRoomController(createRoomInteractor);
 
         // Join Room use case (reuse existing JoinViewModel)
         final JoinRoomPresenter joinRoomPresenter = new JoinRoomPresenter(joinViewModel, viewManagerModel,
-                sessionModel);
+                sessionViewModel);
         final JoinRoomInputBoundary joinRoomInteractor = new JoinRoomInteractor(roomDataAccess, joinRoomPresenter);
         final JoinRoomController joinRoomController = new JoinRoomController(joinRoomInteractor);
 
@@ -285,7 +285,7 @@ public class AppBuilder {
 
         final LoginDataAccessInterface loginDataAccess = new UserDataAccessObject(identityProviderClient);
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel, loginViewModel,
-                signupViewModel, mainViewModel);
+                signupViewModel, sessionViewModel, joinViewModel);
         final LoginInputBoundary loginInteractor = new LoginInteractor(loginOutputBoundary, loginDataAccess);
 
         final LoginController controller = new LoginController(loginInteractor);

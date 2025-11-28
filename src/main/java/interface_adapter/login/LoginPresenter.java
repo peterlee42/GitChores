@@ -1,8 +1,9 @@
 package interface_adapter.login;
 
 import interface_adapter.ViewManagerModel;
-import interface_adapter.logged_in.LoggedInState;
-import interface_adapter.logged_in.MainViewModel;
+import interface_adapter.logged_in.SessionState;
+import interface_adapter.logged_in.SessionViewModel;
+import interface_adapter.room.join.JoinViewModel;
 import interface_adapter.signup.SignupViewModel;
 import use_case.login.LoginOutputBoundary;
 import use_case.login.LoginOutputData;
@@ -12,27 +13,39 @@ public class LoginPresenter implements LoginOutputBoundary {
     private final LoginViewModel loginViewModel;
     private final SignupViewModel signupViewModel;
     private final ViewManagerModel viewManagerModel;
-    private final MainViewModel mainViewModel;
+    private final SessionViewModel sessionViewModel;
+    private final JoinViewModel joinViewModel;
+    // private final CreateRoomViewModel createRoomViewModel;
 
     public LoginPresenter(ViewManagerModel viewManagerModel,
-            LoginViewModel loginViewModel, SignupViewModel signupViewModel, MainViewModel mainViewModel) {
+            LoginViewModel loginViewModel, SignupViewModel signupViewModel, SessionViewModel sessionViewModel,
+            JoinViewModel joinViewModel) {
         this.signupViewModel = signupViewModel;
         this.loginViewModel = loginViewModel;
-        this.mainViewModel = mainViewModel;
+        this.sessionViewModel = sessionViewModel;
         this.viewManagerModel = viewManagerModel;
+        this.joinViewModel = joinViewModel;
+
     }
 
     @Override
     public void prepareSuccessView(LoginOutputData response) {
-        final LoggedInState loggedInState = mainViewModel.getState();
-        loggedInState.setUsername(response.getUsername());
-        this.mainViewModel.firePropertyChange();
+        final SessionState sessionState = sessionViewModel.getState();
+        sessionState.setUsername(response.getUsername());
+        sessionState.setUserId(response.getUserId());
+        sessionState.setEmail(response.getEmail());
 
-        // clear state
+        sessionViewModel.firePropertyChange();
+
+        // clear login state
         loginViewModel.setState(new LoginState());
+        loginViewModel.firePropertyChange();
 
-        // switch view
-        viewManagerModel.setState(mainViewModel.getViewName());
+        final SessionState newSessionState = sessionViewModel.getState();
+        System.out.println(newSessionState.toString());
+
+        // switch to screen based on user status
+        viewManagerModel.setState(joinViewModel.getViewName());
         viewManagerModel.firePropertyChange();
     }
 
@@ -40,6 +53,7 @@ public class LoginPresenter implements LoginOutputBoundary {
     public void prepareFailView(String error) {
         final LoginState loginState = loginViewModel.getState();
         loginState.setLoginError(error);
+        loginViewModel.setState(loginState);
         loginViewModel.firePropertyChange();
     }
 

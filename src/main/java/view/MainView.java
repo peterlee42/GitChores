@@ -9,11 +9,14 @@ import java.beans.PropertyChangeListener;
 import javax.swing.*;
 import javax.swing.border.Border;
 
-import interface_adapter.logged_in.LoggedInState;
-import interface_adapter.logged_in.MainViewModel;
+import interface_adapter.logged_in.SessionState;
+import interface_adapter.logged_in.SessionViewModel;
 
 public class MainView extends JPanel implements ActionListener, PropertyChangeListener {
     private final String viewName = "main";
+
+    private final int navBarHeight = 32;
+    private final int navButtonBorder = 8;
 
     private final CardLayout contentLayout = new CardLayout();
     private final JPanel contentPanel = new JPanel(contentLayout);
@@ -26,18 +29,17 @@ public class MainView extends JPanel implements ActionListener, PropertyChangeLi
     private final GitConsoleView consoleView;
     private final ProfileView profileView;
 
-    private final MainViewModel mainViewModel;
+    private final SessionViewModel sessionViewModel;
 
     private JButton activeButton;
 
-    public MainView(MainViewModel mainViewModel, DashboardView dashboardPanel, GitConsoleView consolePanel,
-            ProfileView profilePanel) {
+    public MainView(DashboardView dashboardPanel, GitConsoleView consolePanel,
+            ProfileView profilePanel, SessionViewModel sessionViewModel) {
         this.dashboardView = dashboardPanel;
         this.consoleView = consolePanel;
         this.profileView = profilePanel;
-
-        this.mainViewModel = mainViewModel;
-        this.mainViewModel.addPropertyChangeListener(this);
+        this.sessionViewModel = sessionViewModel;
+        this.sessionViewModel.addPropertyChangeListener(this);
 
         setLayout(new BorderLayout());
         final JToolBar navBar = createNavBar();
@@ -83,7 +85,7 @@ public class MainView extends JPanel implements ActionListener, PropertyChangeLi
         navBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
 
         final Dimension navSize = navBar.getPreferredSize();
-        navBar.setPreferredSize(new Dimension(navSize.width, MainViewModel.NAV_BAR_HEIGHT));
+        navBar.setPreferredSize(new Dimension(navSize.width, navBarHeight));
 
         return navBar;
     }
@@ -96,17 +98,17 @@ public class MainView extends JPanel implements ActionListener, PropertyChangeLi
         button.setForeground(Color.WHITE);
         button.setBorderPainted(true);
         button.setBorder(
-                BorderFactory.createEmptyBorder(MainViewModel.NAV_BUTTON_BORDER, 2 * MainViewModel.NAV_BUTTON_BORDER,
-                        MainViewModel.NAV_BUTTON_BORDER, 2 * MainViewModel.NAV_BUTTON_BORDER));
+                BorderFactory.createEmptyBorder(navButtonBorder, 2 * navButtonBorder,
+                        navButtonBorder, 2 * navButtonBorder));
     }
 
     private void setActiveTab(JButton button) {
         activeButton = button;
 
         final JButton[] buttons = { dashboardButton, consoleButton, profileButton };
-        final Border padding = BorderFactory.createEmptyBorder(MainViewModel.NAV_BUTTON_BORDER,
-                2 * MainViewModel.NAV_BUTTON_BORDER,
-                MainViewModel.NAV_BUTTON_BORDER, 2 * MainViewModel.NAV_BUTTON_BORDER);
+        final Border padding = BorderFactory.createEmptyBorder(navButtonBorder,
+                2 * navButtonBorder,
+                navButtonBorder, 2 * navButtonBorder);
 
         for (JButton b : buttons) {
             final boolean isActive = b == activeButton;
@@ -148,9 +150,9 @@ public class MainView extends JPanel implements ActionListener, PropertyChangeLi
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        final LoggedInState state = (LoggedInState) evt.getNewValue();
-        if (state.getLoggedInError() != null) {
-            JOptionPane.showMessageDialog(this, state.getLoggedInError());
+        final SessionState state = (SessionState) evt.getNewValue();
+        if (state.getSessionError() != null) {
+            JOptionPane.showMessageDialog(this, "Error with the current session.");
         }
     }
 

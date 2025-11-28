@@ -15,7 +15,6 @@ public class LoginPresenter implements LoginOutputBoundary {
     private final ViewManagerModel viewManagerModel;
     private final SessionViewModel sessionViewModel;
     private final JoinViewModel joinViewModel;
-    // private final CreateRoomViewModel createRoomViewModel;
 
     public LoginPresenter(ViewManagerModel viewManagerModel,
             LoginViewModel loginViewModel, SignupViewModel signupViewModel, SessionViewModel sessionViewModel,
@@ -44,7 +43,7 @@ public class LoginPresenter implements LoginOutputBoundary {
         final SessionState newSessionState = sessionViewModel.getState();
         System.out.println(newSessionState.toString());
 
-        // switch to screen based on user status
+        // TODO: switch to screen based on user status
         viewManagerModel.setState(joinViewModel.getViewName());
         viewManagerModel.firePropertyChange();
     }

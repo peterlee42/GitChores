@@ -1,8 +1,8 @@
 package interface_adapter.room.create;
 
 import interface_adapter.ViewManagerModel;
-import interface_adapter.logged_in.SessionState;
-import interface_adapter.logged_in.SessionViewModel;
+import interface_adapter.session.SessionState;
+import interface_adapter.session.SessionViewModel;
 import use_case.room.create.CreateRoomOutputBoundary;
 import use_case.room.create.CreateRoomOutputData;
 

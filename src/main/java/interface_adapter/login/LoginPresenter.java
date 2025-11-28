@@ -1,9 +1,9 @@
 package interface_adapter.login;
 
 import interface_adapter.ViewManagerModel;
-import interface_adapter.logged_in.SessionState;
-import interface_adapter.logged_in.SessionViewModel;
 import interface_adapter.room.join.JoinViewModel;
+import interface_adapter.session.SessionState;
+import interface_adapter.session.SessionViewModel;
 import interface_adapter.signup.SignupViewModel;
 import use_case.login.LoginOutputBoundary;
 import use_case.login.LoginOutputData;

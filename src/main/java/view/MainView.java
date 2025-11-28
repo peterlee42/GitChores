@@ -9,8 +9,8 @@ import java.beans.PropertyChangeListener;
 import javax.swing.*;
 import javax.swing.border.Border;
 
-import interface_adapter.logged_in.SessionState;
-import interface_adapter.logged_in.SessionViewModel;
+import interface_adapter.session.SessionState;
+import interface_adapter.session.SessionViewModel;
 
 public class MainView extends JPanel implements ActionListener, PropertyChangeListener {
     private final String viewName = "main";

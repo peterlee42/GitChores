@@ -21,12 +21,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import interface_adapter.logged_in.SessionState;
-import interface_adapter.logged_in.SessionViewModel;
 import interface_adapter.room.create.CreateRoomController;
 import interface_adapter.room.join.JoinRoomController;
 import interface_adapter.room.join.JoinState;
 import interface_adapter.room.join.JoinViewModel;
+import interface_adapter.session.SessionState;
+import interface_adapter.session.SessionViewModel;
 
 /**
  * The view for joining or creating a room.

@@ -16,19 +16,20 @@ public class Main {
         final JFrame application = appBuilder
                 .addLoginView()
                 .addSignupView()
-                // .addMainView()
-                // .addJoinView()
-                // .addDashboardView()
+                .addCreateRoomView()
+                .addJoinView()
+                .addDashboardView()
                 .addGitConsoleView()
-                // .addProfileView()
+                .addProfileView()
+                .addMainView()
                 .addSignupUseCase()
                 .addLoginUseCase()
                 .addGitConsoleUseCase()
+                .addRoomUseCases()
                 .build();
 
         application.setFocusable(true);
         application.requestFocus();
-        application.setMinimumSize(application.getMinimumSize());
 
         application.pack();
         application.setLocationRelativeTo(null);

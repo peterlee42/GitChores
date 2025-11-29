@@ -1,4 +1,4 @@
-package interface_adapter.join;
+package interface_adapter.room.join;
 
 import interface_adapter.ViewModel;
 
@@ -13,7 +13,7 @@ public class JoinViewModel extends ViewModel<JoinState> {
      * Constructor for a JoinViewModel.
      */
     public JoinViewModel() {
-        super("join");
+        super("join_room");
         setState(new JoinState());
     }
 

@@ -2,7 +2,6 @@ package view;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -33,8 +32,8 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
 
     private final JTextField usernameField = new JTextField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
     private final JTextField emailField = new JTextField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
-    private final JTextField passwordField = new JTextField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
-    private final JTextField repeatPasswordField = new JTextField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
+    private final JPasswordField passwordField = new JPasswordField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
+    private final JPasswordField repeatPasswordField = new JPasswordField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
 
     private final JLabel title;
     private final JLabel welcomeMessage;
@@ -58,8 +57,6 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         super(JSplitPane.HORIZONTAL_SPLIT);
         this.signupViewModel = signupViewModel;
         signupViewModel.addPropertyChangeListener(this);
-
-        // signupViewModel.addPropertyChangeListener(this);
 
         // initialize components
         welcomeMessage = new JLabel(SignupViewModel.WELCOME_MESSAGE);
@@ -90,8 +87,6 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         this.setContinuousLayout(true);
         this.setDividerSize(0);
         this.setBorder(null);
-
-        this.setMinimumSize(new Dimension(SignupViewModel.VIEW_WIDTH, SignupViewModel.VIEW_HEIGHT));
     }
 
     @SuppressWarnings("checkstyle:ExecutableStatementCountCheck")
@@ -162,10 +157,10 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         signupButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 signupController.execute(
-                        usernameField.getText(),
-                        emailField.getText(),
-                        passwordField.getText(),
-                        repeatPasswordField.getText());
+                        usernameField.getText().strip(),
+                        emailField.getText().strip(),
+                        String.valueOf(passwordField.getPassword()).strip(),
+                        String.valueOf(repeatPasswordField.getPassword()).strip());
             }
         });
 
@@ -246,7 +241,7 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
 
             private void documentListenerHelper() {
                 final SignupState currentState = signupViewModel.getState();
-                currentState.setPassword(new String(passwordField.getText()));
+                currentState.setPassword(String.valueOf(passwordField.getPassword()).strip());
                 signupViewModel.setState(currentState);
             }
 
@@ -273,7 +268,7 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
 
             private void documentListenerHelper() {
                 final SignupState currentState = signupViewModel.getState();
-                currentState.setRepeatPassword(new String(repeatPasswordField.getText()));
+                currentState.setRepeatPassword(String.valueOf(repeatPasswordField.getPassword()).strip());
                 signupViewModel.setState(currentState);
             }
 

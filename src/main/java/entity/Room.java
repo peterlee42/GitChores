@@ -17,7 +17,7 @@ public class Room extends AbstractDomain {
      * @param name        the room name
      * @param description the room description
      * @param ownerId     the user ID of the room owner
-     * @param inviteCode  the room invite code — TODO: generation
+     * @param inviteCode  the room invite code
      * @throws IllegalArgumentException if any of the parameters are null or empty
      */
     public Room(String id, String name, String description, String ownerId, String inviteCode) {

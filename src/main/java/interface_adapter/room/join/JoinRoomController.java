@@ -1,0 +1,37 @@
+package interface_adapter.room.join;
+
+import use_case.room.join.JoinRoomInputBoundary;
+import use_case.room.join.JoinRoomInputData;
+
+public class JoinRoomController {
+
+    private final JoinRoomInputBoundary interactor;
+
+    public JoinRoomController(JoinRoomInputBoundary interactor) {
+        this.interactor = interactor;
+    }
+
+    /**
+     * Executes the join room use case.
+     *
+     * @param inviteCode the room invite code
+     */
+    public void execute(String inviteCode) {
+        final JoinRoomInputData inputData = new JoinRoomInputData(inviteCode);
+        interactor.execute(inputData);
+    }
+
+    /**
+     * Executes the "switch to createView" Use Case.
+     */
+    public void switchToCreateView() {
+        interactor.switchToCreateView();
+    }
+
+    /**
+     * Executes the "switch to loginView" Use Case.
+     */
+    public void switchToLoginView() {
+        interactor.switchToLoginView();
+    }
+}

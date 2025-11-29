@@ -5,9 +5,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 
 public class MainView extends JPanel implements ActionListener {
     private final String viewName = "main";
+
+    private final int navBarHeight = 32;
+    private final int navButtonBorder = 8;
 
     private final CardLayout contentLayout = new CardLayout();
     private final JPanel contentPanel = new JPanel(contentLayout);
@@ -20,14 +24,26 @@ public class MainView extends JPanel implements ActionListener {
     private final GitConsoleView consoleView;
     private final ProfileView profileView;
 
-    public MainView(DashboardView dashboardPanel, GitConsoleView consolePanel, ProfileView profilePanel) {
+    private JButton activeButton;
+
+    public MainView(DashboardView dashboardPanel, GitConsoleView consolePanel,
+            ProfileView profilePanel) {
         this.dashboardView = dashboardPanel;
         this.consoleView = consolePanel;
         this.profileView = profilePanel;
-
         setLayout(new BorderLayout());
-        final JToolBar navBar = new JToolBar();
-        navBar.setFloatable(false);
+        final JToolBar navBar = createNavBar();
+
+        final ButtonGroup group = new ButtonGroup();
+        group.add(dashboardButton);
+        group.add(consoleButton);
+        group.add(profileButton);
+
+        dashboardButton.setSelected(true);
+
+        styleNavButton(dashboardButton);
+        styleNavButton(consoleButton);
+        styleNavButton(profileButton);
 
         navBar.add(dashboardButton);
         navBar.add(consoleButton);
@@ -46,6 +62,63 @@ public class MainView extends JPanel implements ActionListener {
         profileButton.addActionListener(this);
 
         contentLayout.show(contentPanel, "dashboard");
+        setActiveTab(dashboardButton);
+    }
+
+    private JToolBar createNavBar() {
+        final JToolBar navBar = new JToolBar();
+
+        navBar.setFloatable(false);
+        navBar.setRollover(true);
+        navBar.setBackground(ViewColors.ORANGE);
+        navBar.setOpaque(true);
+        navBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
+
+        final Dimension navSize = navBar.getPreferredSize();
+        navBar.setPreferredSize(new Dimension(navSize.width, navBarHeight));
+
+        return navBar;
+    }
+
+    private void styleNavButton(JButton button) {
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setOpaque(false);
+        button.setForeground(Color.WHITE);
+        button.setBorderPainted(true);
+        button.setBorder(
+                BorderFactory.createEmptyBorder(navButtonBorder, 2 * navButtonBorder,
+                        navButtonBorder, 2 * navButtonBorder));
+    }
+
+    private void setActiveTab(JButton button) {
+        activeButton = button;
+
+        final JButton[] buttons = { dashboardButton, consoleButton, profileButton };
+        final Border padding = BorderFactory.createEmptyBorder(navButtonBorder,
+                2 * navButtonBorder,
+                navButtonBorder, 2 * navButtonBorder);
+
+        for (JButton b : buttons) {
+            final boolean isActive = b == activeButton;
+
+            final Font baseFont = ViewConstants.LABEL_FONT;
+            final Font derivedFont;
+            if (isActive) {
+                derivedFont = baseFont.deriveFont(Font.BOLD);
+            } else {
+                derivedFont = baseFont.deriveFont(Font.PLAIN);
+            }
+            b.setFont(derivedFont);
+
+            if (isActive) {
+                final Border underline = BorderFactory.createMatteBorder(0, 0, 3, 0, Color.BLACK);
+                b.setBorder(BorderFactory.createCompoundBorder(underline, padding));
+            } else {
+                b.setBorder(padding);
+            }
+        }
     }
 
     @Override
@@ -53,11 +126,15 @@ public class MainView extends JPanel implements ActionListener {
         final Object source = e.getSource();
 
         if (source == dashboardButton) {
+            // TODO: Use ViewModel constant
             contentLayout.show(contentPanel, "dashboard");
+            setActiveTab(dashboardButton);
         } else if (source == consoleButton) {
             contentLayout.show(contentPanel, consoleView.getViewName());
+            setActiveTab(consoleButton);
         } else if (source == profileButton) {
             contentLayout.show(contentPanel, profileView.getViewName());
+            setActiveTab(profileButton);
         }
     }
 

@@ -4,9 +4,12 @@ import java.awt.*;
 
 import javax.swing.*;
 
-import data_access.cognito.UserDataAccessObject;
+import data_access.SessionDataAccessObject;
+import data_access.cognito.CognitoUserDataAccessObject;
+import data_access.cognito.IdentityProviderClientFactory;
 import data_access.dynamo_db.CommitDataAccessObject;
 import data_access.dynamo_db.DynamoDbClientFactory;
+import data_access.dynamo_db.RoomDataAccessObject;
 import data_access.dynamo_db.RoomMetadataDataAccessObject;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.commit.CommitController;
@@ -14,13 +17,19 @@ import interface_adapter.commit.CommitPresenter;
 import interface_adapter.git_console.GitConsoleController;
 import interface_adapter.git_console.GitConsolePresenter;
 import interface_adapter.git_console.GitConsoleViewModel;
-import interface_adapter.join.JoinViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.room.create.CreateRoomController;
+import interface_adapter.room.create.CreateRoomPresenter;
+import interface_adapter.room.create.CreateRoomViewModel;
+import interface_adapter.room.join.JoinRoomController;
+import interface_adapter.room.join.JoinRoomPresenter;
+import interface_adapter.room.join.JoinViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import use_case.commit.CommitDataAccessInterface;
 import use_case.commit.CommitInputBoundary;
@@ -30,13 +39,21 @@ import interface_adapter.chore_creation.ChoreCreationViewModel;
 import use_case.git_console.GitConsoleInputBoundary;
 import use_case.git_console.GitConsoleInteractor;
 import use_case.git_console.GitConsoleOutputBoundary;
+import use_case.logged_in.UserService;
+import use_case.login.LoginDataAccessInterface;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
+import use_case.room.RoomDataAccessInterface;
+import use_case.room.create.CreateRoomInputBoundary;
+import use_case.room.create.CreateRoomInteractor;
+import use_case.room.join.JoinRoomInputBoundary;
+import use_case.room.join.JoinRoomInteractor;
 import use_case.signup.SignupDataAccessInterface;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
+import view.CreateRoomView;
 import view.DashboardView;
 import view.GitConsoleView;
 import view.JoinView;
@@ -57,7 +74,7 @@ public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
-    private final ViewManager viewManager = new ViewManager(cardPanel, cardLayout);
+    private final DynamoDbClient dynamoDbClient = DynamoDbClientFactory.createClient();
 
     private MainView mainView;
     private JoinView joinView;
@@ -71,13 +88,26 @@ public class AppBuilder {
     private GitConsoleViewModel gitConsoleViewModel;
     private ChoreCreationView choreCreationView;
     private ProfileView profileView;
+    private CreateRoomView createRoomView;
+    private CreateRoomViewModel createRoomViewModel;
+
+    private SessionDataAccessObject sessionDataAccess;
+    private final CognitoIdentityProviderClient identityProviderClient;
+    private final CognitoUserDataAccessObject userDataAccess;
+
+    private final UserService userService;
 
     /**
      * Constructor for AppBuilder.
      */
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
+        final ViewManager viewManager = new ViewManager(cardPanel, cardLayout);
         viewManagerModel.addPropertyChangeListener(viewManager);
+        this.sessionDataAccess = new SessionDataAccessObject();
+        this.identityProviderClient = IdentityProviderClientFactory.createClient();
+        this.userDataAccess = new CognitoUserDataAccessObject(this.identityProviderClient);
+        this.userService = new UserService(userDataAccess, sessionDataAccess);
     }
 
     /**
@@ -93,7 +123,7 @@ public class AppBuilder {
 
     /**
      * Adds dashboard view - incomplete.
-     *
+     * 
      * @return AppBuilder
      */
     public AppBuilder addDashboardView() {
@@ -110,6 +140,18 @@ public class AppBuilder {
         joinViewModel = new JoinViewModel();
         joinView = new JoinView(joinViewModel);
         cardPanel.add(joinView, joinView.getViewName());
+        return this;
+    }
+
+    /**
+     * Adds create room view.
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addCreateRoomView() {
+        createRoomViewModel = new CreateRoomViewModel();
+        createRoomView = new CreateRoomView(createRoomViewModel);
+        cardPanel.add(createRoomView, createRoomView.getViewName());
         return this;
     }
 
@@ -160,9 +202,6 @@ public class AppBuilder {
         final GitConsoleOutputBoundary gitConsoleOutputBoundary = new GitConsolePresenter(gitConsoleViewModel);
 
         // Commit Use case Layer (backend logic)
-        // MIGHT NEED TO MOVE THIS LINE EXTERNALLY TO INITIALIZE ONE CLIENT
-        final DynamoDbClient dynamoDbClient = DynamoDbClientFactory.createClient();
-
         final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(dynamoDbClient);
         final RoomMetadataDataAccessInterface roomMetadataDataAccess = new RoomMetadataDataAccessObject(dynamoDbClient);
         final CommitPresenter commitPresenter = new CommitPresenter();
@@ -207,6 +246,47 @@ public class AppBuilder {
         };
 
         profileView = new ProfileView(viewManagerModel, backTarget, navigator);
+
+        // TEMP: populate profile with user info.
+        // Later, replace these with the real logged-in user’s data.
+        profileView.setUserInfo("Demo User", "demo@example.com");
+
+        return this;
+    }
+
+    /**
+     * Adds room use cases (Create and Join).
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addRoomUseCases() {
+        if (joinView == null || joinViewModel == null) {
+            return this;
+        }
+        if (createRoomView == null || createRoomViewModel == null) {
+            return this;
+        }
+
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
+
+        // Create Room use case
+        final CreateRoomPresenter createRoomPresenter = new CreateRoomPresenter(createRoomViewModel,
+                viewManagerModel, loginViewModel, joinViewModel);
+        final CreateRoomInputBoundary createRoomInteractor = new CreateRoomInteractor(roomDataAccess,
+                sessionDataAccess, createRoomPresenter, userService);
+        final CreateRoomController createRoomController = new CreateRoomController(createRoomInteractor);
+
+        createRoomView.setCreateRoomController(createRoomController);
+
+        // Join Room use case (reuse existing JoinViewModel)
+        final JoinRoomPresenter joinRoomPresenter = new JoinRoomPresenter(joinViewModel, viewManagerModel,
+                loginViewModel, createRoomViewModel);
+        final JoinRoomInputBoundary joinRoomInteractor = new JoinRoomInteractor(roomDataAccess,
+                sessionDataAccess, joinRoomPresenter, userService);
+        final JoinRoomController joinRoomController = new JoinRoomController(joinRoomInteractor);
+
+        joinView.setJoinRoomController(joinRoomController);
+
         return this;
     }
 
@@ -216,9 +296,9 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addSignupUseCase() {
-        final SignupDataAccessInterface signupDataAccess = new UserDataAccessObject();
+        final SignupDataAccessInterface signupDataAccess = userDataAccess;
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel, signupViewModel,
-                loginViewModel, gitConsoleViewModel);
+                loginViewModel);
         final SignupInputBoundary signupInteractor = new SignupInteractor(signupOutputBoundary, signupDataAccess);
 
         final SignupController controller = new SignupController(signupInteractor);
@@ -232,10 +312,11 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addLoginUseCase() {
-        // To be implemented
+        final LoginDataAccessInterface loginDataAccessInterface = userDataAccess;
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel, loginViewModel,
-                signupViewModel);
-        final LoginInputBoundary loginInteractor = new LoginInteractor(loginOutputBoundary);
+                signupViewModel, joinViewModel);
+        final LoginInputBoundary loginInteractor = new LoginInteractor(loginOutputBoundary, loginDataAccessInterface,
+                sessionDataAccess);
 
         final LoginController controller = new LoginController(loginInteractor);
         loginView.setLoginController(controller);
@@ -324,6 +405,17 @@ public class AppBuilder {
         final JFrame application = new JFrame("GitChores");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         application.add(cardPanel);
+
+        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        final int defaultWidth = (int) (screenSize.getWidth() * 0.7);
+        final int defaultHeight = (int) (screenSize.getHeight() * 0.7);
+        final int minWidth = (int) (screenSize.getWidth() * 0.5);
+        final int minHeight = (int) (screenSize.getHeight() * 0.5);
+
+        application.setPreferredSize(new Dimension(defaultWidth, defaultHeight));
+        application.setMinimumSize(new Dimension(minWidth, minHeight));
+
+        application.pack();
 
         // Start on a sensible screen if the ViewManager is wired.
         if (viewManagerModel != null) {

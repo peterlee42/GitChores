@@ -15,10 +15,9 @@ public class JoinRoomController {
      * Executes the join room use case.
      *
      * @param inviteCode the room invite code
-     * @param userId     the user ID
      */
-    public void execute(String inviteCode, String userId) {
-        final JoinRoomInputData inputData = new JoinRoomInputData(inviteCode, userId);
+    public void execute(String inviteCode) {
+        final JoinRoomInputData inputData = new JoinRoomInputData(inviteCode);
         interactor.execute(inputData);
     }
 

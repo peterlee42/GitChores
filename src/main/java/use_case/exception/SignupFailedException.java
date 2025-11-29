@@ -1,4 +1,4 @@
-package use_case.signup;
+package use_case.exception;
 
 public class SignupFailedException extends RuntimeException {
     public SignupFailedException(String message) {

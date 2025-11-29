@@ -1,6 +1,6 @@
 package use_case.login;
 
-import entity.User;
+import entity.Token;
 
 public interface LoginDataAccessInterface {
     /**
@@ -8,7 +8,7 @@ public interface LoginDataAccessInterface {
      *
      * @param username The username of the new user.
      * @param password The password of the new user.
-     * @return User object containing user information.
+     * @return Token object containing token information.
      */
-    User login(String username, String password);
+    Token login(String username, String password);
 }

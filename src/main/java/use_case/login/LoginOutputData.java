@@ -6,24 +6,18 @@ package use_case.login;
 public class LoginOutputData {
 
     private final String username;
-    private final String userId;
-    private final String email;
+    private final Boolean inRoom;
 
-    public LoginOutputData(String username, String userId, String email) {
+    public LoginOutputData(String username, Boolean inRoom) {
         this.username = username;
-        this.userId = userId;
-        this.email = email;
+        this.inRoom = inRoom;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public String getUserId() {
-        return userId;
+    public Boolean isInRoom() {
+        return inRoom;
     }
 }

@@ -3,6 +3,8 @@ package use_case.signup;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
+import use_case.exception.SignupFailedException;
+
 /**
  * The interactor for the Signup Use Case.
  */

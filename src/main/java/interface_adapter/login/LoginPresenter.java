@@ -2,8 +2,6 @@ package interface_adapter.login;
 
 import interface_adapter.ViewManagerModel;
 import interface_adapter.room.join.JoinViewModel;
-import interface_adapter.session.SessionState;
-import interface_adapter.session.SessionViewModel;
 import interface_adapter.signup.SignupViewModel;
 import use_case.login.LoginOutputBoundary;
 import use_case.login.LoginOutputData;
@@ -13,15 +11,13 @@ public class LoginPresenter implements LoginOutputBoundary {
     private final LoginViewModel loginViewModel;
     private final SignupViewModel signupViewModel;
     private final ViewManagerModel viewManagerModel;
-    private final SessionViewModel sessionViewModel;
     private final JoinViewModel joinViewModel;
 
     public LoginPresenter(ViewManagerModel viewManagerModel,
-            LoginViewModel loginViewModel, SignupViewModel signupViewModel, SessionViewModel sessionViewModel,
+            LoginViewModel loginViewModel, SignupViewModel signupViewModel,
             JoinViewModel joinViewModel) {
         this.signupViewModel = signupViewModel;
         this.loginViewModel = loginViewModel;
-        this.sessionViewModel = sessionViewModel;
         this.viewManagerModel = viewManagerModel;
         this.joinViewModel = joinViewModel;
 
@@ -29,20 +25,18 @@ public class LoginPresenter implements LoginOutputBoundary {
 
     @Override
     public void prepareSuccessView(LoginOutputData response) {
-        final SessionState sessionState = sessionViewModel.getState();
-        sessionState.setUsername(response.getUsername());
-        sessionState.setUserId(response.getUserId());
-        sessionState.setEmail(response.getEmail());
-
-        sessionViewModel.firePropertyChange();
 
         // clear login state
         loginViewModel.setState(new LoginState());
         loginViewModel.firePropertyChange();
 
-        // TODO: switch to screen based on user status
-        viewManagerModel.setState(joinViewModel.getViewName());
-        viewManagerModel.firePropertyChange();
+        if (!response.isInRoom()) {
+            viewManagerModel.setState(joinViewModel.getViewName());
+            viewManagerModel.firePropertyChange();
+        } else {
+            viewManagerModel.setState("main");
+            viewManagerModel.firePropertyChange();
+        }
     }
 
     @Override

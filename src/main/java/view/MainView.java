@@ -3,16 +3,11 @@ package view;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 
-import interface_adapter.session.SessionState;
-import interface_adapter.session.SessionViewModel;
-
-public class MainView extends JPanel implements ActionListener, PropertyChangeListener {
+public class MainView extends JPanel implements ActionListener {
     private final String viewName = "main";
 
     private final int navBarHeight = 32;
@@ -29,18 +24,13 @@ public class MainView extends JPanel implements ActionListener, PropertyChangeLi
     private final GitConsoleView consoleView;
     private final ProfileView profileView;
 
-    private final SessionViewModel sessionViewModel;
-
     private JButton activeButton;
 
     public MainView(DashboardView dashboardPanel, GitConsoleView consolePanel,
-            ProfileView profilePanel, SessionViewModel sessionViewModel) {
+            ProfileView profilePanel) {
         this.dashboardView = dashboardPanel;
         this.consoleView = consolePanel;
         this.profileView = profilePanel;
-        this.sessionViewModel = sessionViewModel;
-        this.sessionViewModel.addPropertyChangeListener(this);
-
         setLayout(new BorderLayout());
         final JToolBar navBar = createNavBar();
 
@@ -145,14 +135,6 @@ public class MainView extends JPanel implements ActionListener, PropertyChangeLi
         } else if (source == profileButton) {
             contentLayout.show(contentPanel, profileView.getViewName());
             setActiveTab(profileButton);
-        }
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        final SessionState state = (SessionState) evt.getNewValue();
-        if (state.getSessionError() != null) {
-            JOptionPane.showMessageDialog(this, "Error with the current session.");
         }
     }
 

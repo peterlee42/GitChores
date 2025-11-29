@@ -45,8 +45,8 @@ public class ProfileView extends JPanel {
      *                           CardLayout
      */
     public ProfileView(final ViewManagerModel viewManagerModel,
-                       final String backTargetViewName,
-                       final Consumer<String> navigator) {
+            final String backTargetViewName,
+            final Consumer<String> navigator) {
         this.viewManagerModel = viewManagerModel;
         this.backTargetViewName = backTargetViewName;
         this.navigator = navigator;

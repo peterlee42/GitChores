@@ -24,8 +24,6 @@ import javax.swing.JTextField;
 import interface_adapter.room.create.CreateRoomController;
 import interface_adapter.room.create.CreateRoomState;
 import interface_adapter.room.create.CreateRoomViewModel;
-import interface_adapter.session.SessionState;
-import interface_adapter.session.SessionViewModel;
 
 /**
  * The view for joining or creating a room.
@@ -36,7 +34,6 @@ public class CreateRoomView extends JPanel implements ActionListener,
     private static final String VIEW_NAME = "create_room";
 
     private final CreateRoomViewModel createRoomViewModel;
-    private final SessionViewModel sessionViewModel;
 
     private final JTextField roomNameField;
     private final JTextField roomDescriptionField;
@@ -46,21 +43,17 @@ public class CreateRoomView extends JPanel implements ActionListener,
     private final JButton toJoinButton;
 
     private CreateRoomController createRoomController;
-    private String currentUserId;
 
     /**
      * Constructs a CreateRoomView with the given CreateRoomViewModel and
      * SessionModel.
      *
      * @param createRoomViewModel the CreateRoomViewModel
-     * @param sessionViewModel    the SessionModel
      */
     @SuppressWarnings("checkstyle:ExecutableStatementCountCheck")
-    public CreateRoomView(CreateRoomViewModel createRoomViewModel, SessionViewModel sessionViewModel) {
+    public CreateRoomView(CreateRoomViewModel createRoomViewModel) {
         this.createRoomViewModel = createRoomViewModel;
-        this.sessionViewModel = sessionViewModel;
         this.createRoomViewModel.addPropertyChangeListener(this);
-        this.sessionViewModel.addPropertyChangeListener(this);
 
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
@@ -225,12 +218,9 @@ public class CreateRoomView extends JPanel implements ActionListener,
             if (roomName.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please enter a room name",
                         ViewConstants.ERROR_PREFIX, JOptionPane.ERROR_MESSAGE);
-            } else if (currentUserId == null) {
-                JOptionPane.showMessageDialog(this, "User not logged in",
-                        ViewConstants.ERROR_PREFIX, JOptionPane.ERROR_MESSAGE);
             } else if (createRoomController != null) {
                 final String description = roomDescriptionField.getText().trim();
-                createRoomController.execute(roomName, description, currentUserId);
+                createRoomController.execute(roomName, description);
             }
         }
     }
@@ -239,20 +229,8 @@ public class CreateRoomView extends JPanel implements ActionListener,
         this.createRoomController = createRoomController;
     }
 
-    public void setCurrentUserId(String userId) {
-        this.currentUserId = userId;
-    }
-
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-
-        // session view model
-        if (evt.getSource() == sessionViewModel) {
-            final SessionState sessionState = (SessionState) evt.getNewValue();
-            this.currentUserId = sessionState.getUserId();
-            return;
-        }
-
         // create room view model
         if (evt.getSource() == createRoomViewModel) {
             final CreateRoomState createRoomState = (CreateRoomState) evt.getNewValue();

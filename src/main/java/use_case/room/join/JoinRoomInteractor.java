@@ -36,6 +36,12 @@ public class JoinRoomInteractor implements JoinRoomInputBoundary {
             return;
         }
 
+        // Check if user is in any room
+        if (roomDataAccess.getUserRoomId(user.getId()) != null) {
+            joinRoomPresenter.presentFailure("You are already in a room. Leave your current room first.");
+            return;
+        }
+
         if (user.getId() == null || user.getId().trim().isEmpty()) {
             joinRoomPresenter.presentFailure("User ID cannot be empty");
             return;

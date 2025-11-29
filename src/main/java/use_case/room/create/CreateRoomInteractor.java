@@ -46,6 +46,12 @@ public class CreateRoomInteractor implements CreateRoomInputBoundary {
             return;
         }
 
+        // Check if user is in any room
+        if (roomDataAccess.getUserRoomId(user.getId()) != null) {
+            createRoomPresenter.presentFailure("You are already in a room. Leave your current room first.");
+            return;
+        }
+
         if (inputData.getRoomName() == null || inputData.getRoomName().trim().isEmpty()) {
             createRoomPresenter.presentFailure("Room name cannot be empty");
             return;

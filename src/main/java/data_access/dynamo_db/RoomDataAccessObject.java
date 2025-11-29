@@ -120,6 +120,23 @@ public class RoomDataAccessObject implements RoomDataAccessInterface {
     }
 
     @Override
+    public String getUserRoomId(String userId) {
+        final QueryRequest queryRequest = QueryRequest.builder()
+                .tableName(ROOM_MEMBERS_TABLE)
+                .indexName("UserIdIndex")
+                .keyConditionExpression("userId = :userId")
+                .expressionAttributeValues(Map.of(":userId", AttributeValue.fromS(userId)))
+                .build();
+
+        final QueryResponse response = client.query(queryRequest);
+
+        if (!response.items().isEmpty()) {
+            return response.items().get(0).get(ROOM_ID).s();
+        }
+        return null;
+    }
+
+    @Override
     public boolean isUserInRoom(String roomId, String userId) {
         final Map<String, AttributeValue> key = new HashMap<>();
         key.put(ROOM_ID, AttributeValue.fromS(roomId));

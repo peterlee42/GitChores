@@ -45,6 +45,14 @@ public interface RoomDataAccessInterface {
     List<String> getRoomMembers(String roomId);
 
     /**
+     * Gets the room ID that the given user belongs to (if any).
+     *
+     * @param userId the user ID
+     * @return the room ID the user is in, null if the user is not in a room
+     */
+    String getUserRoomId(String userId);
+
+    /**
      * Checks if a user is a member of a room.
      *
      * @param roomId the room ID

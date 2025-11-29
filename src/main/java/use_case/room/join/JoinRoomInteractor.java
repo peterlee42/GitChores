@@ -1,26 +1,42 @@
 package use_case.room.join;
 
 import entity.Room;
+import entity.User;
+import use_case.logged_in.UserService;
 import use_case.room.RoomDataAccessInterface;
+import use_case.session.SessionDataAccessInterface;
 
 public class JoinRoomInteractor implements JoinRoomInputBoundary {
 
     private final RoomDataAccessInterface roomDataAccess;
+    private final SessionDataAccessInterface sessionDataAccess;
     private final JoinRoomOutputBoundary joinRoomPresenter;
+    private final UserService userService;
 
-    public JoinRoomInteractor(RoomDataAccessInterface roomDataAccess, JoinRoomOutputBoundary joinRoomPresenter) {
+    public JoinRoomInteractor(RoomDataAccessInterface roomDataAccess,
+            SessionDataAccessInterface sessionDataAccess, JoinRoomOutputBoundary joinRoomPresenter,
+            UserService userService) {
         this.roomDataAccess = roomDataAccess;
+        this.sessionDataAccess = sessionDataAccess;
         this.joinRoomPresenter = joinRoomPresenter;
+        this.userService = userService;
     }
 
     @Override
     public void execute(JoinRoomInputData inputData) {
+        final User user = userService.getUser();
+
+        if (user == null) {
+            joinRoomPresenter.presentFailure("User not logged in");
+            return;
+        }
+
         if (inputData.getInviteCode() == null || inputData.getInviteCode().trim().isEmpty()) {
             joinRoomPresenter.presentFailure("Invite code cannot be empty");
             return;
         }
 
-        if (inputData.getUserId() == null || inputData.getUserId().trim().isEmpty()) {
+        if (user.getId() == null || user.getId().trim().isEmpty()) {
             joinRoomPresenter.presentFailure("User ID cannot be empty");
             return;
         }
@@ -34,20 +50,16 @@ public class JoinRoomInteractor implements JoinRoomInputBoundary {
         }
 
         // Check if user is already in the room
-        if (roomDataAccess.isUserInRoom(room.getId(), inputData.getUserId())) {
+        if (roomDataAccess.isUserInRoom(room.getId(), user.getId())) {
             joinRoomPresenter.presentFailure("You are already a member of this room");
             return;
         }
 
         // Add user to room
-        roomDataAccess.addUserToRoom(room.getId(), inputData.getUserId());
+        roomDataAccess.addUserToRoom(room.getId(), user.getId());
 
         // Present success
-        final JoinRoomOutputData outputData = new JoinRoomOutputData(
-                room.getId(),
-                room.getName(),
-                true,
-                null);
+        final JoinRoomOutputData outputData = new JoinRoomOutputData(room.getName(), true, null);
         joinRoomPresenter.presentSuccess(outputData);
     }
 
@@ -58,6 +70,7 @@ public class JoinRoomInteractor implements JoinRoomInputBoundary {
 
     @Override
     public void switchToLoginView() {
+        sessionDataAccess.clearCurrentToken();
         joinRoomPresenter.switchToLoginView();
     }
 }

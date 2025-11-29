@@ -1,6 +1,8 @@
 package use_case.login;
 
-import entity.User;
+import entity.Token;
+import use_case.exception.LoginFailedException;
+import use_case.session.SessionDataAccessInterface;
 
 /**
  * The interactor for the Signup Use Case.
@@ -8,10 +10,13 @@ import entity.User;
 public class LoginInteractor implements LoginInputBoundary {
     private final LoginOutputBoundary loginPresenter;
     private final LoginDataAccessInterface userDataAccessObject;
+    private final SessionDataAccessInterface sessionDataAccessObject;
 
-    public LoginInteractor(LoginOutputBoundary loginPresenter, LoginDataAccessInterface userDataAccessObject) {
+    public LoginInteractor(LoginOutputBoundary loginPresenter, LoginDataAccessInterface userDataAccessObject,
+            SessionDataAccessInterface sessionDataAccessObject) {
         this.loginPresenter = loginPresenter;
         this.userDataAccessObject = userDataAccessObject;
+        this.sessionDataAccessObject = sessionDataAccessObject;
     }
 
     @Override
@@ -25,12 +30,14 @@ public class LoginInteractor implements LoginInputBoundary {
         } else {
 
             try {
-                final User user = userDataAccessObject.login(username, password);
+                final Token token = userDataAccessObject.login(username, password);
+                sessionDataAccessObject.setCurrentToken(token);
 
-                final LoginOutputData output = new LoginOutputData(user.getUsername(), user.getId(),
-                        user.getEmail());
+                // TODO: Determine if the user is in a room
+                // For now, we assume the user is not in a room
+                // We need to look up in DynamoDB to check this information
+                final LoginOutputData output = new LoginOutputData(username, false);
                 loginPresenter.prepareSuccessView(output);
-
             } catch (LoginFailedException ex) {
                 loginPresenter.prepareFailView(ex.getMessage());
             }

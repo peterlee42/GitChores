@@ -24,8 +24,6 @@ import javax.swing.JTextField;
 import interface_adapter.room.join.JoinRoomController;
 import interface_adapter.room.join.JoinState;
 import interface_adapter.room.join.JoinViewModel;
-import interface_adapter.session.SessionState;
-import interface_adapter.session.SessionViewModel;
 
 /**
  * The view for joining or creating a room.
@@ -35,7 +33,6 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
     private static final String VIEW_NAME = "join_room";
 
     private final JoinViewModel joinViewModel;
-    private final SessionViewModel sessionViewModel;
 
     private final JTextField inviteCodeField;
 
@@ -43,22 +40,18 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
     private final JButton backToLoginButton;
 
     private JoinRoomController joinRoomController;
-    private String currentUserId;
 
     private JButton toCreateButton;
 
     /**
      * Constructs a JoinView with the given JoinViewModel and SessionModel.
      *
-     * @param joinViewModel    the JoinViewModel
-     * @param sessionViewModel the SessionModel
+     * @param joinViewModel the JoinViewModel
      */
     @SuppressWarnings("checkstyle:ExecutableStatementCountCheck")
-    public JoinView(JoinViewModel joinViewModel, SessionViewModel sessionViewModel) {
+    public JoinView(JoinViewModel joinViewModel) {
         this.joinViewModel = joinViewModel;
-        this.sessionViewModel = sessionViewModel;
         this.joinViewModel.addPropertyChangeListener(this);
-        this.sessionViewModel.addPropertyChangeListener(this);
 
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
@@ -204,11 +197,8 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
             if (inviteCode.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Please enter an invite code",
                         ViewConstants.ERROR_PREFIX, JOptionPane.ERROR_MESSAGE);
-            } else if (currentUserId == null) {
-                JOptionPane.showMessageDialog(this, "User not logged in",
-                        ViewConstants.ERROR_PREFIX, JOptionPane.ERROR_MESSAGE);
             } else if (joinRoomController != null) {
-                joinRoomController.execute(inviteCode, currentUserId);
+                joinRoomController.execute(inviteCode);
             }
         }
     }
@@ -217,20 +207,8 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
         this.joinRoomController = joinRoomController;
     }
 
-    public void setCurrentUserId(String userId) {
-        this.currentUserId = userId;
-    }
-
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-
-        // session view model
-        if (evt.getSource() == sessionViewModel) {
-            final SessionState sessionState = (SessionState) evt.getNewValue();
-            this.currentUserId = sessionState.getUserId();
-            return;
-        }
-
         // join view model
         if (evt.getSource() == joinViewModel) {
             final JoinState joinState = (JoinState) evt.getNewValue();

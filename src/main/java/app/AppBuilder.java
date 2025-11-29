@@ -4,8 +4,9 @@ import java.awt.*;
 
 import javax.swing.*;
 
+import data_access.SessionDataAccessObject;
+import data_access.cognito.CognitoUserDataAccessObject;
 import data_access.cognito.IdentityProviderClientFactory;
-import data_access.cognito.UserDataAccessObject;
 import data_access.dynamo_db.CommitDataAccessObject;
 import data_access.dynamo_db.DynamoDbClientFactory;
 import data_access.dynamo_db.RoomDataAccessObject;
@@ -25,7 +26,6 @@ import interface_adapter.room.create.CreateRoomViewModel;
 import interface_adapter.room.join.JoinRoomController;
 import interface_adapter.room.join.JoinRoomPresenter;
 import interface_adapter.room.join.JoinViewModel;
-import interface_adapter.session.SessionViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
@@ -38,6 +38,7 @@ import use_case.commit.RoomMetadataDataAccessInterface;
 import use_case.git_console.GitConsoleInputBoundary;
 import use_case.git_console.GitConsoleInteractor;
 import use_case.git_console.GitConsoleOutputBoundary;
+import use_case.logged_in.UserService;
 import use_case.login.LoginDataAccessInterface;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
@@ -87,7 +88,11 @@ public class AppBuilder {
     private CreateRoomView createRoomView;
     private CreateRoomViewModel createRoomViewModel;
 
-    private SessionViewModel sessionViewModel;
+    private SessionDataAccessObject sessionDataAccess;
+    private final CognitoIdentityProviderClient identityProviderClient;
+    private final CognitoUserDataAccessObject userDataAccess;
+
+    private final UserService userService;
 
     /**
      * Constructor for AppBuilder.
@@ -96,9 +101,10 @@ public class AppBuilder {
         cardPanel.setLayout(cardLayout);
         final ViewManager viewManager = new ViewManager(cardPanel, cardLayout);
         viewManagerModel.addPropertyChangeListener(viewManager);
-
-        // Session
-        this.sessionViewModel = new SessionViewModel();
+        this.sessionDataAccess = new SessionDataAccessObject();
+        this.identityProviderClient = IdentityProviderClientFactory.createClient();
+        this.userDataAccess = new CognitoUserDataAccessObject(this.identityProviderClient);
+        this.userService = new UserService(userDataAccess, sessionDataAccess);
     }
 
     /**
@@ -107,7 +113,7 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addMainView() {
-        mainView = new MainView(dashboardView, gitConsoleView, profileView, sessionViewModel);
+        mainView = new MainView(dashboardView, gitConsoleView, profileView);
         cardPanel.add(mainView, mainView.getViewName());
         return this;
     }
@@ -129,7 +135,7 @@ public class AppBuilder {
      */
     public AppBuilder addJoinView() {
         joinViewModel = new JoinViewModel();
-        joinView = new JoinView(joinViewModel, sessionViewModel);
+        joinView = new JoinView(joinViewModel);
         cardPanel.add(joinView, joinView.getViewName());
         return this;
     }
@@ -141,7 +147,7 @@ public class AppBuilder {
      */
     public AppBuilder addCreateRoomView() {
         createRoomViewModel = new CreateRoomViewModel();
-        createRoomView = new CreateRoomView(createRoomViewModel, sessionViewModel);
+        createRoomView = new CreateRoomView(createRoomViewModel);
         cardPanel.add(createRoomView, createRoomView.getViewName());
         return this;
     }
@@ -262,17 +268,18 @@ public class AppBuilder {
 
         // Create Room use case
         final CreateRoomPresenter createRoomPresenter = new CreateRoomPresenter(createRoomViewModel,
-                viewManagerModel, sessionViewModel, loginViewModel, joinViewModel);
+                viewManagerModel, loginViewModel, joinViewModel);
         final CreateRoomInputBoundary createRoomInteractor = new CreateRoomInteractor(roomDataAccess,
-                createRoomPresenter);
+                sessionDataAccess, createRoomPresenter, userService);
         final CreateRoomController createRoomController = new CreateRoomController(createRoomInteractor);
 
         createRoomView.setCreateRoomController(createRoomController);
 
         // Join Room use case (reuse existing JoinViewModel)
         final JoinRoomPresenter joinRoomPresenter = new JoinRoomPresenter(joinViewModel, viewManagerModel,
-                sessionViewModel, loginViewModel, createRoomViewModel);
-        final JoinRoomInputBoundary joinRoomInteractor = new JoinRoomInteractor(roomDataAccess, joinRoomPresenter);
+                loginViewModel, createRoomViewModel);
+        final JoinRoomInputBoundary joinRoomInteractor = new JoinRoomInteractor(roomDataAccess,
+                sessionDataAccess, joinRoomPresenter, userService);
         final JoinRoomController joinRoomController = new JoinRoomController(joinRoomInteractor);
 
         joinView.setJoinRoomController(joinRoomController);
@@ -286,9 +293,7 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addSignupUseCase() {
-        final CognitoIdentityProviderClient identityProviderClient = IdentityProviderClientFactory.createClient();
-
-        final SignupDataAccessInterface signupDataAccess = new UserDataAccessObject(identityProviderClient);
+        final SignupDataAccessInterface signupDataAccess = userDataAccess;
         final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel, signupViewModel,
                 loginViewModel);
         final SignupInputBoundary signupInteractor = new SignupInteractor(signupOutputBoundary, signupDataAccess);
@@ -304,12 +309,11 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addLoginUseCase() {
-        final CognitoIdentityProviderClient identityProviderClient = IdentityProviderClientFactory.createClient();
-
-        final LoginDataAccessInterface loginDataAccess = new UserDataAccessObject(identityProviderClient);
+        final LoginDataAccessInterface loginDataAccessInterface = userDataAccess;
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel, loginViewModel,
-                signupViewModel, sessionViewModel, joinViewModel);
-        final LoginInputBoundary loginInteractor = new LoginInteractor(loginOutputBoundary, loginDataAccess);
+                signupViewModel, joinViewModel);
+        final LoginInputBoundary loginInteractor = new LoginInteractor(loginOutputBoundary, loginDataAccessInterface,
+                sessionDataAccess);
 
         final LoginController controller = new LoginController(loginInteractor);
         loginView.setLoginController(controller);

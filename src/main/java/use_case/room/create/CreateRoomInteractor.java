@@ -4,37 +4,54 @@ import java.security.SecureRandom;
 
 import entity.DomainIdGenerator;
 import entity.Room;
+import entity.User;
+import use_case.logged_in.UserService;
 import use_case.room.RoomDataAccessInterface;
+import use_case.session.SessionDataAccessInterface;
 
 public class CreateRoomInteractor implements CreateRoomInputBoundary {
     private static final int INVITE_CODE_LENGTH = 6;
     private static final String INVITE_CODE_CHARS = "0123456789";
 
     private final RoomDataAccessInterface roomDataAccess;
+    private final SessionDataAccessInterface sessionDataAccess;
     private final CreateRoomOutputBoundary createRoomPresenter;
     private final SecureRandom random;
+    private final UserService userService;
 
     /**
      * Constructs a CreateRoomInteractor.
      *
      * @param roomDataAccess      the room data access
+     * @param sessionDataAccess   the session data access
      * @param createRoomPresenter the output boundary
+     * @param userService         the user service
      */
     public CreateRoomInteractor(RoomDataAccessInterface roomDataAccess,
-            CreateRoomOutputBoundary createRoomPresenter) {
+            SessionDataAccessInterface sessionDataAccess,
+            CreateRoomOutputBoundary createRoomPresenter, UserService userService) {
         this.roomDataAccess = roomDataAccess;
+        this.sessionDataAccess = sessionDataAccess;
         this.createRoomPresenter = createRoomPresenter;
+        this.userService = userService;
         this.random = new SecureRandom();
     }
 
     @Override
     public void execute(CreateRoomInputData inputData) {
+        final User user = userService.getUser();
+
+        if (user == null) {
+            createRoomPresenter.presentFailure("User not logged in");
+            return;
+        }
+
         if (inputData.getRoomName() == null || inputData.getRoomName().trim().isEmpty()) {
             createRoomPresenter.presentFailure("Room name cannot be empty");
             return;
         }
 
-        if (inputData.getOwnerId() == null || inputData.getOwnerId().trim().isEmpty()) {
+        if (user.getId() == null || user.getId().trim().isEmpty()) {
             createRoomPresenter.presentFailure("Owner ID cannot be empty");
             return;
         }
@@ -48,17 +65,16 @@ public class CreateRoomInteractor implements CreateRoomInputBoundary {
                 roomId,
                 inputData.getRoomName(),
                 inputData.getDescription(),
-                inputData.getOwnerId(),
+                user.getId(),
                 inviteCode);
 
         roomDataAccess.saveRoom(room);
 
         // Add owner to room
-        roomDataAccess.addUserToRoom(roomId, inputData.getOwnerId());
+        roomDataAccess.addUserToRoom(roomId, user.getId());
 
         // Success Confirmation
         final CreateRoomOutputData outputData = new CreateRoomOutputData(
-                roomId,
                 inputData.getRoomName(),
                 inviteCode,
                 true);
@@ -72,6 +88,7 @@ public class CreateRoomInteractor implements CreateRoomInputBoundary {
 
     @Override
     public void switchToLoginView() {
+        sessionDataAccess.clearCurrentToken();
         createRoomPresenter.switchToLoginView();
     }
 

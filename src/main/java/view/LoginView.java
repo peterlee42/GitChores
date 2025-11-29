@@ -31,7 +31,7 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
     private final JPanel rightPanel;
 
     private final JTextField usernameField = new JTextField(LoginViewModel.MAX_TEXT_FIELD_LENGTH);
-    private final JTextField passwordField = new JTextField(LoginViewModel.MAX_TEXT_FIELD_LENGTH);
+    private final JPasswordField passwordField = new JPasswordField(LoginViewModel.MAX_TEXT_FIELD_LENGTH);
 
     private final JLabel welcomeMessage;
     private final JLabel title;
@@ -135,7 +135,8 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                loginController.execute(usernameField.getText().strip(), passwordField.getText().strip());
+                loginController.execute(usernameField.getText().strip(),
+                        String.valueOf(passwordField.getPassword()).strip());
             }
         });
 
@@ -217,7 +218,7 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
 
             private void documentListenerHelper() {
                 final LoginState currentState = loginViewModel.getState();
-                currentState.setPassword(new String(passwordField.getText()));
+                currentState.setPassword(String.valueOf(passwordField.getPassword()));
                 loginViewModel.setState(currentState);
             }
 

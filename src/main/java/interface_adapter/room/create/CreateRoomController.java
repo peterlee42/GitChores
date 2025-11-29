@@ -21,10 +21,9 @@ public class CreateRoomController {
      *
      * @param roomName    the room name
      * @param description the room description
-     * @param ownerId     the owner user ID
      */
-    public void execute(String roomName, String description, String ownerId) {
-        final CreateRoomInputData inputData = new CreateRoomInputData(roomName, description, ownerId);
+    public void execute(String roomName, String description) {
+        final CreateRoomInputData inputData = new CreateRoomInputData(roomName, description);
         interactor.execute(inputData);
     }
 

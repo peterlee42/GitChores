@@ -32,8 +32,8 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
 
     private final JTextField usernameField = new JTextField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
     private final JTextField emailField = new JTextField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
-    private final JTextField passwordField = new JTextField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
-    private final JTextField repeatPasswordField = new JTextField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
+    private final JPasswordField passwordField = new JPasswordField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
+    private final JPasswordField repeatPasswordField = new JPasswordField(SignupViewModel.MAX_TEXT_FIELD_LENGTH);
 
     private final JLabel title;
     private final JLabel welcomeMessage;
@@ -159,8 +159,8 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
                 signupController.execute(
                         usernameField.getText().strip(),
                         emailField.getText().strip(),
-                        passwordField.getText().strip(),
-                        repeatPasswordField.getText().strip());
+                        String.valueOf(passwordField.getPassword()).strip(),
+                        String.valueOf(repeatPasswordField.getPassword()).strip());
             }
         });
 
@@ -241,7 +241,7 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
 
             private void documentListenerHelper() {
                 final SignupState currentState = signupViewModel.getState();
-                currentState.setPassword(new String(passwordField.getText()));
+                currentState.setPassword(String.valueOf(passwordField.getPassword()).strip());
                 signupViewModel.setState(currentState);
             }
 
@@ -268,7 +268,7 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
 
             private void documentListenerHelper() {
                 final SignupState currentState = signupViewModel.getState();
-                currentState.setRepeatPassword(new String(repeatPasswordField.getText()));
+                currentState.setRepeatPassword(String.valueOf(repeatPasswordField.getPassword()).strip());
                 signupViewModel.setState(currentState);
             }
 

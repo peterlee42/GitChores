@@ -2,12 +2,14 @@
 
 To organize roommate chores.
 
-- [ ] TODO: Views
-- [ ] TODO: Entities
-- [ ] TODO: Interface adapters
-- [X] TODO: Add checkstyle
-- [ ] TODO: Create/Join room feature
-- [ ] TODO: Login/sign up
+### Use Cases
+- [X] User authentication with Amazon Cognito
+- [ ] Profile
+- [ ] Room creation
+- [ ] Room joining
+- [ ] Git console to manage chores
+- [ ] Listing chores
+- [ ] Github tiles to track roommate chores
 
 ### Team
 

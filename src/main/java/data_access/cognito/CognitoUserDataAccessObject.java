@@ -181,7 +181,6 @@ public class CognitoUserDataAccessObject
                 email = attr.value();
             }
         }
-        System.out.println("id:" + userId);
 
         // return User entity
         return new User(userId, response.username(), email);

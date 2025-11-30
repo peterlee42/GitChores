@@ -29,7 +29,8 @@ public class UserService {
         }
 
         try {
-            return loggedInDataAccess.getCurrentUser(token);
+            final User user = loggedInDataAccess.getCurrentUser(token);
+            return user;
         } catch (TokenExpiredException expiredException) {
             try {
                 final Token newToken = loggedInDataAccess.refreshToken(token.getRefreshToken());

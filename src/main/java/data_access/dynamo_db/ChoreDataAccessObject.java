@@ -24,41 +24,50 @@ public class ChoreDataAccessObject implements ChoreDataAccessInterface {
     private static final String ROOM_ID = "roomId";
     private static final String CHORE_ID = "choreId";
 
+    private static final String CREATING_USER_ID = "creatingUserId";
+    private static final String ASSIGNED_USER_ID = "assignedUserId";
+    private static final String TITLE = "title";
+    private static final String DESCRIPTION = "description";
+    private static final String DUE_DATE = "dueDate";
+    private static final String STATUS = "status";
+    private static final String NEEDS_REVIEW = "needsReview";
+    private static final String CREATED_AT = "createdAt";
+    private static final String UPDATED_AT = "updatedAt";
+
     private final DynamoDbClient client;
 
     public ChoreDataAccessObject(DynamoDbClient client) {
         this.client = client;
     }
 
-    @SuppressWarnings("checkstyle:MultipleStringLiterals")
     @Override
     public void saveChore(Chore chore) {
         final Map<String, AttributeValue> item = new HashMap<>();
 
+        // set partition and sort key
         item.put(ROOM_ID, AttributeValue.fromS(chore.getRoomId()));
         item.put(CHORE_ID, AttributeValue.fromS(chore.getId()));
-
-        item.put("creatingUserId", AttributeValue.fromS(chore.getCreatingUserId()));
+        item.put(CREATING_USER_ID, AttributeValue.fromS(chore.getCreatingUserId()));
 
         if (chore.getAssignedUserId() != null && !chore.getAssignedUserId().trim().isEmpty()) {
-            item.put("assignedUserId", AttributeValue.fromS(chore.getAssignedUserId()));
+            item.put(ASSIGNED_USER_ID, AttributeValue.fromS(chore.getAssignedUserId()));
         }
 
-        item.put("title", AttributeValue.fromS(chore.getTitle()));
+        item.put(TITLE, AttributeValue.fromS(chore.getTitle()));
 
         if (chore.getDescription() != null && !chore.getDescription().trim().isEmpty()) {
-            item.put("description", AttributeValue.fromS(chore.getDescription()));
+            item.put(DESCRIPTION, AttributeValue.fromS(chore.getDescription()));
         }
 
-        item.put("dueDate", AttributeValue.fromS(chore.getDueDate().toString()));
-        item.put("status", AttributeValue.fromS(chore.getStatus().name()));
-        item.put("needsReview", AttributeValue.fromBool(chore.getNeedsReview()));
+        item.put(DUE_DATE, AttributeValue.fromS(chore.getDueDate().toString()));
+        item.put(STATUS, AttributeValue.fromS(chore.getStatus().name()));
+        item.put(NEEDS_REVIEW, AttributeValue.fromBool(chore.getNeedsReview()));
 
         if (chore.getCreatedAt() != null) {
-            item.put("createdAt", AttributeValue.fromS(chore.getCreatedAt().toString()));
+            item.put(CREATED_AT, AttributeValue.fromS(chore.getCreatedAt().toString()));
         }
         if (chore.getUpdatedAt() != null) {
-            item.put("updatedAt", AttributeValue.fromS(chore.getUpdatedAt().toString()));
+            item.put(UPDATED_AT, AttributeValue.fromS(chore.getUpdatedAt().toString()));
         }
 
         final PutItemRequest request = PutItemRequest.builder()
@@ -94,8 +103,7 @@ public class ChoreDataAccessObject implements ChoreDataAccessInterface {
         final QueryRequest request = QueryRequest.builder()
                 .tableName(TABLE_NAME)
                 .keyConditionExpression(ROOM_ID + " = :roomId")
-                .expressionAttributeValues(Map.of(
-                        ":roomId", AttributeValue.fromS(roomId)))
+                .expressionAttributeValues(Map.of(":roomId", AttributeValue.fromS(roomId)))
                 .build();
 
         final QueryResponse response = client.query(request);
@@ -137,24 +145,27 @@ public class ChoreDataAccessObject implements ChoreDataAccessInterface {
     private Chore itemToChore(Map<String, AttributeValue> item) {
         final String roomId = item.get(ROOM_ID).s();
         final String choreId = item.get(CHORE_ID).s();
-        final String creatingUserId = item.get("creatingUserId").s();
+        final String creatingUserId = item.get(CREATING_USER_ID).s();
+
         final String assignedUserId;
-        if (item.containsKey("assignedUserId")) {
-            assignedUserId = item.get("assignedUserId").s();
+        if (item.containsKey(ASSIGNED_USER_ID)) {
+            assignedUserId = item.get(ASSIGNED_USER_ID).s();
         } else {
             assignedUserId = null;
         }
-        final String title = item.get("title").s();
+
+        final String title = item.get(TITLE).s();
+
         final String description;
-        if (item.containsKey("description")) {
-            description = item.get("description").s();
+        if (item.containsKey(DESCRIPTION)) {
+            description = item.get(DESCRIPTION).s();
         } else {
             description = null;
         }
 
-        final LocalDateTime dueDate = LocalDateTime.parse(item.get("dueDate").s());
-        final ChoreStatus status = ChoreStatus.valueOf(item.get("status").s());
-        final boolean needsReview = item.containsKey("needsReview") && item.get("needsReview").bool();
+        final LocalDateTime dueDate = LocalDateTime.parse(item.get(DUE_DATE).s());
+        final ChoreStatus status = ChoreStatus.valueOf(item.get(STATUS).s());
+        final boolean needsReview = item.containsKey(NEEDS_REVIEW) && item.get(NEEDS_REVIEW).bool();
 
         return new Chore(
                 choreId,

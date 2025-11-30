@@ -135,9 +135,9 @@ public class CognitoUserDataAccessObject
             final AuthenticationResultType result = authResponse.authenticationResult();
 
             return new Token(
+                    result.idToken(),
                     result.accessToken(),
-                    result.refreshToken(),
-                    result.idToken());
+                    result.refreshToken());
         } catch (NotAuthorizedException ex) {
             throw new LoginFailedException("Incorrect username or password.");
         } catch (UserNotFoundException ex) {

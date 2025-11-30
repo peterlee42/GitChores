@@ -1,7 +1,5 @@
 package view;
 
-import software.amazon.awssdk.services.dynamodb.endpoints.internal.Value;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -25,6 +23,7 @@ public class ActivityTilesPanel extends JPanel {
     private static final int TILE_GAP = 4;
     private static final int WEEKS_TO_SHOW = 36;
     private static final int DAYS_PER_WEEK = 7;
+    private static final int DISMISS_DELAY = 10000;
 
     private static final Color TILE_EMPTY = new Color(235, 237, 240);
     private static final Color TILE_LEVEL_1 = new Color(155, 233, 168);
@@ -43,7 +42,11 @@ public class ActivityTilesPanel extends JPanel {
     }
 
     public ActivityTilesPanel(Map<LocalDate, Integer> activityData) {
-        this.activityData = activityData != null ? activityData : new HashMap<>();
+        if (activityData == null) {
+            this.activityData = new HashMap<>();
+        } else {
+            this.activityData = activityData;
+        }
         this.commitMessages = new HashMap<>();
         setupPanel();
         setupTooltips();
@@ -61,7 +64,7 @@ public class ActivityTilesPanel extends JPanel {
 
     private void setupTooltips() {
         ToolTipManager.sharedInstance().setInitialDelay(0);
-        ToolTipManager.sharedInstance().setDismissDelay(10000);
+        ToolTipManager.sharedInstance().setDismissDelay(DISMISS_DELAY);
 
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
@@ -75,8 +78,7 @@ public class ActivityTilesPanel extends JPanel {
         final LocalDate date = getDateAtPoint(mousePoint);
         if (date != null) {
             setToolTipText(generateTooltipText(date));
-        }
-        else {
+        } else {
             setToolTipText(null);
         }
     }
@@ -105,7 +107,7 @@ public class ActivityTilesPanel extends JPanel {
     }
 
     private String generateTooltipText(LocalDate date) {
-        final Integer count =  activityData.get(date);
+        final Integer count = activityData.get(date);
         final List<String> messages = commitMessages.get(date);
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, yyyy");
 
@@ -116,12 +118,21 @@ public class ActivityTilesPanel extends JPanel {
 
         final StringBuilder tooltip = new StringBuilder("<html>");
         tooltip.append(String.format("<b>%s</b><br/>", date.format(formatter)));
+
+        final String suffix;
+        if (count == 1) {
+            suffix = "";
+        } else {
+            suffix = "s";
+        }
+
         tooltip.append(String.format("<b>%d chore%s completed</b><br/><br/>",
-                count, count == 1 ? "" : "s"));
+                count, suffix));
 
         if (messages != null && !messages.isEmpty()) {
             for (int i = 0; i < messages.size(); i++) {
-                tooltip.append(String.format("• %s<br/>", messages.get(i)));
+                final String message = messages.get(i);
+                tooltip.append(String.format("%d. %s<br/>", i + 1, message));
             }
         }
 
@@ -131,9 +142,15 @@ public class ActivityTilesPanel extends JPanel {
 
     private void addCommit(LocalDate date, String message) {
         activityData.put(date, activityData.getOrDefault(date, 0) + 1);
-        commitMessages.computeIfAbsent(date, k -> new ArrayList<>()).add(message);
+        commitMessages.computeIfAbsent(date, key -> new ArrayList<>()).add(message);
     }
 
+    /**
+     * Sets the activity data to be displayed in the tiles.
+     * 
+     * @param activityData a map where the key is the date and the value is the
+     *                     number of chores completed on that date
+     */
     public void setActivityData(Map<LocalDate, Integer> activityData) {
         this.activityData.clear();
 
@@ -143,24 +160,46 @@ public class ActivityTilesPanel extends JPanel {
         repaint();
     }
 
-    public void setDetailedActivityData(Map<LocalDate, Integer> activityData,
-                                        Map<LocalDate, List<String>> commitMessages) {
+    /**
+     * Sets the detailed activity data including commit messages.
+     * 
+     * @param activityDataParam   a map where the key is the date and the value is
+     *                            the
+     *                            number of chores completed on that date
+     * @param commitMessagesParam a map where the key is the date and the value is a
+     *                            list
+     *                            of commit messages for that date
+     */
+    public void setDetailedActivityData(Map<LocalDate, Integer> activityDataParam,
+            Map<LocalDate, List<String>> commitMessagesParam) {
         this.activityData.clear();
         this.commitMessages.clear();
-        if (activityData != null) {
-            this.activityData.putAll(activityData);
+        if (activityDataParam != null) {
+            this.activityData.putAll(activityDataParam);
         }
-        if (commitMessages != null) {
-            this.commitMessages.putAll(commitMessages);
+        if (commitMessagesParam != null) {
+            this.commitMessages.putAll(commitMessagesParam);
         }
         repaint();
     }
 
+    /**
+     * Sets the activity count for a specific date.
+     * 
+     * @param date  the date to set the activity for
+     * @param count the number of chores completed on that date
+     */
     public void setActivityForDate(LocalDate date, int count) {
         activityData.put(date, count);
         repaint();
     }
 
+    /**
+     * Adds a commit message for a specific date.
+     * 
+     * @param date    the date to add the commit message for
+     * @param message the commit message to add
+     */
     public void addCommitForDate(LocalDate date, String message) {
         addCommit(date, message);
         repaint();
@@ -194,19 +233,19 @@ public class ActivityTilesPanel extends JPanel {
 
     private Color getColorForActivity(LocalDate date) {
         final Integer count = activityData.get(date);
+        final int thresholdLevel1 = 2;
+        final int thresholdLevel2 = 4;
+        final int thresholdLevel3 = 6;
+
         if (count == null || count == 0) {
             return TILE_EMPTY;
-        }
-        else if (count <= 2) {
+        } else if (count <= thresholdLevel1) {
             return TILE_LEVEL_1;
-        }
-        else if (count <= 4) {
+        } else if (count <= thresholdLevel2) {
             return TILE_LEVEL_2;
-        }
-        else if (count <= 6) {
+        } else if (count <= thresholdLevel3) {
             return TILE_LEVEL_3;
-        }
-        else {
+        } else {
             return TILE_LEVEL_4;
         }
     }

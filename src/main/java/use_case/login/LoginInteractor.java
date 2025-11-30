@@ -1,7 +1,9 @@
 package use_case.login;
 
 import entity.Token;
+import entity.User;
 import use_case.exception.LoginFailedException;
+import use_case.room.RoomDataAccessInterface;
 import use_case.session.SessionDataAccessInterface;
 
 /**
@@ -11,12 +13,14 @@ public class LoginInteractor implements LoginInputBoundary {
     private final LoginOutputBoundary loginPresenter;
     private final LoginDataAccessInterface userDataAccessObject;
     private final SessionDataAccessInterface sessionDataAccessObject;
+    private final RoomDataAccessInterface roomDataAccessObject;
 
     public LoginInteractor(LoginOutputBoundary loginPresenter, LoginDataAccessInterface userDataAccessObject,
-            SessionDataAccessInterface sessionDataAccessObject) {
+            SessionDataAccessInterface sessionDataAccessObject, RoomDataAccessInterface roomDataAccessObject) {
         this.loginPresenter = loginPresenter;
         this.userDataAccessObject = userDataAccessObject;
         this.sessionDataAccessObject = sessionDataAccessObject;
+        this.roomDataAccessObject = roomDataAccessObject;
     }
 
     @Override
@@ -33,10 +37,15 @@ public class LoginInteractor implements LoginInputBoundary {
                 final Token token = userDataAccessObject.login(username, password);
                 sessionDataAccessObject.setCurrentToken(token);
 
-                // TODO: Determine if the user is in a room
-                // For now, we assume the user is not in a room
-                // We need to look up in DynamoDB to check this information
-                final LoginOutputData output = new LoginOutputData(username, false);
+                final User user = userDataAccessObject.getCurrentUser(token);
+
+                final boolean inRoom;
+                if (roomDataAccessObject.getUserRoomId(user.getId()) != null) {
+                    inRoom = true;
+                } else {
+                    inRoom = false;
+                }
+                final LoginOutputData output = new LoginOutputData(username, inRoom);
                 loginPresenter.prepareSuccessView(output);
             } catch (LoginFailedException ex) {
                 loginPresenter.prepareFailView(ex.getMessage());

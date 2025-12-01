@@ -23,6 +23,9 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
     private static final int GUIDE_FONT_SIZE = 13;
     private static final int VERTICAL_SPACING = 15;
     private static final int SMALL_VERTICAL_SPACING = 5;
+    private static final int LEFT_SPACING = 5;
+    private static final int GRID_ONE = 3;
+    private static final int GRID_TWO = 4;
 
     private final String viewName = "console";
     private final GitConsoleViewModel gitConsoleViewModel;
@@ -34,6 +37,7 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
     private final int fontSize = 14;
     private Font monospacedFont = new Font(Font.MONOSPACED, Font.PLAIN, fontSize);
 
+    @SuppressWarnings("checkstyle:ExecutableStatementCount")
     public GitConsoleView(GitConsoleViewModel gitConsoleViewModel) {
         this.gitConsoleViewModel = gitConsoleViewModel;
         gitConsoleViewModel.addPropertyChangeListener(this);
@@ -65,13 +69,42 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
         commandInputField.addActionListener(this);
         addCommandListener();
 
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.add(Box.createVerticalStrut(SMALL_VERTICAL_SPACING));
-        this.add(title);
-        this.add(Box.createVerticalStrut(VERTICAL_SPACING));
-        this.add(guidePanel);
-        this.add(scrollPane);
-        this.add(commandPanel);
+        // Grid bag layout change
+        this.setLayout(new GridBagLayout());
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(SMALL_VERTICAL_SPACING, LEFT_SPACING, 0, 0);
+
+        // Title - centered
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        this.add(title, gbc);
+
+        // Vertical spacing
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weighty = 0;
+        this.add(Box.createVerticalStrut(VERTICAL_SPACING), gbc);
+
+        // Guide panel
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        this.add(guidePanel, gbc);
+
+        // Scroll pane with previous commands
+        gbc.gridy = GRID_ONE;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        this.add(scrollPane, gbc);
+
+        // Command panel at bottom
+        gbc.gridy = GRID_TWO;
+        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        this.add(commandPanel, gbc);
     }
 
     private JLabel createInstruction(String instruction) {

@@ -1,7 +1,6 @@
 package app;
 
 import java.awt.*;
-
 import java.beans.PropertyChangeEvent;
 
 import javax.swing.*;
@@ -338,18 +337,22 @@ public class AppBuilder {
         }
 
         // 1) Try the fully populated User from Cognito via UserService.
-        User currentUser = null;
-        try {
-            currentUser = userService.getUser();
-        } catch (Exception ignored) {
-            // If anything goes wrong (e.g. no token / network), we just fall back.
-        }
+        final User currentUser = userService.getUser();
 
         if (currentUser != null) {
-            final String username = currentUser.getUsername() == null ? ""
-                    : currentUser.getUsername();
-            final String email = currentUser.getEmail() == null ? ""
-                    : currentUser.getEmail();
+            final String username;
+            if (currentUser.getUsername() == null) {
+                username = "";
+            } else {
+                username = currentUser.getUsername();
+            }
+
+            final String email;
+            if (currentUser.getEmail() == null) {
+                email = "";
+            } else {
+                email = currentUser.getEmail();
+            }
 
             profileView.setUserInfo(username, email);
             return;
@@ -358,7 +361,12 @@ public class AppBuilder {
         // 2) Fallback: whatever the login screen knows.
         if (loginViewModel != null && loginViewModel.getState() != null) {
             final String usernameFromLogin = loginViewModel.getState().getUsername();
-            final String safeUsername = usernameFromLogin == null ? "" : usernameFromLogin;
+            final String safeUsername;
+            if (usernameFromLogin == null) {
+                safeUsername = "";
+            } else {
+                safeUsername = usernameFromLogin;
+            }
             // We don't have email in LoginState, so leave it blank here.
             profileView.setUserInfo(safeUsername, "");
         } else {

@@ -1,18 +1,77 @@
 package view;
 
+import java.awt.*;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 
 import interface_adapter.dashboard.DashboardState;
 
+@SuppressWarnings("checkstyle:ClassDataAbstractionCoupling")
 public class DashboardView extends JPanel implements PropertyChangeListener {
-    private final String viewName = "dashboard";
+
+    private final ActivityTilesPanel activityTilesPanel;
 
     public DashboardView() {
-        final JLabel placeholderLabel = new JLabel("Dashboard - Coming Soon");
-        placeholderLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        add(placeholderLabel);
+        setLayout(new BorderLayout());
+        setBackground(ViewColors.SAND_BACKGROUND);
+
+        // Main content panel with grid layout
+        final JPanel contentPanel = new JPanel(new GridBagLayout());
+        final int pad = ViewConstants.DASHBOARD_PANEL_PADDING;
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(pad, pad, pad, pad));
+
+        final GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.BOTH;
+        final int spacing = ViewConstants.DASHBOARD_COMPONENT_SPACING;
+        constraints.insets = new Insets(spacing, spacing, spacing, spacing);
+
+        // Activity Tiles Section (top, full width)
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 2;
+        constraints.weightx = ViewConstants.DASHBOARD_WEIGHTX;
+        constraints.weighty = ViewConstants.DASHBOARD_WEIGHTY;
+        this.activityTilesPanel = new ActivityTilesPanel();
+        ViewSampleData.initializeSampleData(activityTilesPanel);
+        final JPanel tilesSection = createSection(activityTilesPanel);
+        contentPanel.add(tilesSection, constraints);
+
+        add(contentPanel, BorderLayout.CENTER);
+    }
+
+    /**
+     * Load activity data for a room (temporary implementation).
+     * TODO: Refactor to use a proper use case interactor.
+     *
+     * @param roomId the room id to fetch commits for
+     */
+    public void loadActivity(String roomId) {
+        if (roomId == null) {
+            return;
+        }
+        activityTilesPanel.loadFromCommitDao(roomId);
+    }
+
+    private JPanel createSection(Component content) {
+        final JPanel section = new JPanel(new BorderLayout());
+        section.setBackground(ViewColors.SAND_BACKGROUND);
+        section.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(ViewConstants.DASHBOARD_230, ViewConstants.DASHBOARD_230,
+                        ViewConstants.DASHBOARD_230), 1),
+                BorderFactory.createEmptyBorder(ViewConstants.DASHBOARD_BORDER, ViewConstants.DASHBOARD_BORDER,
+                        ViewConstants.DASHBOARD_BORDER, ViewConstants.DASHBOARD_BORDER)
+        ));
+
+        final JLabel titleLabel = new JLabel("Chore Activity");
+        titleLabel.setFont(ViewConstants.TITLE_FONT);
+        titleLabel.setForeground(ViewColors.DARK_BLUE);
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, ViewConstants.DASHBOARD_BORDER, 0));
+
+        section.add(titleLabel, BorderLayout.NORTH);
+        section.add(content, BorderLayout.CENTER);
+
+        return section;
     }
 
     @Override
@@ -23,7 +82,12 @@ public class DashboardView extends JPanel implements PropertyChangeListener {
         }
     }
 
+    /**
+     * Returns the name of this view.
+     *
+     * @return the view name
+     */
     public String getViewName() {
-        return viewName;
+        return "dashboard";
     }
 }

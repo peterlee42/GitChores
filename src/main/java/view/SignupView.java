@@ -153,6 +153,7 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
         addUsernameListener();
         addPasswordListener();
         addRepeatPasswordListener();
+        addEmailListener();
 
         signupButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
@@ -161,6 +162,10 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
                         emailField.getText().strip(),
                         String.valueOf(passwordField.getPassword()).strip(),
                         String.valueOf(repeatPasswordField.getPassword()).strip());
+                usernameField.setText("");
+                emailField.setText("");
+                passwordField.setText("");
+                repeatPasswordField.setText("");
             }
         });
 
@@ -269,6 +274,33 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
             private void documentListenerHelper() {
                 final SignupState currentState = signupViewModel.getState();
                 currentState.setRepeatPassword(String.valueOf(repeatPasswordField.getPassword()).strip());
+                signupViewModel.setState(currentState);
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+        });
+    }
+
+    @SuppressWarnings("checkstyle:AnonInnerLength")
+    private void addEmailListener() {
+        emailField.getDocument().addDocumentListener(new DocumentListener() {
+
+            private void documentListenerHelper() {
+                final SignupState currentState = signupViewModel.getState();
+                currentState.setEmail(emailField.getText().strip());
                 signupViewModel.setState(currentState);
             }
 

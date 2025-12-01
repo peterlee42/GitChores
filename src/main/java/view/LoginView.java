@@ -137,6 +137,8 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
             public void actionPerformed(ActionEvent e) {
                 loginController.execute(usernameField.getText().strip(),
                         String.valueOf(passwordField.getPassword()).strip());
+                usernameField.setText("");
+                passwordField.setText("");
             }
         });
 

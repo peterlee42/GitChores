@@ -18,19 +18,10 @@ import java.util.Map;
 import javax.swing.JPanel;
 import javax.swing.ToolTipManager;
 
+import data_access.dynamo_db.CommitDataAccessObject;
+import data_access.dynamo_db.DynamoDbClientFactory;
+
 public class ActivityTilesPanel extends JPanel {
-    private static final int TILE_SIZE = 18;
-    private static final int TILE_GAP = 4;
-    private static final int WEEKS_TO_SHOW = 36;
-    private static final int DAYS_PER_WEEK = 7;
-    private static final int DISMISS_DELAY = 10000;
-
-    private static final Color TILE_EMPTY = new Color(235, 237, 240);
-    private static final Color TILE_LEVEL_1 = new Color(155, 233, 168);
-    private static final Color TILE_LEVEL_2 = new Color(64, 196, 99);
-    private static final Color TILE_LEVEL_3 = new Color(48, 161, 78);
-    private static final Color TILE_LEVEL_4 = new Color(33, 110, 57);
-
     private final Map<LocalDate, Integer> activityData;
     private final Map<LocalDate, List<String>> commitMessages;
 
@@ -41,30 +32,21 @@ public class ActivityTilesPanel extends JPanel {
         setupTooltips();
     }
 
-    public ActivityTilesPanel(Map<LocalDate, Integer> activityData) {
-        if (activityData == null) {
-            this.activityData = new HashMap<>();
-        } else {
-            this.activityData = activityData;
-        }
-        this.commitMessages = new HashMap<>();
-        setupPanel();
-        setupTooltips();
-    }
-
     private void setupPanel() {
-        final int width = WEEKS_TO_SHOW * (TILE_SIZE + TILE_GAP) + TILE_GAP * 2;
-        final int height = DAYS_PER_WEEK * (TILE_SIZE + TILE_GAP) + TILE_GAP * 2;
+        final int width = ViewConstants.WEEKS_TO_SHOW * (ViewConstants.TILE_SIZE + ViewConstants.TILE_GAP)
+                + ViewConstants.TILE_GAP * 2;
+        final int height = ViewConstants.DAYS_PER_WEEK * (ViewConstants.TILE_SIZE + ViewConstants.TILE_GAP)
+                + ViewConstants.TILE_GAP * 2;
 
         setPreferredSize(new Dimension(width, height));
         setMinimumSize(new Dimension(width, height));
         setMaximumSize(new Dimension(width, height));
-        setBackground(Color.WHITE);
+        setBackground(ViewColors.SAND_BACKGROUND);
     }
 
     private void setupTooltips() {
         ToolTipManager.sharedInstance().setInitialDelay(0);
-        ToolTipManager.sharedInstance().setDismissDelay(DISMISS_DELAY);
+        ToolTipManager.sharedInstance().setDismissDelay(ViewConstants.DISMISS_DELAY);
 
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
@@ -85,18 +67,20 @@ public class ActivityTilesPanel extends JPanel {
 
     private LocalDate getDateAtPoint(Point point) {
         final LocalDate today = LocalDate.now();
-        final LocalDate startDate = today.minusWeeks(WEEKS_TO_SHOW - 1);
+        final LocalDate startDate = today.minusWeeks(ViewConstants.WEEKS_TO_SHOW - 1);
 
-        for (int week = 0; week < WEEKS_TO_SHOW; week++) {
-            for (int day = 0; day < DAYS_PER_WEEK; day++) {
+        for (int week = 0; week < ViewConstants.WEEKS_TO_SHOW; week++) {
+            for (int day = 0; day < ViewConstants.DAYS_PER_WEEK; day++) {
                 final LocalDate currentDate = startDate.plusWeeks(week).plusDays(day);
 
                 if (!currentDate.isAfter(today)) {
-                    final int xPosition = week * (TILE_SIZE + TILE_GAP) + TILE_GAP;
-                    final int yPosition = day * (TILE_SIZE + TILE_GAP) + TILE_GAP;
+                    final int xPosition = week * (ViewConstants.TILE_SIZE + ViewConstants.TILE_GAP)
+                            + ViewConstants.TILE_GAP;
+                    final int yPosition = day * (ViewConstants.TILE_SIZE + ViewConstants.TILE_GAP)
+                            + ViewConstants.TILE_GAP;
 
-                    if (point.x >= xPosition && point.x <= xPosition + TILE_SIZE
-                            && point.y >= yPosition && point.y <= yPosition + TILE_SIZE) {
+                    if (point.x >= xPosition && point.x <= xPosition + ViewConstants.TILE_SIZE
+                            && point.y >= yPosition && point.y <= yPosition + ViewConstants.TILE_SIZE) {
                         return currentDate;
                     }
                 }
@@ -140,14 +124,20 @@ public class ActivityTilesPanel extends JPanel {
         return tooltip.toString();
     }
 
-    private void addCommit(LocalDate date, String message) {
+    /**
+     * Adds commit.
+     *
+     * @param date      the date to add the activity for
+     * @param message   the commit message to add
+     */
+    public void addCommit(LocalDate date, String message) {
         activityData.put(date, activityData.getOrDefault(date, 0) + 1);
         commitMessages.computeIfAbsent(date, key -> new ArrayList<>()).add(message);
     }
 
     /**
      * Sets the activity data to be displayed in the tiles.
-     * 
+     *
      * @param activityData a map where the key is the date and the value is the
      *                     number of chores completed on that date
      */
@@ -162,7 +152,7 @@ public class ActivityTilesPanel extends JPanel {
 
     /**
      * Sets the detailed activity data including commit messages.
-     * 
+     *
      * @param activityDataParam   a map where the key is the date and the value is
      *                            the
      *                            number of chores completed on that date
@@ -205,6 +195,41 @@ public class ActivityTilesPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Loads commit data for the given room.
+     * TODO: Refactor to use a use-case interactor.
+     *
+     * @param roomId the room id to load commits for
+     */
+    public void loadFromCommitDao(String roomId) {
+        if (roomId == null) {
+            return;
+        }
+
+        new Thread(() -> fetchAndApplyCommits(roomId)).start();
+    }
+
+    // TODO: Refactor to use a use-case interactor.
+    private void fetchAndApplyCommits(String roomId) {
+        final CommitDataAccessObject dao = new CommitDataAccessObject(DynamoDbClientFactory.createClient());
+        final java.util.List<entity.Commit> commits = dao.getCommitsForRoom(roomId);
+
+        if (commits == null) {
+            return;
+        }
+
+        final java.util.Map<LocalDate, Integer> counts = new HashMap<>();
+        final java.util.Map<LocalDate, java.util.List<String>> messages = new HashMap<>();
+
+        for (entity.Commit c : commits) {
+            final LocalDate date = c.getTimestamp().toLocalDate();
+            counts.put(date, counts.getOrDefault(date, 0) + 1);
+            messages.computeIfAbsent(date, key -> new ArrayList<>()).add(c.getMessage());
+        }
+
+        javax.swing.SwingUtilities.invokeLater(() -> setDetailedActivityData(counts, messages));
+    }
+
     @Override
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
@@ -213,19 +238,22 @@ public class ActivityTilesPanel extends JPanel {
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         final LocalDate today = LocalDate.now();
-        final LocalDate startDate = today.minusWeeks(WEEKS_TO_SHOW - 1);
+        final LocalDate startDate = today.minusWeeks(ViewConstants.WEEKS_TO_SHOW - 1);
 
-        for (int week = 0; week < WEEKS_TO_SHOW; week++) {
-            for (int day = 0; day < DAYS_PER_WEEK; day++) {
+        for (int week = 0; week < ViewConstants.WEEKS_TO_SHOW; week++) {
+            for (int day = 0; day < ViewConstants.DAYS_PER_WEEK; day++) {
                 final LocalDate currentDate = startDate.plusWeeks(week).plusDays(day);
 
                 if (!currentDate.isAfter(today)) {
-                    final int xPosition = week * (TILE_SIZE + TILE_GAP) + TILE_GAP;
-                    final int yPosition = day * (TILE_SIZE + TILE_GAP) + TILE_GAP;
+                    final int xPosition = week * (ViewConstants.TILE_SIZE + ViewConstants.TILE_GAP)
+                            + ViewConstants.TILE_GAP;
+                    final int yPosition = day * (ViewConstants.TILE_SIZE + ViewConstants.TILE_GAP)
+                            + ViewConstants.TILE_GAP;
 
                     final Color tileColor = getColorForActivity(currentDate);
                     graphics2D.setColor(tileColor);
-                    graphics2D.fillRoundRect(xPosition, yPosition, TILE_SIZE, TILE_SIZE, 2, 2);
+                    graphics2D.fillRoundRect(xPosition, yPosition, ViewConstants.TILE_SIZE,
+                            ViewConstants.TILE_SIZE, 2, 2);
                 }
             }
         }
@@ -238,15 +266,15 @@ public class ActivityTilesPanel extends JPanel {
         final int thresholdLevel3 = 6;
 
         if (count == null || count == 0) {
-            return TILE_EMPTY;
+            return ViewColors.TILE_EMPTY;
         } else if (count <= thresholdLevel1) {
-            return TILE_LEVEL_1;
+            return ViewColors.TILE_LEVEL_1;
         } else if (count <= thresholdLevel2) {
-            return TILE_LEVEL_2;
+            return ViewColors.TILE_LEVEL_2;
         } else if (count <= thresholdLevel3) {
-            return TILE_LEVEL_3;
+            return ViewColors.TILE_LEVEL_3;
         } else {
-            return TILE_LEVEL_4;
+            return ViewColors.TILE_LEVEL_4;
         }
     }
 }

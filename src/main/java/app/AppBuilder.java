@@ -21,6 +21,7 @@ import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.profile.ProfileController;
 import interface_adapter.room.create.CreateRoomController;
 import interface_adapter.room.create.CreateRoomPresenter;
 import interface_adapter.room.create.CreateRoomViewModel;
@@ -44,6 +45,9 @@ import use_case.login.LoginDataAccessInterface;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
+import use_case.profile.UpdateProfileInteractor;
+import use_case.profile.UpdateProfileOutputBoundary;
+import use_case.profile.UpdateProfileOutputData;
 import use_case.room.RoomDataAccessInterface;
 import use_case.room.create.CreateRoomInputBoundary;
 import use_case.room.create.CreateRoomInteractor;
@@ -243,9 +247,33 @@ public class AppBuilder {
             cardLayout.show(cardPanel, name);
         };
 
-        profileView = new ProfileView(viewManagerModel, backTarget, navigator);
+        // --- Build Profile use case stack (Interactor + Controller) ---
 
-        // 🔹 NEW: fill Profile with the real logged-in username if we have it
+        final UpdateProfileOutputBoundary profilePresenter = new UpdateProfileOutputBoundary() {
+            @Override
+            public void prepareSuccessView(final UpdateProfileOutputData data) {
+                // For now we don't update a ProfileViewModel.
+                // ProfileView already shows "Profile updated." locally.
+                // Later we can hook this into a real ViewModel if the team wants.
+            }
+
+            @Override
+            public void prepareFailView(final String errorMessage) {
+                // Optional: log or handle errors later.
+            }
+        };
+
+        final UpdateProfileInteractor profileInteractor =
+                new UpdateProfileInteractor(profilePresenter);
+
+        final ProfileController profileController =
+                new ProfileController(profileInteractor);
+
+        // --- Create the ProfileView, now with controller injected ---
+
+        profileView = new ProfileView(viewManagerModel, backTarget, navigator, profileController);
+
+        // Fill Profile with the real logged-in username if we have it
         if (loginViewModel != null && loginViewModel.getState() != null) {
             final LoginState loginState = loginViewModel.getState();
             final String username = loginState.getUsername();

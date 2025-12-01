@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import interface_adapter.ViewManagerModel;
+import interface_adapter.profile.ProfileController;
 
 /**
  * Profile screen that displays basic user information, allows selecting a
@@ -24,6 +25,7 @@ public class ProfileView extends JPanel {
     private final ViewManagerModel viewManagerModel;
     private final String backTargetViewName;
     private final Consumer<String> navigator;
+    private final ProfileController profileController;
 
     private final JLabel usernameValueLabel;
     private final JLabel emailValueLabel;
@@ -43,14 +45,16 @@ public class ProfileView extends JPanel {
      * @param viewManagerModel   shared model used to switch screens (can be null)
      * @param backTargetViewName card to show when Back is clicked
      * @param navigator          callback that shows a given card name via
-     *                           CardLayout
+     * @param profileController                          CardLayout
      */
     public ProfileView(final ViewManagerModel viewManagerModel,
-            final String backTargetViewName,
-            final Consumer<String> navigator) {
+                       final String backTargetViewName,
+                       final Consumer<String> navigator,
+                       final ProfileController profileController) {
         this.viewManagerModel = viewManagerModel;
         this.backTargetViewName = backTargetViewName;
         this.navigator = navigator;
+        this.profileController = profileController;
 
         this.usernameValueLabel = new JLabel("");
         this.emailValueLabel = new JLabel("");
@@ -240,9 +244,19 @@ public class ProfileView extends JPanel {
      * @param event the action event
      */
     private void handleSave(final ActionEvent event) {
-        // Later: call UpdateProfile use case via a controller.
-        // For now, show simple feedback to the user.
-        messageLabel.setText("Profile updated.");
+        // Get the current email shown on the profile.
+        // If you use a JLabel for email, use getText(); if it’s a JTextField, also use getText().
+        final String email = emailValueLabel.getText();
+        final String photoPath = profilePhotoPath;
+
+        if (profileController != null) {
+            profileController.saveProfile(email, photoPath);
+        }
+
+        // Keep local feedback so user sees something immediately.
+        if (messageLabel != null) {
+            messageLabel.setText("Profile updated.");
+        }
     }
 
     /**

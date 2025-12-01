@@ -14,6 +14,7 @@ import data_access.dynamo_db.RoomMetadataDataAccessObject;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.commit.CommitController;
 import interface_adapter.commit.CommitPresenter;
+import interface_adapter.chore_creation.ChoreCreationViewModel;
 import interface_adapter.git_console.GitConsoleController;
 import interface_adapter.git_console.GitConsolePresenter;
 import interface_adapter.git_console.GitConsoleViewModel;
@@ -54,6 +55,8 @@ import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
 import view.CreateRoomView;
+import view.ChoreCreationView;
+import view.ViewConstants;
 import view.DashboardView;
 import view.GitConsoleView;
 import view.JoinView;
@@ -324,38 +327,6 @@ public class AppBuilder {
     }
 
     /**
-     * Adds Git Console use case.
-     *
-     * @return AppBuilder
-     */
-    public AppBuilder addGitConsoleUseCase() {
-
-        final GitConsoleOutputBoundary gitConsoleOutputBoundary = new GitConsolePresenter(gitConsoleViewModel);
-
-        // Commit Use case Layer (backend logic)
-        // MIGHT NEED TO MOVE THIS LINE EXTERNALLY TO INITIALIZE ONE CLIENT
-        final DynamoDbClient dynamoDbClient = DynamoDbClientFactory.createClient();
-
-        final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(dynamoDbClient);
-        final RoomMetadataDataAccessInterface roomMetadataDataAccess = new RoomMetadataDataAccessObject(dynamoDbClient);
-        final CommitPresenter commitPresenter = new CommitPresenter();
-        final CommitInputBoundary commitInteractor = new CommitInteractor(commitDataAccess,
-                roomMetadataDataAccess, commitPresenter);
-        final CommitController commitController = new CommitController(commitInteractor);
-        final RoomMetadataDataAccessObject roomMetadataDataAccessObject =
-                new RoomMetadataDataAccessObject(dynamoDbClient);
-
-        // Git Console Use Case Layer
-        final GitConsoleInputBoundary gitConsoleInteractor =
-                new GitConsoleInteractor(gitConsoleOutputBoundary, commitController,
-                        commitPresenter, roomMetadataDataAccessObject);
-
-        final GitConsoleController controller = new GitConsoleController(gitConsoleInteractor);
-        gitConsoleView.setGitConsoleController(controller);
-        return this;
-    }
-
-    /**
      * Adds Chore Creation View.
      *
      * @return AppBuilder
@@ -364,35 +335,6 @@ public class AppBuilder {
         final ChoreCreationViewModel choreCreationViewModel = new ChoreCreationViewModel();
         choreCreationView = new ChoreCreationView(choreCreationViewModel);
         cardPanel.add(choreCreationView, choreCreationView.getViewName());
-
-        return this;
-    }
-
-    /**
-     * Adds Profile view (your screen). Does not modify teammates' views.
-     *
-     * @return AppBuilder
-     */
-    public AppBuilder addProfileView() {
-        // Prefer going back to Signup; else Join; else default name
-        final String backTarget;
-        if (signupView != null) {
-            backTarget = signupView.getViewName();
-        } else if (joinView != null) {
-            backTarget = joinView.getViewName();
-        } else {
-            backTarget = ViewConstants.JOIN_VIEW_NAME;
-        }
-
-        // Navigation callback: always show the card; also drive CA engine if wired
-        final java.util.function.Consumer<String> navigator = (String name) -> {
-            if (viewManagerModel != null) {
-                viewManagerModel.setActiveViewName(name);
-            }
-            cardLayout.show(cardPanel, name);
-        };
-
-        profileView = new ProfileView(viewManagerModel, backTarget, navigator);
         return this;
     }
 
@@ -427,6 +369,8 @@ public class AppBuilder {
                 viewManagerModel.setActiveViewName(joinView.getViewName());
             } else if (gitConsoleView != null) {
                 viewManagerModel.setActiveViewName(gitConsoleView.getViewName());
+            } else if (choreCreationView != null) {
+                viewManagerModel.setActiveViewName(choreCreationView.getViewName());
             }
         }
 

@@ -1,6 +1,9 @@
 package view;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -38,37 +41,86 @@ public class ChoreCreationView extends JPanel implements ActionListener, Propert
      */
     public ChoreCreationView(ChoreCreationViewModel choreCreationViewModel) {
         this.choreCreationViewModel = choreCreationViewModel;
-        this.choreCreationViewModel.addPropertyChangeListener(this);
+        choreCreationViewModel.addPropertyChangeListener(this);
 
         final JLabel title = new JLabel(ChoreCreationViewModel.TITLE_LABEL);
+        title.setFont(ViewConstants.LABEL_FONT);
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        final LabelTextPanel titleInfo = new LabelTextPanel(
-                new JLabel(ChoreCreationViewModel.TITLE_FIELD_LABEL), titleField);
+        final JLabel titleLabel = new JLabel(ChoreCreationViewModel.TITLE_FIELD_LABEL);
+        titleLabel.setFont(ViewConstants.LABEL_FONT);
+        titleField.setFont(ViewConstants.LABEL_FONT);
+        final LabelTextPanel titleInfo = new LabelTextPanel(titleLabel, titleField);
+        titleInfo.setBackground(Color.WHITE);
 
-        final LabelTextPanel descInfo = new LabelTextPanel(
-                new JLabel(ChoreCreationViewModel.DESCRIPTION_FIELD_LABEL), descriptionField);
+        final JLabel descriptionLabel = new JLabel(ChoreCreationViewModel.DESCRIPTION_FIELD_LABEL);
+        descriptionLabel.setFont(ViewConstants.LABEL_FONT);
+        descriptionField.setFont(ViewConstants.LABEL_FONT);
+        final LabelTextPanel descInfo = new LabelTextPanel(descriptionLabel, descriptionField);
+        descInfo.setBackground(Color.WHITE);
 
-        final LabelTextPanel priorityInfo = new LabelTextPanel(
-                new JLabel(ChoreCreationViewModel.PRIORITY_FIELD_LABEL), priorityField);
+        final JLabel priorityLabel = new JLabel(ChoreCreationViewModel.PRIORITY_FIELD_LABEL);
+        priorityLabel.setFont(ViewConstants.LABEL_FONT);
+        priorityField.setFont(ViewConstants.LABEL_FONT);
+        final LabelTextPanel priorityInfo = new LabelTextPanel(priorityLabel, priorityField);
+        priorityInfo.setBackground(Color.WHITE);
 
-        final LabelTextPanel dueDateInfo = new LabelTextPanel(
-                new JLabel(ChoreCreationViewModel.DUE_DATE_FIELD_LABEL), dueDateField);
+        final JLabel dueDateLabel = new JLabel(ChoreCreationViewModel.DUE_DATE_FIELD_LABEL);
+        dueDateLabel.setFont(ViewConstants.LABEL_FONT);
+        dueDateField.setFont(ViewConstants.LABEL_FONT);
+        final LabelTextPanel dueDateInfo = new LabelTextPanel(dueDateLabel, dueDateField);
+        dueDateInfo.setBackground(Color.WHITE);
 
-        final LabelTextPanel assignedInfo = new LabelTextPanel(
-                new JLabel(ChoreCreationViewModel.ASSIGNED_USER_FIELD_LABEL), assignedUserField);
+        final JLabel assignedLabel = new JLabel(ChoreCreationViewModel.ASSIGNED_USER_FIELD_LABEL);
+        assignedLabel.setFont(ViewConstants.LABEL_FONT);
+        assignedUserField.setFont(ViewConstants.LABEL_FONT);
+        final LabelTextPanel assignedInfo = new LabelTextPanel(assignedLabel, assignedUserField);
+        assignedInfo.setBackground(Color.WHITE);
+
+        final JPanel buttons = new JPanel();
+        buttons.setBackground(Color.WHITE);
 
         createButton = new ButtonBuilder()
                 .setText(ChoreCreationViewModel.CREATE_BUTTON_LABEL)
+                .setBackground(ViewColors.ORANGE)
+                .setForeground(Color.WHITE)
+                .setFont(ViewConstants.LABEL_FONT)
+                .setBorder(ViewConstants.DEFAULT_BUTTON_FOCUS_BORDER)
                 .build();
 
         cancelButton = new ButtonBuilder()
                 .setText(ChoreCreationViewModel.CANCEL_BUTTON_LABEL)
+                .setBackground(ViewColors.ORANGE)
+                .setForeground(Color.WHITE)
+                .setFont(ViewConstants.LABEL_FONT)
+                .setBorder(ViewConstants.DEFAULT_BUTTON_FOCUS_BORDER)
                 .build();
 
-        final JPanel buttons = new JPanel();
         buttons.add(createButton);
         buttons.add(cancelButton);
+
+        this.setLayout(new GridBagLayout());
+        this.setBackground(Color.WHITE);
+
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = ViewConstants.TEXT_FIELD_INSETS;
+
+        final Component[] components = {
+                titleInfo,
+                descInfo,
+                priorityInfo,
+                dueDateInfo,
+                assignedInfo,
+                buttons
+        };
+
+        int row = 0;
+        for (Component c : components) {
+            gbc.gridx = 0;
+            gbc.gridy = row++;
+            this.add(c, gbc);
+        }
 
         addTitleListener();
         addDescriptionListener();
@@ -78,15 +130,6 @@ public class ChoreCreationView extends JPanel implements ActionListener, Propert
 
         createButton.addActionListener(this);
         cancelButton.addActionListener(this);
-
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.add(title);
-        this.add(titleInfo);
-        this.add(descInfo);
-        this.add(priorityInfo);
-        this.add(dueDateInfo);
-        this.add(assignedInfo);
-        this.add(buttons);
     }
 
     @SuppressWarnings("checkstyle:AnonInnerLength")

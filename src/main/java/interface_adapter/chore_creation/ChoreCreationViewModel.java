@@ -1,16 +1,19 @@
 package interface_adapter.chore_creation;
 
+import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 import interface_adapter.ViewModel;
+
+import javax.swing.*;
 
 /**
  * The ViewModel for the Chore view.
  */
 public class ChoreCreationViewModel extends ViewModel<ChoreCreationState> {
 
-    public static final String TITLE_LABEL = "Chore Creation";
+    public static final String TITLE_LABEL = "Create a Chore";
     public static final String TITLE_FIELD_LABEL = "Title";
     public static final String DESCRIPTION_FIELD_LABEL = "Description (optional)";
     public static final String PRIORITY_FIELD_LABEL = "Priority";

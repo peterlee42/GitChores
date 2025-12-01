@@ -1,6 +1,6 @@
 package view;
 
-import java.awt.Font;
+import java.awt.*;
 
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
@@ -80,6 +80,9 @@ public final class ViewConstants {
     public static final int CODE_FIELD_WIDTH = 200;
     public static final int BORDER_WIDTH = 1;
     public static final int BORDER_COLOR = 230;
+
+    // ---- Insets ----
+    public static final Insets TEXT_FIELD_INSETS = new Insets(5, 5, 5, 5);
 
     private ViewConstants() {
     }

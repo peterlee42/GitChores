@@ -9,11 +9,11 @@ import java.beans.PropertyChangeListener;
 import javax.swing.*;
 import javax.swing.border.Border;
 
-import interface_adapter.main.MainState;
-import interface_adapter.main.MainViewModel;
+import interface_adapter.logged_in.LoggedInState;
+import interface_adapter.logged_in.LoggedInViewModel;
 
 public class MainView extends JPanel implements ActionListener, PropertyChangeListener {
-    private final String viewName = "main";
+    private final String viewName = "logged_in";
 
     private final int navBarHeight = 32;
     private final int navButtonBorder = 8;
@@ -29,13 +29,13 @@ public class MainView extends JPanel implements ActionListener, PropertyChangeLi
     private final GitConsoleView consoleView;
     private final ProfileView profileView;
 
-    private final MainViewModel mainViewModel;
+    private final LoggedInViewModel loggedInViewModel;
 
     private JButton activeButton;
 
-    public MainView(MainViewModel mainViewModel, DashboardView dashboardPanel, GitConsoleView consolePanel,
+    public MainView(LoggedInViewModel loggedInViewModel, DashboardView dashboardPanel, GitConsoleView consolePanel,
             ProfileView profilePanel) {
-        this.mainViewModel = mainViewModel;
+        this.loggedInViewModel = loggedInViewModel;
         this.dashboardView = dashboardPanel;
         this.consoleView = consolePanel;
         this.profileView = profilePanel;
@@ -133,7 +133,7 @@ public class MainView extends JPanel implements ActionListener, PropertyChangeLi
     public void actionPerformed(ActionEvent e) {
         final Object source = e.getSource();
 
-        final MainState state = mainViewModel.getState();
+        final LoggedInState state = loggedInViewModel.getState();
 
         if (source == dashboardButton) {
             contentLayout.show(contentPanel, dashboardView.getViewName());
@@ -153,7 +153,7 @@ public class MainView extends JPanel implements ActionListener, PropertyChangeLi
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        final MainState state = (MainState) evt.getNewValue();
+        final LoggedInState state = (LoggedInState) evt.getNewValue();
         if (state.getErrorMessage() != null) {
             JOptionPane.showMessageDialog(this, state.getErrorMessage());
         }

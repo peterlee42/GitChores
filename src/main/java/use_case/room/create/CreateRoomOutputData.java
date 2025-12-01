@@ -2,31 +2,31 @@ package use_case.room.create;
 
 public class CreateRoomOutputData {
     private final String roomName;
+    private final String roomDescription;
     private final String inviteCode;
-    private final boolean success;
 
     /**
      * Constructs output data for room creation.
      *
-     * @param roomName   the room name
-     * @param inviteCode the generated invite code
-     * @param success    whether the creation was successful
+     * @param roomName        the room name
+     * @param roomDescription the room description
+     * @param inviteCode      the generated invite code
      */
-    public CreateRoomOutputData(String roomName, String inviteCode, boolean success) {
+    public CreateRoomOutputData(String roomName, String roomDescription, String inviteCode) {
         this.roomName = roomName;
+        this.roomDescription = roomDescription;
         this.inviteCode = inviteCode;
-        this.success = success;
     }
 
     public String getRoomName() {
         return roomName;
     }
 
-    public String getInviteCode() {
-        return inviteCode;
+    public String getRoomDescription() {
+        return roomDescription;
     }
 
-    public boolean isSuccess() {
-        return success;
+    public String getInviteCode() {
+        return inviteCode;
     }
 }

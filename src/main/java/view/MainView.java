@@ -148,8 +148,6 @@ public class MainView extends JPanel implements ActionListener, PropertyChangeLi
             contentLayout.show(contentPanel, profileView.getViewName());
             state.setActiveTab(profileView.getViewName());
             setActiveTab(profileButton);
-            // Refresh user info when profile tab is shown
-            profileView.onViewShown();
         }
     }
 

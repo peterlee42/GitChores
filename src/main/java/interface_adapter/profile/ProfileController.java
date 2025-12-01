@@ -27,8 +27,21 @@ public class ProfileController {
      * @param profilePhotoPath the path to the profile photo; may be null
      */
     public void saveProfile(final String email, final String profilePhotoPath) {
-        final UpdateProfileInputData data =
-                new UpdateProfileInputData(email, profilePhotoPath);
+        final UpdateProfileInputData data = new UpdateProfileInputData(email, profilePhotoPath);
         interactor.updateProfile(data);
+    }
+
+    /**
+     * Logs out the current user.
+     */
+    public void logout() {
+        interactor.logout();
+    }
+
+    /**
+     * Leaves the current room.
+     */
+    public void leaveRoom() {
+        interactor.leaveRoom();
     }
 }

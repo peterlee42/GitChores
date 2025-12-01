@@ -11,4 +11,14 @@ public interface UpdateProfileInputBoundary {
      * @param data input data containing new profile information
      */
     void updateProfile(UpdateProfileInputData data);
+
+    /**
+     * Logs out the current user.
+     */
+    void logout();
+
+    /**
+     * Allows the user to leave the current room.
+     */
+    void leaveRoom();
 }

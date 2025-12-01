@@ -1,7 +1,6 @@
 package app;
 
 import java.awt.*;
-import java.beans.PropertyChangeEvent;
 
 import javax.swing.*;
 
@@ -12,7 +11,6 @@ import data_access.dynamo_db.CommitDataAccessObject;
 import data_access.dynamo_db.DynamoDbClientFactory;
 import data_access.dynamo_db.RoomDataAccessObject;
 import data_access.dynamo_db.RoomMetadataDataAccessObject;
-import entity.User;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.commit.CommitController;
 import interface_adapter.commit.CommitPresenter;
@@ -24,6 +22,8 @@ import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.main.MainViewModel;
 import interface_adapter.profile.ProfileController;
+import interface_adapter.profile.ProfilePresenter;
+import interface_adapter.profile.ProfileViewModel;
 import interface_adapter.room.create.CreateRoomController;
 import interface_adapter.room.create.CreateRoomPresenter;
 import interface_adapter.room.create.CreateRoomViewModel;
@@ -47,9 +47,9 @@ import use_case.login.LoginDataAccessInterface;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
+import use_case.profile.UpdateProfileInputBoundary;
 import use_case.profile.UpdateProfileInteractor;
 import use_case.profile.UpdateProfileOutputBoundary;
-import use_case.profile.UpdateProfileOutputData;
 import use_case.room.RoomDataAccessInterface;
 import use_case.room.create.CreateRoomInputBoundary;
 import use_case.room.create.CreateRoomInteractor;
@@ -67,7 +67,6 @@ import view.LoginView;
 import view.MainView;
 import view.ProfileView;
 import view.SignupView;
-import view.ViewConstants;
 import view.ViewManager;
 
 /**
@@ -92,9 +91,10 @@ public class AppBuilder {
     private DashboardView dashboardView;
     private GitConsoleView gitConsoleView;
     private GitConsoleViewModel gitConsoleViewModel;
-    private ProfileView profileView;
     private CreateRoomView createRoomView;
     private CreateRoomViewModel createRoomViewModel;
+    private ProfileView profileView;
+    private ProfileViewModel profileViewModel;
 
     private SessionDataAccessObject sessionDataAccess;
     private final CognitoUserDataAccessObject userDataAccess;
@@ -228,150 +228,14 @@ public class AppBuilder {
     }
 
     /**
-     * Adds Profile view (your screen). Does not modify teammates' views.
+     * Adds Profile view.
      *
      * @return AppBuilder
      */
     public AppBuilder addProfileView() {
-        // Where "Log Out" (back button) should go:
-        final String backTarget;
-        if (signupView != null) {
-            backTarget = signupView.getViewName();
-        } else {
-            backTarget = ViewConstants.SIGNUP_VIEW_NAME;
-        }
-
-        // Where "Leave Room" should go:
-        final String leaveRoomTarget;
-        if (joinView != null) {
-            leaveRoomTarget = joinView.getViewName();
-        } else {
-            leaveRoomTarget = ViewConstants.JOIN_VIEW_NAME;
-        }
-
-        // --- Build Profile use case stack (Interactor + Controller) ---
-        final UpdateProfileOutputBoundary profilePresenter = new UpdateProfileOutputBoundary() {
-            @Override
-            public void prepareSuccessView(final UpdateProfileOutputData data) {
-                // For now we don't update a ProfileViewModel.
-                // ProfileView already shows "Profile updated." locally.
-            }
-
-            @Override
-            public void prepareFailView(final String errorMessage) {
-                // Optional: log or handle errors later.
-            }
-        };
-
-        final UpdateProfileInteractor profileInteractor =
-                new UpdateProfileInteractor(profilePresenter);
-
-        final ProfileController profileController =
-                new ProfileController(profileInteractor);
-
-        // Navigation callback: always show the card; also drive CA engine if wired
-        final java.util.function.Consumer<String> navigator = (String name) -> {
-            viewManagerModel.setActiveViewName(name);
-            cardLayout.show(cardPanel, name);
-        };
-
-        // --- Create the ProfileView, now with controller injected ---
-        profileView = new ProfileView(
-                viewManagerModel,
-                backTarget,
-                leaveRoomTarget,
-                navigator,
-                profileController);
-
-        // Set callback to refresh user info when view is shown
-        profileView.setOnViewShown(this::refreshProfileUserInfo);
-
-        // Fill the Profile screen with any user info we already have.
-        refreshProfileUserInfo();
-
-        // Add it to the CardLayout with its view name
-        cardPanel.add(profileView, profileView.getViewName());
-
-        // 1️⃣ Try to load current user info immediately (if already logged in)
-        final entity.User initialUser = userService.getUser();
-        if (initialUser != null) {
-            profileView.setUserInfo(
-                    initialUser.getUsername(),
-                    initialUser.getEmail());
-        }
-
-        // 2️⃣ Whenever the active view switches to Profile, refresh the displayed user info.
-        viewManagerModel.addPropertyChangeListener(this::handleViewManagerPropertyChange);
-
+        profileViewModel = new ProfileViewModel();
+        profileView = new ProfileView(profileViewModel);
         return this;
-    }
-
-    /**
-     * Updates the Profile view when the active view switches to the profile card.
-     *
-     * @param event property change event from the ViewManagerModel
-     */
-    private void handleViewManagerPropertyChange(final PropertyChangeEvent event) {
-        final Object newValue = event.getNewValue();
-        if (!(newValue instanceof String)) {
-            return;
-        }
-
-        final String viewName = (String) newValue;
-        if (!ViewConstants.PROFILE_VIEW_NAME.equals(viewName)) {
-            return;
-        }
-
-        // We just switched to the Profile tab: refresh the displayed user info.
-        refreshProfileUserInfo();
-    }
-
-    /**
-     * Refreshes the ProfileView with the best available user info.
-     * First tries the logged-in User from UserService (Cognito),
-     * then falls back to whatever the LoginViewModel knows.
-     */
-    private void refreshProfileUserInfo() {
-        if (profileView == null) {
-            return;
-        }
-
-        // 1) Try the fully populated User from Cognito via UserService.
-        final User currentUser = userService.getUser();
-
-        if (currentUser != null) {
-            final String username;
-            if (currentUser.getUsername() == null) {
-                username = "";
-            } else {
-                username = currentUser.getUsername();
-            }
-
-            final String email;
-            if (currentUser.getEmail() == null) {
-                email = "";
-            } else {
-                email = currentUser.getEmail();
-            }
-
-            profileView.setUserInfo(username, email);
-            return;
-        }
-
-        // 2) Fallback: whatever the login screen knows.
-        if (loginViewModel != null && loginViewModel.getState() != null) {
-            final String usernameFromLogin = loginViewModel.getState().getUsername();
-            final String safeUsername;
-            if (usernameFromLogin == null) {
-                safeUsername = "";
-            } else {
-                safeUsername = usernameFromLogin;
-            }
-            // We don't have email in LoginState, so leave it blank here.
-            profileView.setUserInfo(safeUsername, "");
-        } else {
-            profileView.setUserInfo("", "");
-        }
     }
 
     /**
@@ -441,6 +305,23 @@ public class AppBuilder {
 
         final LoginController controller = new LoginController(loginInteractor);
         loginView.setLoginController(controller);
+        return this;
+    }
+
+    /**
+     * Adds Profile use case.
+     * 
+     * @return AppBuilder
+     */
+    public AppBuilder addProfileUseCase() {
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
+        final UpdateProfileOutputBoundary updateProfileOutputBoundary = new ProfilePresenter(viewManagerModel,
+                profileViewModel, loginViewModel, joinViewModel);
+        final UpdateProfileInputBoundary updateProfileInteractor = new UpdateProfileInteractor(
+                updateProfileOutputBoundary, sessionDataAccess, roomDataAccess, userService);
+
+        final ProfileController controller = new ProfileController(updateProfileInteractor);
+        profileView.setProfileController(controller);
         return this;
     }
 

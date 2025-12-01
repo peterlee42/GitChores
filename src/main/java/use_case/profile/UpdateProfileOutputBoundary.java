@@ -18,4 +18,14 @@ public interface UpdateProfileOutputBoundary {
      * @param errorMessage message describing the error
      */
     void prepareFailView(String errorMessage);
+
+    /**
+     * Switwches to login view.
+     */
+    void prepareLoginView();
+
+    /**
+     * Switches user out of their room view.
+     */
+    void prepareLeaveRoomView();
 }

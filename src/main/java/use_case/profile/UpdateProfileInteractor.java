@@ -1,5 +1,10 @@
 package use_case.profile;
 
+import entity.User;
+import use_case.logged_in.UserService;
+import use_case.room.RoomDataAccessInterface;
+import use_case.session.SessionDataAccessInterface;
+
 /**
  * Interactor for updating a user's profile.
  *
@@ -11,14 +16,25 @@ package use_case.profile;
 public class UpdateProfileInteractor implements UpdateProfileInputBoundary {
 
     private final UpdateProfileOutputBoundary presenter;
+    private final SessionDataAccessInterface sessionDataAccessObject;
+    private final RoomDataAccessInterface roomDataAccessInterface;
+    private final UserService userService;
 
     /**
      * Constructs an interactor with the given presenter.
      *
-     * @param presenter output boundary used to present results
+     * @param presenter               output boundary used to present results
+     * @param sessionDataAccessObject data access object for session data
+     * @param roomDataAccessInterface data access object for room data
+     * @param userService             service for user
      */
-    public UpdateProfileInteractor(final UpdateProfileOutputBoundary presenter) {
+    public UpdateProfileInteractor(final UpdateProfileOutputBoundary presenter,
+            SessionDataAccessInterface sessionDataAccessObject, RoomDataAccessInterface roomDataAccessInterface,
+            UserService userService) {
         this.presenter = presenter;
+        this.sessionDataAccessObject = sessionDataAccessObject;
+        this.roomDataAccessInterface = roomDataAccessInterface;
+        this.userService = userService;
     }
 
     @Override
@@ -29,9 +45,22 @@ public class UpdateProfileInteractor implements UpdateProfileInputBoundary {
         final String photoPath = data.getProfilePhotoPath();
 
         final String message = "Profile updated.";
-        final UpdateProfileOutputData output =
-                new UpdateProfileOutputData(message, email, photoPath);
+        final UpdateProfileOutputData output = new UpdateProfileOutputData(message, email, photoPath);
 
         presenter.prepareSuccessView(output);
+    }
+
+    @Override
+    public void logout() {
+        sessionDataAccessObject.clearCurrentToken();
+        presenter.prepareLoginView();
+    }
+
+    @Override
+    public void leaveRoom() {
+        final User user = userService.getUser();
+        final String roomId = roomDataAccessInterface.getUserRoomId(user.getId());
+        roomDataAccessInterface.removeUserFromRoom(roomId, user.getId());
+        presenter.prepareLeaveRoomView();
     }
 }

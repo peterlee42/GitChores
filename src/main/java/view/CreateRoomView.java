@@ -61,14 +61,14 @@ public class CreateRoomView extends JPanel implements ActionListener,
         // Main panel
         final JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBackground(Color.WHITE);
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(ViewConstants.DASHBOARD_PANEL_PADDING,
-                ViewConstants.DASHBOARD_PANEL_PADDING,
-                ViewConstants.DASHBOARD_PANEL_PADDING, ViewConstants.DASHBOARD_PANEL_PADDING));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(ViewConstants.PANEL_PADDING,
+                ViewConstants.PANEL_PADDING,
+                ViewConstants.PANEL_PADDING, ViewConstants.PANEL_PADDING));
 
         final GridBagConstraints constraints = new GridBagConstraints();
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.insets = new Insets(ViewConstants.DASHBOARD_COMPONENT_SPACING / 2, 0,
-                ViewConstants.DASHBOARD_COMPONENT_SPACING / 2, 0);
+        constraints.insets = new Insets(ViewConstants.COMPONENT_SPACING / 2, 0,
+                ViewConstants.COMPONENT_SPACING / 2, 0);
         constraints.gridx = 0;
         constraints.gridy = 0;
 

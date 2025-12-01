@@ -6,6 +6,7 @@ package entity;
 public class User extends AbstractDomain {
     private String username;
     private String email;
+    private String profilePhotoPath;
 
     /**
      * Creates a new user with the given non-empty id and non-empty username.
@@ -44,4 +45,13 @@ public class User extends AbstractDomain {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public String getProfilePhotoPath() {
+        return profilePhotoPath;
+    }
+
+    public void setProfilePhotoPath(String profilePhotoPath) {
+        this.profilePhotoPath = profilePhotoPath;
+    }
 }
+

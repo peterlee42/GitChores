@@ -19,6 +19,7 @@ import interface_adapter.git_console.GitConsolePresenter;
 import interface_adapter.git_console.GitConsoleViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
+import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.room.create.CreateRoomController;
 import interface_adapter.room.create.CreateRoomPresenter;
@@ -244,9 +245,14 @@ public class AppBuilder {
 
         profileView = new ProfileView(viewManagerModel, backTarget, navigator);
 
-        // TEMP: populate profile with user info.
-        // Later, replace these with the real logged-in user’s data.
-        profileView.setUserInfo("Demo User", "demo@example.com");
+        // 🔹 NEW: fill Profile with the real logged-in username if we have it
+        if (loginViewModel != null && loginViewModel.getState() != null) {
+            final LoginState loginState = loginViewModel.getState();
+            final String username = loginState.getUsername();
+
+            // For now we don't have email from login, so leave it empty or placeholder
+            profileView.setUserInfo(username, "");
+        }
 
         return this;
     }

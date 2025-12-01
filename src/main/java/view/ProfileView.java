@@ -27,6 +27,7 @@ public class ProfileView extends JPanel {
 
     private final JLabel usernameValueLabel;
     private final JLabel emailValueLabel;
+    private final JLabel messageLabel;
 
     private final JButton backButton;
     private final JButton saveButton;
@@ -53,11 +54,15 @@ public class ProfileView extends JPanel {
 
         this.usernameValueLabel = new JLabel("");
         this.emailValueLabel = new JLabel("");
+        this.messageLabel = new JLabel("");
 
         this.backButton = createPrimaryButton(ViewConstants.BACK_BUTTON_TEXT);
         this.saveButton = createPrimaryButton(ViewConstants.SAVE_BUTTON_TEXT);
         this.leaveRoomButton = createPrimaryButton(ViewConstants.LEAVE_ROOM_BUTTON_TEXT);
         this.changePhotoButton = createPrimaryButton(ViewConstants.CHANGE_PHOTO_BUTTON_TEXT);
+        messageLabel.setFont(ViewConstants.LABEL_FONT);
+        messageLabel.setForeground(ViewColors.DARK_BLUE);
+        messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         initializeLayout();
         initializeListeners();
@@ -200,6 +205,11 @@ public class ProfileView extends JPanel {
         buttonsRow.add(leaveRoomButton);
 
         add(buttonsRow);
+
+        add(Box.createVerticalStrut(ViewConstants.V_GAP / 2));
+        messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        add(messageLabel);
+
     }
 
     /**
@@ -230,8 +240,9 @@ public class ProfileView extends JPanel {
      * @param event the action event
      */
     private void handleSave(final ActionEvent event) {
-        // In a future iteration this can call a use case to update profile info.
-        // For now, values would be provided via setUserInfo and persist elsewhere.
+        // Later: call UpdateProfile use case via a controller.
+        // For now, show simple feedback to the user.
+        messageLabel.setText("Profile updated.");
     }
 
     /**
@@ -278,6 +289,8 @@ public class ProfileView extends JPanel {
                             true));
 
             replaceProfilePhotoLabel(newPhotoLabel);
+
+            messageLabel.setText("Profile photo updated.");
         }
     }
 

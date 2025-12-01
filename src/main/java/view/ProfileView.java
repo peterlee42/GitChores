@@ -2,8 +2,10 @@ package view;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.function.Consumer;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -11,24 +13,27 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import interface_adapter.ViewManagerModel;
+import interface_adapter.profile.ProfileController;
+import interface_adapter.profile.ProfileState;
+import interface_adapter.profile.ProfileViewModel;
 
 /**
  * Profile screen that displays basic user information, allows selecting a
  * profile photo, and provides navigation actions.
  */
-public class ProfileView extends JPanel {
+@SuppressWarnings("checkstyle:ClassDataAbstractionCouplingCheck")
+public class ProfileView extends JPanel implements ActionListener, PropertyChangeListener {
 
-    private final ViewManagerModel viewManagerModel;
-    private final String backTargetViewName;
-    private final Consumer<String> navigator;
+    private ProfileController profileController;
 
     private final JLabel usernameValueLabel;
     private final JLabel emailValueLabel;
+    private final JLabel messageLabel;
 
-    private final JButton backButton;
+    private final JButton logoutButton;
     private final JButton saveButton;
     private final JButton leaveRoomButton;
     private final JButton changePhotoButton;
@@ -36,28 +41,30 @@ public class ProfileView extends JPanel {
     private JLabel profilePhotoLabel;
     private String profilePhotoPath;
 
+    private final ProfileViewModel profileViewModel;
+
     /**
      * Constructs a profile view.
      *
-     * @param viewManagerModel   shared model used to switch screens (can be null)
-     * @param backTargetViewName card to show when Back is clicked
-     * @param navigator          callback that shows a given card name via
-     *                           CardLayout
+     * @param profileViewModel view model for this view
      */
-    public ProfileView(final ViewManagerModel viewManagerModel,
-            final String backTargetViewName,
-            final Consumer<String> navigator) {
-        this.viewManagerModel = viewManagerModel;
-        this.backTargetViewName = backTargetViewName;
-        this.navigator = navigator;
+
+    public ProfileView(
+            ProfileViewModel profileViewModel) {
+
+        this.profileViewModel = profileViewModel;
 
         this.usernameValueLabel = new JLabel("");
         this.emailValueLabel = new JLabel("");
+        this.messageLabel = new JLabel("");
 
-        this.backButton = createPrimaryButton(ViewConstants.BACK_BUTTON_TEXT);
+        this.logoutButton = createPrimaryButton(ViewConstants.LOGOUT_BUTTON_TEXT);
         this.saveButton = createPrimaryButton(ViewConstants.SAVE_BUTTON_TEXT);
         this.leaveRoomButton = createPrimaryButton(ViewConstants.LEAVE_ROOM_BUTTON_TEXT);
         this.changePhotoButton = createPrimaryButton(ViewConstants.CHANGE_PHOTO_BUTTON_TEXT);
+        messageLabel.setFont(ViewConstants.LABEL_FONT);
+        messageLabel.setForeground(ViewColors.DARK_BLUE);
+        messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         initializeLayout();
         initializeListeners();
@@ -193,58 +200,52 @@ public class ProfileView extends JPanel {
     private void addButtonsSection() {
         final JPanel buttonsRow = new JPanel();
         buttonsRow.setBackground(ViewColors.SAND_BACKGROUND);
-        buttonsRow.add(backButton);
+        buttonsRow.add(logoutButton);
         buttonsRow.add(Box.createHorizontalStrut(ViewConstants.V_GAP));
         buttonsRow.add(saveButton);
         buttonsRow.add(Box.createHorizontalStrut(ViewConstants.V_GAP));
         buttonsRow.add(leaveRoomButton);
 
         add(buttonsRow);
+
+        add(Box.createVerticalStrut(ViewConstants.V_GAP / 2));
+        messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        add(messageLabel);
+
     }
 
     /**
      * Sets up listeners for the buttons.
      */
     private void initializeListeners() {
-        backButton.addActionListener(this::handleBack);
-        saveButton.addActionListener(this::handleSave);
-        leaveRoomButton.addActionListener(this::handleLeaveRoom);
-        changePhotoButton.addActionListener(this::handleChangePhoto);
-    }
+        logoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                profileController.logout();
+            }
+        });
 
-    /**
-     * Handles the Back button press.
-     *
-     * @param event the action event
-     */
-    private void handleBack(final ActionEvent event) {
-        if (viewManagerModel != null) {
-            viewManagerModel.setActiveViewName(backTargetViewName);
-        }
-        navigator.accept(backTargetViewName);
-    }
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                handleSave(event);
+                messageLabel.setText("Profile saved.");
+            }
+        });
 
-    /**
-     * Handles the Save button press.
-     *
-     * @param event the action event
-     */
-    private void handleSave(final ActionEvent event) {
-        // In a future iteration this can call a use case to update profile info.
-        // For now, values would be provided via setUserInfo and persist elsewhere.
-    }
+        leaveRoomButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                profileController.leaveRoom();
+            }
+        });
 
-    /**
-     * Handles the Leave Room button press.
-     *
-     * @param event the action event
-     */
-    private void handleLeaveRoom(final ActionEvent event) {
-        final String joinViewName = ViewConstants.JOIN_VIEW_NAME;
-        if (viewManagerModel != null) {
-            viewManagerModel.setActiveViewName(joinViewName);
-        }
-        navigator.accept(joinViewName);
+        changePhotoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                handleChangePhoto(event);
+            }
+        });
     }
 
     /**
@@ -278,6 +279,28 @@ public class ProfileView extends JPanel {
                             true));
 
             replaceProfilePhotoLabel(newPhotoLabel);
+
+            messageLabel.setText("Profile photo updated.");
+        }
+    }
+
+    /**
+     * Handles the Save button press.
+     *
+     * @param event the action event
+     */
+    private void handleSave(final ActionEvent event) {
+        // Get the current email shown on the profile.
+        final String email = emailValueLabel.getText();
+        final String photoPath = profilePhotoPath;
+
+        if (profileController != null) {
+            profileController.saveProfile(email, photoPath);
+        }
+
+        // Keep local feedback so user sees something immediately.
+        if (messageLabel != null) {
+            messageLabel.setText("Profile updated.");
         }
     }
 
@@ -332,31 +355,17 @@ public class ProfileView extends JPanel {
         return button;
     }
 
-    /**
-     * Creates a secondary (outline) button matching the app design.
-     *
-     * @param text text to show on the button
-     * @return configured JButton
-     */
-    private JButton createSecondaryButton(final String text) {
-        final JButton button = new JButton(text);
-        button.setFont(ViewConstants.LABEL_FONT);
-        button.setBackground(ViewColors.SAND_BACKGROUND);
-        button.setForeground(ViewColors.DARK_BLUE);
-        button.setFocusPainted(false);
-        button.setBorder(ViewConstants.EMPTY_BORDER);
-        return button;
+    @Override
+    public void actionPerformed(ActionEvent evt) {
+        JOptionPane.showMessageDialog(this, "Not implemented.");
     }
 
-    /**
-     * Sets the user information shown on the profile page.
-     *
-     * @param username username to display
-     * @param email    email to display
-     */
-    public void setUserInfo(final String username, final String email) {
-        usernameValueLabel.setText(username);
-        emailValueLabel.setText(email);
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        final ProfileState state = (ProfileState) evt.getNewValue();
+        if (state.getErrorMessage() != null) {
+            JOptionPane.showMessageDialog(this, state.getErrorMessage());
+        }
     }
 
     /**
@@ -366,5 +375,14 @@ public class ProfileView extends JPanel {
      */
     public String getViewName() {
         return ViewConstants.PROFILE_VIEW_NAME;
+    }
+
+    /**
+     * Sets the profile controller for this view.
+     *
+     * @param profileController controller to set
+     */
+    public void setProfileController(ProfileController profileController) {
+        this.profileController = profileController;
     }
 }

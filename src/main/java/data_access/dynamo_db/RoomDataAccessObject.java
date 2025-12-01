@@ -8,6 +8,7 @@ import java.util.Map;
 import entity.Room;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
@@ -150,6 +151,19 @@ public class RoomDataAccessObject implements RoomDataAccessInterface {
         final GetItemResponse response = client.getItem(getItemRequest);
 
         return response.hasItem() && !response.item().isEmpty();
+    }
+
+    @Override
+    public void removeUserFromRoom(String roomId, String userId) {
+        final Map<String, AttributeValue> key = new HashMap<>();
+        key.put(ROOM_ID, AttributeValue.fromS(roomId));
+        key.put(USER_ID, AttributeValue.fromS(userId));
+
+        final DeleteItemRequest deleteItemRequest = DeleteItemRequest.builder()
+                .tableName(ROOM_MEMBERS_TABLE)
+                .key(key)
+                .build();
+        client.deleteItem(deleteItemRequest);
     }
 
     private Room itemToRoom(Map<String, AttributeValue> item) {

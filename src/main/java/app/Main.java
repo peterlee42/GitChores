@@ -25,7 +25,8 @@ public class Main {
                 // .addSignupUseCase()
                 // .addLoginUseCase()
                 .addGitConsoleUseCase()
-                // .addRoomUseCases()
+                .addRoomUseCases()
+                .addProfileUseCase()
                 .build();
 
         application.setFocusable(true);

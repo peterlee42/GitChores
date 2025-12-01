@@ -60,4 +60,12 @@ public interface RoomDataAccessInterface {
      * @return true if the user is a member, false otherwise
      */
     boolean isUserInRoom(String roomId, String userId);
+
+    /**
+     * Removes a user from a room.
+     *
+     * @param roomId the room ID
+     * @param userId the user ID to remove
+     */
+    void removeUserFromRoom(String roomId, String userId);
 }

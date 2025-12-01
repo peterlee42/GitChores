@@ -58,6 +58,7 @@ public final class ProfileViewTestMain {
         final ProfileView profileView =
                 new ProfileView(viewManagerModel,
                         "join",
+                        "signup",
                         navigator,
                         profileController);
 

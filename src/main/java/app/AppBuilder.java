@@ -2,6 +2,8 @@ package app;
 
 import java.awt.*;
 
+import java.beans.PropertyChangeEvent;
+
 import javax.swing.*;
 
 import data_access.SessionDataAccessObject;
@@ -11,6 +13,7 @@ import data_access.dynamo_db.CommitDataAccessObject;
 import data_access.dynamo_db.DynamoDbClientFactory;
 import data_access.dynamo_db.RoomDataAccessObject;
 import data_access.dynamo_db.RoomMetadataDataAccessObject;
+import entity.User;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.commit.CommitController;
 import interface_adapter.commit.CommitPresenter;
@@ -19,7 +22,6 @@ import interface_adapter.git_console.GitConsolePresenter;
 import interface_adapter.git_console.GitConsoleViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
-import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.profile.ProfileController;
 import interface_adapter.room.create.CreateRoomController;
@@ -229,32 +231,28 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addProfileView() {
-        // Prefer going back to Signup; else Join; else default name
+        // Where "Log Out" (back button) should go:
         final String backTarget;
         if (signupView != null) {
             backTarget = signupView.getViewName();
-        } else if (joinView != null) {
-            backTarget = joinView.getViewName();
         } else {
-            backTarget = ViewConstants.JOIN_VIEW_NAME;
+            backTarget = ViewConstants.SIGNUP_VIEW_NAME;
         }
 
-        // Navigation callback: always show the card; also drive CA engine if wired
-        final java.util.function.Consumer<String> navigator = (String name) -> {
-            if (viewManagerModel != null) {
-                viewManagerModel.setActiveViewName(name);
-            }
-            cardLayout.show(cardPanel, name);
-        };
+        // Where "Leave Room" should go:
+        final String leaveRoomTarget;
+        if (joinView != null) {
+            leaveRoomTarget = joinView.getViewName();
+        } else {
+            leaveRoomTarget = ViewConstants.JOIN_VIEW_NAME;
+        }
 
         // --- Build Profile use case stack (Interactor + Controller) ---
-
         final UpdateProfileOutputBoundary profilePresenter = new UpdateProfileOutputBoundary() {
             @Override
             public void prepareSuccessView(final UpdateProfileOutputData data) {
                 // For now we don't update a ProfileViewModel.
                 // ProfileView already shows "Profile updated." locally.
-                // Later we can hook this into a real ViewModel if the team wants.
             }
 
             @Override
@@ -269,20 +267,100 @@ public class AppBuilder {
         final ProfileController profileController =
                 new ProfileController(profileInteractor);
 
+        // Navigation callback: always show the card; also drive CA engine if wired
+        final java.util.function.Consumer<String> navigator = (String name) -> {
+            viewManagerModel.setActiveViewName(name);
+            cardLayout.show(cardPanel, name);
+        };
+
         // --- Create the ProfileView, now with controller injected ---
+        profileView = new ProfileView(
+                viewManagerModel,
+                backTarget,
+                leaveRoomTarget,
+                navigator,
+                profileController);
 
-        profileView = new ProfileView(viewManagerModel, backTarget, navigator, profileController);
+        // Set callback to refresh user info when view is shown
+        profileView.setOnViewShown(this::refreshProfileUserInfo);
 
-        // Fill Profile with the real logged-in username if we have it
-        if (loginViewModel != null && loginViewModel.getState() != null) {
-            final LoginState loginState = loginViewModel.getState();
-            final String username = loginState.getUsername();
+        // Fill the Profile screen with any user info we already have.
+        refreshProfileUserInfo();
 
-            // For now we don't have email from login, so leave it empty or placeholder
-            profileView.setUserInfo(username, "");
+        // Add it to the CardLayout with its view name
+        cardPanel.add(profileView, profileView.getViewName());
+
+        // 1️⃣ Try to load current user info immediately (if already logged in)
+        final entity.User initialUser = userService.getUser();
+        if (initialUser != null) {
+            profileView.setUserInfo(
+                    initialUser.getUsername(),
+                    initialUser.getEmail());
         }
 
+        // 2️⃣ Whenever the active view switches to Profile, refresh the displayed user info.
+        viewManagerModel.addPropertyChangeListener(this::handleViewManagerPropertyChange);
+
         return this;
+    }
+
+    /**
+     * Updates the Profile view when the active view switches to the profile card.
+     *
+     * @param event property change event from the ViewManagerModel
+     */
+    private void handleViewManagerPropertyChange(final PropertyChangeEvent event) {
+        final Object newValue = event.getNewValue();
+        if (!(newValue instanceof String)) {
+            return;
+        }
+
+        final String viewName = (String) newValue;
+        if (!ViewConstants.PROFILE_VIEW_NAME.equals(viewName)) {
+            return;
+        }
+
+        // We just switched to the Profile tab: refresh the displayed user info.
+        refreshProfileUserInfo();
+    }
+
+    /**
+     * Refreshes the ProfileView with the best available user info.
+     * First tries the logged-in User from UserService (Cognito),
+     * then falls back to whatever the LoginViewModel knows.
+     */
+    private void refreshProfileUserInfo() {
+        if (profileView == null) {
+            return;
+        }
+
+        // 1) Try the fully populated User from Cognito via UserService.
+        User currentUser = null;
+        try {
+            currentUser = userService.getUser();
+        } catch (Exception ignored) {
+            // If anything goes wrong (e.g. no token / network), we just fall back.
+        }
+
+        if (currentUser != null) {
+            final String username = currentUser.getUsername() == null ? ""
+                    : currentUser.getUsername();
+            final String email = currentUser.getEmail() == null ? ""
+                    : currentUser.getEmail();
+
+            profileView.setUserInfo(username, email);
+            return;
+        }
+
+        // 2) Fallback: whatever the login screen knows.
+        if (loginViewModel != null && loginViewModel.getState() != null) {
+            final String usernameFromLogin = loginViewModel.getState().getUsername();
+            final String safeUsername = usernameFromLogin == null ? "" : usernameFromLogin;
+            // We don't have email in LoginState, so leave it blank here.
+            profileView.setUserInfo(safeUsername, "");
+        } else {
+            profileView.setUserInfo("", "");
+        }
     }
 
     /**

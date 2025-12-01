@@ -24,6 +24,7 @@ public class ProfileView extends JPanel {
 
     private final ViewManagerModel viewManagerModel;
     private final String backTargetViewName;
+    private final String leaveRoomTargetViewName;
     private final Consumer<String> navigator;
     private final ProfileController profileController;
 
@@ -39,19 +40,27 @@ public class ProfileView extends JPanel {
     private JLabel profilePhotoLabel;
     private String profilePhotoPath;
 
+    // Callback to refresh user info when view becomes visible
+    private Runnable onViewShown;
+
     /**
      * Constructs a profile view.
      *
      * @param viewManagerModel   shared model used to switch screens (can be null)
      * @param backTargetViewName card to show when Back is clicked
-     * @param navigator          callback that shows a given card name via
-     * @param profileController                          CardLayout
+     * @param navigator          callback that shows a given
+     * @param leaveRoomTargetViewName  a given card name via
+     * @param profileController    CardLayout
      */
+
     public ProfileView(final ViewManagerModel viewManagerModel,
                        final String backTargetViewName,
+                       final String leaveRoomTargetViewName,
                        final Consumer<String> navigator,
                        final ProfileController profileController) {
+
         this.viewManagerModel = viewManagerModel;
+        this.leaveRoomTargetViewName = leaveRoomTargetViewName;
         this.backTargetViewName = backTargetViewName;
         this.navigator = navigator;
         this.profileController = profileController;
@@ -60,7 +69,7 @@ public class ProfileView extends JPanel {
         this.emailValueLabel = new JLabel("");
         this.messageLabel = new JLabel("");
 
-        this.backButton = createPrimaryButton(ViewConstants.BACK_BUTTON_TEXT);
+        this.backButton = createPrimaryButton(ViewConstants.LOGOUT_BUTTON_TEXT);
         this.saveButton = createPrimaryButton(ViewConstants.SAVE_BUTTON_TEXT);
         this.leaveRoomButton = createPrimaryButton(ViewConstants.LEAVE_ROOM_BUTTON_TEXT);
         this.changePhotoButton = createPrimaryButton(ViewConstants.CHANGE_PHOTO_BUTTON_TEXT);
@@ -245,7 +254,6 @@ public class ProfileView extends JPanel {
      */
     private void handleSave(final ActionEvent event) {
         // Get the current email shown on the profile.
-        // If you use a JLabel for email, use getText(); if it’s a JTextField, also use getText().
         final String email = emailValueLabel.getText();
         final String photoPath = profilePhotoPath;
 
@@ -265,18 +273,12 @@ public class ProfileView extends JPanel {
      * @param event the action event
      */
     private void handleLeaveRoom(final ActionEvent event) {
-        // Notify the user that they have effectively logged out / left the room.
-        javax.swing.JOptionPane.showMessageDialog(
-                this,
-                "You have been logged out.",
-                "Logout",
-                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        final String target = leaveRoomTargetViewName;
 
-        final String joinViewName = ViewConstants.JOIN_VIEW_NAME;
         if (viewManagerModel != null) {
-            viewManagerModel.setActiveViewName(joinViewName);
+            viewManagerModel.setActiveViewName(target);
         }
-        navigator.accept(joinViewName);
+        navigator.accept(target);
     }
 
     /**
@@ -391,6 +393,25 @@ public class ProfileView extends JPanel {
     public void setUserInfo(final String username, final String email) {
         usernameValueLabel.setText(username);
         emailValueLabel.setText(email);
+    }
+
+    /**
+     * Sets a callback to be invoked when this view is shown.
+     * Used to refresh user information from the data source.
+     *
+     * @param onViewShown callback to execute when view becomes visible
+     */
+    public void setOnViewShown(final Runnable onViewShown) {
+        this.onViewShown = onViewShown;
+    }
+
+    /**
+     * Called when this view becomes visible. Triggers the refresh callback if set.
+     */
+    public void onViewShown() {
+        if (onViewShown != null) {
+            onViewShown.run();
+        }
     }
 
     /**

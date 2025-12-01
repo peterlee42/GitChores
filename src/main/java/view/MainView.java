@@ -135,6 +135,8 @@ public class MainView extends JPanel implements ActionListener {
         } else if (source == profileButton) {
             contentLayout.show(contentPanel, profileView.getViewName());
             setActiveTab(profileButton);
+            // Refresh user info when profile tab is shown
+            profileView.onViewShown();
         }
     }
 

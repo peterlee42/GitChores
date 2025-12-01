@@ -241,7 +241,7 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
 
     @Override
     public void actionPerformed(ActionEvent evt) {
-        JOptionPane.showMessageDialog(this, "Cancel not implemented yet.");
+        JOptionPane.showMessageDialog(this, "Not implemented.");
     }
 
     @Override

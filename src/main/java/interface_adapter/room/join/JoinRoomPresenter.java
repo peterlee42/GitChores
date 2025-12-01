@@ -2,6 +2,7 @@ package interface_adapter.room.join;
 
 import interface_adapter.ViewManagerModel;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.main.MainViewModel;
 import interface_adapter.room.create.CreateRoomViewModel;
 import use_case.room.join.JoinRoomOutputBoundary;
 import use_case.room.join.JoinRoomOutputData;
@@ -15,6 +16,7 @@ public class JoinRoomPresenter implements JoinRoomOutputBoundary {
     private final ViewManagerModel viewManagerModel;
     private final LoginViewModel loginViewModel;
     private final CreateRoomViewModel createRoomViewModel;
+    private final MainViewModel mainViewModel;
 
     /**
      * Constructs a JoinRoomPresenter.
@@ -23,13 +25,15 @@ public class JoinRoomPresenter implements JoinRoomOutputBoundary {
      * @param viewManagerModel    the view manager model
      * @param loginViewModel      the login view model
      * @param createRoomViewModel the create room view model
+     * @param mainViewModel       the main view model
      */
     public JoinRoomPresenter(JoinViewModel viewModel, ViewManagerModel viewManagerModel,
-            LoginViewModel loginViewModel, CreateRoomViewModel createRoomViewModel) {
+            LoginViewModel loginViewModel, CreateRoomViewModel createRoomViewModel, MainViewModel mainViewModel) {
         this.viewModel = viewModel;
         this.viewManagerModel = viewManagerModel;
         this.loginViewModel = loginViewModel;
         this.createRoomViewModel = createRoomViewModel;
+        this.mainViewModel = mainViewModel;
     }
 
     @Override
@@ -41,7 +45,8 @@ public class JoinRoomPresenter implements JoinRoomOutputBoundary {
         viewModel.firePropertyChange();
 
         // Navigate to dashboard/main view
-        viewManagerModel.setActiveViewName("main");
+        viewManagerModel.setActiveViewName(mainViewModel.getViewName());
+        viewManagerModel.firePropertyChange();
     }
 
     @Override

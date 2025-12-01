@@ -26,6 +26,7 @@ public final class ViewConstants {
     public static final String PROFILE_BUTTON_TEXT = "Profile";
     public static final String CHANGE_PHOTO_BUTTON_TEXT = "Change Photo";
     public static final String LEAVE_ROOM_BUTTON_TEXT = "Leave Room";
+    public static final String LOGOUT_BUTTON_TEXT = "Log Out";
 
     // ---- Error Labels ----
     public static final String ERROR_PREFIX = "Error: ";

@@ -210,11 +210,12 @@ public class AppBuilder {
         final CommitController commitController = new CommitController(commitInteractor);
         final RoomMetadataDataAccessObject roomMetadataDataAccessObject = new RoomMetadataDataAccessObject(
                 dynamoDbClient);
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
 
         // Git Console Use Case Layer
         final GitConsoleInputBoundary gitConsoleInteractor = new GitConsoleInteractor(gitConsoleOutputBoundary,
-                commitController,
-                commitPresenter, roomMetadataDataAccessObject);
+                commitController, commitPresenter, roomMetadataDataAccessObject,
+                userService, roomDataAccess);
 
         final GitConsoleController controller = new GitConsoleController(gitConsoleInteractor);
         gitConsoleView.setGitConsoleController(controller);

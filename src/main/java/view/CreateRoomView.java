@@ -221,6 +221,8 @@ public class CreateRoomView extends JPanel implements ActionListener,
             } else if (createRoomController != null) {
                 final String description = roomDescriptionField.getText().trim();
                 createRoomController.execute(roomName, description);
+                roomNameField.setText("");
+                roomDescriptionField.setText("");
             }
         }
     }

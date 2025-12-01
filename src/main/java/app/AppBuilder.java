@@ -19,10 +19,11 @@ import interface_adapter.git_console.GitConsolePresenter;
 import interface_adapter.git_console.GitConsoleViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
-import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.main.MainViewModel;
 import interface_adapter.profile.ProfileController;
+import interface_adapter.profile.ProfilePresenter;
+import interface_adapter.profile.ProfileViewModel;
 import interface_adapter.room.create.CreateRoomController;
 import interface_adapter.room.create.CreateRoomPresenter;
 import interface_adapter.room.create.CreateRoomViewModel;
@@ -46,9 +47,9 @@ import use_case.login.LoginDataAccessInterface;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
+import use_case.profile.UpdateProfileInputBoundary;
 import use_case.profile.UpdateProfileInteractor;
 import use_case.profile.UpdateProfileOutputBoundary;
-import use_case.profile.UpdateProfileOutputData;
 import use_case.room.RoomDataAccessInterface;
 import use_case.room.create.CreateRoomInputBoundary;
 import use_case.room.create.CreateRoomInteractor;
@@ -66,7 +67,6 @@ import view.LoginView;
 import view.MainView;
 import view.ProfileView;
 import view.SignupView;
-import view.ViewConstants;
 import view.ViewManager;
 
 /**
@@ -91,9 +91,10 @@ public class AppBuilder {
     private DashboardView dashboardView;
     private GitConsoleView gitConsoleView;
     private GitConsoleViewModel gitConsoleViewModel;
-    private ProfileView profileView;
     private CreateRoomView createRoomView;
     private CreateRoomViewModel createRoomViewModel;
+    private ProfileView profileView;
+    private ProfileViewModel profileViewModel;
 
     private SessionDataAccessObject sessionDataAccess;
     private final CognitoUserDataAccessObject userDataAccess;
@@ -227,64 +228,13 @@ public class AppBuilder {
     }
 
     /**
-     * Adds Profile view (your screen). Does not modify teammates' views.
+     * Adds Profile view.
      *
      * @return AppBuilder
      */
     public AppBuilder addProfileView() {
-        // Prefer going back to Signup; else Join; else default name
-        final String backTarget;
-        if (signupView != null) {
-            backTarget = signupView.getViewName();
-        } else if (joinView != null) {
-            backTarget = joinView.getViewName();
-        } else {
-            backTarget = ViewConstants.JOIN_VIEW_NAME;
-        }
-
-        // Navigation callback: always show the card; also drive CA engine if wired
-        final java.util.function.Consumer<String> navigator = (String name) -> {
-            if (viewManagerModel != null) {
-                viewManagerModel.setActiveViewName(name);
-            }
-            cardLayout.show(cardPanel, name);
-        };
-
-        // --- Build Profile use case stack (Interactor + Controller) ---
-
-        final UpdateProfileOutputBoundary profilePresenter = new UpdateProfileOutputBoundary() {
-            @Override
-            public void prepareSuccessView(final UpdateProfileOutputData data) {
-                // For now we don't update a ProfileViewModel.
-                // ProfileView already shows "Profile updated." locally.
-                // Later we can hook this into a real ViewModel if the team wants.
-            }
-
-            @Override
-            public void prepareFailView(final String errorMessage) {
-                // Optional: log or handle errors later.
-            }
-        };
-
-        final UpdateProfileInteractor profileInteractor =
-                new UpdateProfileInteractor(profilePresenter);
-
-        final ProfileController profileController =
-                new ProfileController(profileInteractor);
-
-        // --- Create the ProfileView, now with controller injected ---
-
-        profileView = new ProfileView(viewManagerModel, backTarget, navigator, profileController);
-
-        // Fill Profile with the real logged-in username if we have it
-        if (loginViewModel != null && loginViewModel.getState() != null) {
-            final LoginState loginState = loginViewModel.getState();
-            final String username = loginState.getUsername();
-
-            // For now we don't have email from login, so leave it empty or placeholder
-            profileView.setUserInfo(username, "");
-        }
-
+        profileViewModel = new ProfileViewModel();
+        profileView = new ProfileView(profileViewModel);
         return this;
     }
 
@@ -355,6 +305,23 @@ public class AppBuilder {
 
         final LoginController controller = new LoginController(loginInteractor);
         loginView.setLoginController(controller);
+        return this;
+    }
+
+    /**
+     * Adds Profile use case.
+     * 
+     * @return AppBuilder
+     */
+    public AppBuilder addProfileUseCase() {
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
+        final UpdateProfileOutputBoundary updateProfileOutputBoundary = new ProfilePresenter(viewManagerModel,
+                profileViewModel, loginViewModel, joinViewModel);
+        final UpdateProfileInputBoundary updateProfileInteractor = new UpdateProfileInteractor(
+                updateProfileOutputBoundary, sessionDataAccess, roomDataAccess, userService);
+
+        final ProfileController controller = new ProfileController(updateProfileInteractor);
+        profileView.setProfileController(controller);
         return this;
     }
 

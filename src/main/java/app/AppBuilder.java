@@ -212,6 +212,24 @@ public class AppBuilder {
                 dynamoDbClient);
         final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
 
+        // If the dashboard exists and we can determine a current room, load activity tiles
+        // TODO: Refactor to use a proper use case interactor
+        if (dashboardView != null) {
+            final entity.User current = userService.getUser();
+            if (current != null) {
+                final String currentRoomId = roomDataAccess.getUserRoomId(current.getId());
+                if (currentRoomId != null) {
+                    dashboardView.loadActivity(currentRoomId);
+                }
+            } else {
+                // Demo fallback: allow overriding a room id via system property for local testing
+                final String demoRoomId = System.getProperty("demo.roomId");
+                if (demoRoomId != null && !demoRoomId.isBlank()) {
+                    dashboardView.loadActivity(demoRoomId);
+                }
+            }
+        }
+
         // Git Console Use Case Layer
         final GitConsoleInputBoundary gitConsoleInteractor = new GitConsoleInteractor(gitConsoleOutputBoundary,
                 commitController, commitPresenter, roomMetadataDataAccessObject,

@@ -22,6 +22,7 @@ import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginState;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.profile.ProfileController;
+import interface_adapter.main.MainViewModel;
 import interface_adapter.room.create.CreateRoomController;
 import interface_adapter.room.create.CreateRoomPresenter;
 import interface_adapter.room.create.CreateRoomViewModel;
@@ -80,6 +81,7 @@ public class AppBuilder {
     private final DynamoDbClient dynamoDbClient = DynamoDbClientFactory.createClient();
 
     private MainView mainView;
+    private MainViewModel mainViewModel;
     private JoinView joinView;
     private JoinViewModel joinViewModel;
     private SignupView signupView;
@@ -94,8 +96,8 @@ public class AppBuilder {
     private CreateRoomViewModel createRoomViewModel;
 
     private SessionDataAccessObject sessionDataAccess;
-    private final CognitoIdentityProviderClient identityProviderClient;
     private final CognitoUserDataAccessObject userDataAccess;
+    private final CognitoIdentityProviderClient identityProviderClient;
 
     private final UserService userService;
 
@@ -118,7 +120,8 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addMainView() {
-        mainView = new MainView(dashboardView, gitConsoleView, profileView);
+        mainViewModel = new MainViewModel();
+        mainView = new MainView(mainViewModel, dashboardView, gitConsoleView, profileView);
         cardPanel.add(mainView, mainView.getViewName());
         return this;
     }
@@ -302,7 +305,7 @@ public class AppBuilder {
 
         // Create Room use case
         final CreateRoomPresenter createRoomPresenter = new CreateRoomPresenter(createRoomViewModel,
-                viewManagerModel, loginViewModel, joinViewModel);
+                viewManagerModel, loginViewModel, joinViewModel, mainViewModel);
         final CreateRoomInputBoundary createRoomInteractor = new CreateRoomInteractor(roomDataAccess,
                 sessionDataAccess, createRoomPresenter, userService);
         final CreateRoomController createRoomController = new CreateRoomController(createRoomInteractor);
@@ -311,7 +314,7 @@ public class AppBuilder {
 
         // Join Room use case (reuse existing JoinViewModel)
         final JoinRoomPresenter joinRoomPresenter = new JoinRoomPresenter(joinViewModel, viewManagerModel,
-                loginViewModel, createRoomViewModel);
+                loginViewModel, createRoomViewModel, mainViewModel);
         final JoinRoomInputBoundary joinRoomInteractor = new JoinRoomInteractor(roomDataAccess,
                 sessionDataAccess, joinRoomPresenter, userService);
         final JoinRoomController joinRoomController = new JoinRoomController(joinRoomInteractor);
@@ -343,11 +346,12 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addLoginUseCase() {
-        final LoginDataAccessInterface loginDataAccessInterface = userDataAccess;
+        final LoginDataAccessInterface loginDataAccess = userDataAccess;
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel, loginViewModel,
                 signupViewModel, joinViewModel);
-        final LoginInputBoundary loginInteractor = new LoginInteractor(loginOutputBoundary, loginDataAccessInterface,
-                sessionDataAccess);
+        final LoginInputBoundary loginInteractor = new LoginInteractor(loginOutputBoundary, loginDataAccess,
+                sessionDataAccess, roomDataAccess);
 
         final LoginController controller = new LoginController(loginInteractor);
         loginView.setLoginController(controller);

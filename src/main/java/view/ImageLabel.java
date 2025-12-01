@@ -28,8 +28,6 @@ class ImageLabel extends JLabel {
         }
         final BufferedImage scaledImage = Scalr.resize(logoImage, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, width,
                 height, Scalr.OP_ANTIALIAS);
-        // final Image scaledImage = logoImage.getScaledInstance(width, height,
-        // Image.SCALE_SMOOTH);
         return new ImageIcon(scaledImage);
     }
 }

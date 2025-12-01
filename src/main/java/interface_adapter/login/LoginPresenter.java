@@ -1,6 +1,7 @@
 package interface_adapter.login;
 
 import interface_adapter.ViewManagerModel;
+import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.room.join.JoinViewModel;
 import interface_adapter.signup.SignupViewModel;
 import use_case.login.LoginOutputBoundary;
@@ -12,20 +13,21 @@ public class LoginPresenter implements LoginOutputBoundary {
     private final SignupViewModel signupViewModel;
     private final ViewManagerModel viewManagerModel;
     private final JoinViewModel joinViewModel;
+    private final LoggedInViewModel loggedInViewModel;
 
     public LoginPresenter(ViewManagerModel viewManagerModel,
             LoginViewModel loginViewModel, SignupViewModel signupViewModel,
-            JoinViewModel joinViewModel) {
+            JoinViewModel joinViewModel, LoggedInViewModel loggedInViewModel) {
         this.signupViewModel = signupViewModel;
         this.loginViewModel = loginViewModel;
         this.viewManagerModel = viewManagerModel;
         this.joinViewModel = joinViewModel;
+        this.loggedInViewModel = loggedInViewModel;
 
     }
 
     @Override
     public void prepareSuccessView(LoginOutputData response) {
-
         // clear login state
         loginViewModel.setState(new LoginState());
         loginViewModel.firePropertyChange();
@@ -34,7 +36,7 @@ public class LoginPresenter implements LoginOutputBoundary {
             viewManagerModel.setState(joinViewModel.getViewName());
             viewManagerModel.firePropertyChange();
         } else {
-            viewManagerModel.setState("main");
+            viewManagerModel.setState(loggedInViewModel.getViewName());
             viewManagerModel.firePropertyChange();
         }
     }

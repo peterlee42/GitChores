@@ -25,9 +25,10 @@ public class ActivityTilesPanel extends JPanel {
     private final Map<LocalDate, Integer> activityData;
     private final Map<LocalDate, List<String>> commitMessages;
 
-    public ActivityTilesPanel() {
-        this.activityData = new HashMap<>();
-        this.commitMessages = new HashMap<>();
+    public ActivityTilesPanel(Map<LocalDate, Integer> activityData,
+            Map<LocalDate, List<String>> commitMessages) {
+        this.activityData = activityData;
+        this.commitMessages = commitMessages;
         setupPanel();
         setupTooltips();
     }
@@ -127,8 +128,8 @@ public class ActivityTilesPanel extends JPanel {
     /**
      * Adds commit.
      *
-     * @param date      the date to add the activity for
-     * @param message   the commit message to add
+     * @param date    the date to add the activity for
+     * @param message the commit message to add
      */
     public void addCommit(LocalDate date, String message) {
         activityData.put(date, activityData.getOrDefault(date, 0) + 1);

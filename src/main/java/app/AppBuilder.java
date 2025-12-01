@@ -14,6 +14,7 @@ import data_access.dynamo_db.RoomMetadataDataAccessObject;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.commit.CommitController;
 import interface_adapter.commit.CommitPresenter;
+import interface_adapter.dashboard.DashboardViewModel;
 import interface_adapter.git_console.GitConsoleController;
 import interface_adapter.git_console.GitConsolePresenter;
 import interface_adapter.git_console.GitConsoleViewModel;
@@ -86,6 +87,7 @@ public class AppBuilder {
     private LoginView loginView;
     private LoginViewModel loginViewModel;
     private DashboardView dashboardView;
+    private DashboardViewModel dashboardViewModel;
     private GitConsoleView gitConsoleView;
     private GitConsoleViewModel gitConsoleViewModel;
     private CreateRoomView createRoomView;
@@ -128,7 +130,8 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addDashboardView() {
-        dashboardView = new DashboardView();
+        dashboardViewModel = new DashboardViewModel();
+        dashboardView = new DashboardView(dashboardViewModel);
         return this;
     }
 
@@ -215,26 +218,6 @@ public class AppBuilder {
                 DynamoDbClientSingleton.getInstance());
         final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(DynamoDbClientSingleton.getInstance());
 
-        // If the dashboard exists and we can determine a current room, load activity
-        // tiles
-        // TODO: Refactor to use a proper use case interactor
-        if (dashboardView != null) {
-            final entity.User current = userService.getUser();
-            if (current != null) {
-                final String currentRoomId = roomDataAccess.getUserRoomId(current.getId());
-                if (currentRoomId != null) {
-                    dashboardView.loadActivity(currentRoomId);
-                }
-            } else {
-                // Demo fallback: allow overriding a room id via system property for local
-                // testing
-                final String demoRoomId = System.getProperty("demo.roomId");
-                if (demoRoomId != null && !demoRoomId.isBlank()) {
-                    dashboardView.loadActivity(demoRoomId);
-                }
-            }
-        }
-
         // Git Console Use Case Layer
         final GitConsoleInputBoundary gitConsoleInteractor = new GitConsoleInteractor(gitConsoleOutputBoundary,
                 commitController, commitPresenter, roomMetadataDataAccessObject,
@@ -317,7 +300,7 @@ public class AppBuilder {
         final LoginDataAccessInterface loginDataAccess = userDataAccess;
         final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(DynamoDbClientSingleton.getInstance());
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel, loginViewModel,
-                signupViewModel, joinViewModel);
+                signupViewModel, joinViewModel, loggedInViewModel);
         final LoginInputBoundary loginInteractor = new LoginInteractor(loginOutputBoundary, loginDataAccess,
                 sessionDataAccess, roomDataAccess);
 

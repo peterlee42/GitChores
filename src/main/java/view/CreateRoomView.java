@@ -240,7 +240,7 @@ public class CreateRoomView extends JPanel implements ActionListener,
     public void propertyChange(PropertyChangeEvent evt) {
         // create room view model
         if (evt.getSource() == createRoomViewModel) {
-            final CreateRoomState createRoomState = (CreateRoomState) evt.getNewValue();
+            final CreateRoomState createRoomState = createRoomViewModel.getState();
 
             if (createRoomState.getError() != null) {
                 JOptionPane.showMessageDialog(this,

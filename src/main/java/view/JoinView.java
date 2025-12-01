@@ -245,7 +245,7 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
     public void propertyChange(PropertyChangeEvent evt) {
         // join view model
         if (evt.getSource() == joinViewModel) {
-            final JoinState joinState = (JoinState) evt.getNewValue();
+            final JoinState joinState = joinViewModel.getState();
 
             if (joinState.getJoinError() != null) {
                 JOptionPane.showMessageDialog(this,

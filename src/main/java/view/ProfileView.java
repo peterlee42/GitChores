@@ -362,7 +362,7 @@ public class ProfileView extends JPanel implements ActionListener, PropertyChang
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        final ProfileState state = (ProfileState) evt.getNewValue();
+        final ProfileState state = profileViewModel.getState();
         if (state.getErrorMessage() != null) {
             JOptionPane.showMessageDialog(this, state.getErrorMessage());
         }

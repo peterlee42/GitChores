@@ -162,10 +162,6 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
                         emailField.getText().strip(),
                         String.valueOf(passwordField.getPassword()).strip(),
                         String.valueOf(repeatPasswordField.getPassword()).strip());
-                usernameField.setText("");
-                emailField.setText("");
-                passwordField.setText("");
-                repeatPasswordField.setText("");
             }
         });
 
@@ -328,7 +324,7 @@ public class SignupView extends JSplitPane implements ActionListener, PropertyCh
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        final SignupState state = (SignupState) evt.getNewValue();
+        final SignupState state = signupViewModel.getState();
         if (state.getSignupError() != null) {
             JOptionPane.showMessageDialog(this, state.getSignupError());
         }

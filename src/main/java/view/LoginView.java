@@ -248,7 +248,7 @@ public class LoginView extends JSplitPane implements ActionListener, PropertyCha
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        final LoginState state = (LoginState) evt.getNewValue();
+        final LoginState state = loginViewModel.getState();
         if (state.getLoginError() != null) {
             JOptionPane.showMessageDialog(this, state.getLoginError());
         }

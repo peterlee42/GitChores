@@ -196,7 +196,7 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
     public void propertyChange(PropertyChangeEvent evt) {
 
         if ("state".equals(evt.getPropertyName())) {
-            final GitConsoleState currentState = (GitConsoleState) evt.getNewValue();
+            final GitConsoleState currentState = gitConsoleViewModel.getState();
 
             if (currentState.getLastResponse() != null && currentState.getLastCommand() != null) {
                 final JLabel commandLabel = new JLabel(GitConsoleViewModel.OPERATOR_LABEL

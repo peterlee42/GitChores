@@ -199,6 +199,7 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
                         ViewConstants.ERROR_PREFIX, JOptionPane.ERROR_MESSAGE);
             } else if (joinRoomController != null) {
                 joinRoomController.execute(inviteCode);
+                inviteCodeField.setText("");
             }
         }
     }

@@ -3,11 +3,16 @@ package view;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 
-public class MainView extends JPanel implements ActionListener {
+import interface_adapter.main.MainState;
+import interface_adapter.main.MainViewModel;
+
+public class MainView extends JPanel implements ActionListener, PropertyChangeListener {
     private final String viewName = "main";
 
     private final int navBarHeight = 32;
@@ -24,10 +29,13 @@ public class MainView extends JPanel implements ActionListener {
     private final GitConsoleView consoleView;
     private final ProfileView profileView;
 
+    private final MainViewModel mainViewModel;
+
     private JButton activeButton;
 
-    public MainView(DashboardView dashboardPanel, GitConsoleView consolePanel,
+    public MainView(MainViewModel mainViewModel, DashboardView dashboardPanel, GitConsoleView consolePanel,
             ProfileView profilePanel) {
+        this.mainViewModel = mainViewModel;
         this.dashboardView = dashboardPanel;
         this.consoleView = consolePanel;
         this.profileView = profilePanel;
@@ -61,7 +69,7 @@ public class MainView extends JPanel implements ActionListener {
         consoleButton.addActionListener(this);
         profileButton.addActionListener(this);
 
-        contentLayout.show(contentPanel, "dashboard");
+        contentLayout.show(contentPanel, dashboardView.getViewName());
         setActiveTab(dashboardButton);
     }
 
@@ -125,18 +133,31 @@ public class MainView extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         final Object source = e.getSource();
 
+        final MainState state = mainViewModel.getState();
+
         if (source == dashboardButton) {
-            // TODO: Use ViewModel constant
-            contentLayout.show(contentPanel, "dashboard");
+            contentLayout.show(contentPanel, dashboardView.getViewName());
+            state.setActiveTab(dashboardView.getViewName());
+
             setActiveTab(dashboardButton);
         } else if (source == consoleButton) {
             contentLayout.show(contentPanel, consoleView.getViewName());
+            state.setActiveTab(consoleView.getViewName());
             setActiveTab(consoleButton);
         } else if (source == profileButton) {
             contentLayout.show(contentPanel, profileView.getViewName());
+            state.setActiveTab(profileView.getViewName());
             setActiveTab(profileButton);
             // Refresh user info when profile tab is shown
             profileView.onViewShown();
+        }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        final MainState state = (MainState) evt.getNewValue();
+        if (state.getErrorMessage() != null) {
+            JOptionPane.showMessageDialog(this, state.getErrorMessage());
         }
     }
 

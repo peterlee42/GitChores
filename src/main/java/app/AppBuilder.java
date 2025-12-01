@@ -125,7 +125,7 @@ public class AppBuilder {
 
     /**
      * Adds dashboard view - incomplete.
-     * 
+     *
      * @return AppBuilder
      */
     public AppBuilder addDashboardView() {

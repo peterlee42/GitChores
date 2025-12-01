@@ -30,6 +30,19 @@ public class User extends AbstractDomain {
         this.email = email;
     }
 
+    /**
+     * Creates a new user with a profile photo path.
+     *
+     * @param id               the user ID
+     * @param username         the user's username
+     * @param email            the user's email
+     * @param profilePhotoPath path to the user's profile photo (may be null)
+     */
+    public User(String id, String username, String email, String profilePhotoPath) {
+        this(id, username, email);
+        this.profilePhotoPath = profilePhotoPath;
+    }
+
     public String getUsername() {
         return username;
     }

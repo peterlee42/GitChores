@@ -265,6 +265,13 @@ public class ProfileView extends JPanel {
      * @param event the action event
      */
     private void handleLeaveRoom(final ActionEvent event) {
+        // Notify the user that they have effectively logged out / left the room.
+        javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "You have been logged out.",
+                "Logout",
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
         final String joinViewName = ViewConstants.JOIN_VIEW_NAME;
         if (viewManagerModel != null) {
             viewManagerModel.setActiveViewName(joinViewName);

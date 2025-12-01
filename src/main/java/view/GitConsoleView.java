@@ -19,7 +19,13 @@ import interface_adapter.git_console.GitConsoleViewModel;
  */
 @SuppressWarnings("checkstyle:ClassDataAbstractionCouplingCheck")
 public class GitConsoleView extends JPanel implements ActionListener, PropertyChangeListener {
-    private static final int TITLE_FONT_SIZE = 16;
+    private static final int TITLE_FONT_SIZE = 20;
+    private static final int GUIDE_FONT_SIZE = 13;
+    private static final int VERTICAL_SPACING = 15;
+    private static final int SMALL_VERTICAL_SPACING = 5;
+    private static final int LEFT_SPACING = 5;
+    private static final int GRID_ONE = 3;
+    private static final int GRID_TWO = 4;
 
     private final String viewName = "console";
     private final GitConsoleViewModel gitConsoleViewModel;
@@ -31,6 +37,7 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
     private final int fontSize = 14;
     private Font monospacedFont = new Font(Font.MONOSPACED, Font.PLAIN, fontSize);
 
+    @SuppressWarnings("checkstyle:ExecutableStatementCount")
     public GitConsoleView(GitConsoleViewModel gitConsoleViewModel) {
         this.gitConsoleViewModel = gitConsoleViewModel;
         gitConsoleViewModel.addPropertyChangeListener(this);
@@ -40,7 +47,10 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
         final Font largeFont = title.getFont();
         title.setFont(largeFont.deriveFont(Font.BOLD, TITLE_FONT_SIZE));
 
-        // Creating previous text area
+        // Guide text panel
+        final JPanel guidePanel = createGuidePanel();
+
+        // Creating previous commands area
         previousCommands = new JPanel();
         previousCommands.setLayout(new BoxLayout(previousCommands, BoxLayout.Y_AXIS));
         previousCommands.setBackground(getBackground());
@@ -55,15 +65,75 @@ public class GitConsoleView extends JPanel implements ActionListener, PropertyCh
         submitCommand = new JButton(GitConsoleViewModel.PROMPT_LABEL);
         final JPanel commandPanel = createCommandPanel();
 
-        // May have to expand on this based on the ca-lab
         submitCommand.addActionListener(this);
         commandInputField.addActionListener(this);
         addCommandListener();
 
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.add(title);
-        this.add(scrollPane);
-        this.add(commandPanel);
+        // Grid bag layout change
+        this.setLayout(new GridBagLayout());
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(SMALL_VERTICAL_SPACING, LEFT_SPACING, 0, 0);
+
+        // Title - centered
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        this.add(title, gbc);
+
+        // Vertical spacing
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weighty = 0;
+        this.add(Box.createVerticalStrut(VERTICAL_SPACING), gbc);
+
+        // Guide panel
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        this.add(guidePanel, gbc);
+
+        // Scroll pane with previous commands
+        gbc.gridy = GRID_ONE;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        this.add(scrollPane, gbc);
+
+        // Command panel at bottom
+        gbc.gridy = GRID_TWO;
+        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        this.add(commandPanel, gbc);
+    }
+
+    private JLabel createInstruction(String instruction) {
+        final JLabel instructionLabel = new JLabel(instruction);
+        instructionLabel.setFont(monospacedFont.deriveFont(Font.PLAIN, GUIDE_FONT_SIZE));
+        instructionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return instructionLabel;
+    }
+
+    private JPanel createGuidePanel() {
+        final JPanel guidePanel = new JPanel();
+        guidePanel.setLayout(new BoxLayout(guidePanel, BoxLayout.Y_AXIS));
+        guidePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        guidePanel.setBackground(getBackground());
+
+        final JLabel guideTitle = createInstruction("This is the console for GitChores! Here is a list of commands.");
+        final JLabel command1 = createInstruction("1) git commit -m '<insert_message>' will push a commit.");
+        final JLabel command2 = createInstruction("2) git request_review '<insert_chore_name>' will list that chore "
+                + "for review, if it hasn't already.");
+        final JLabel command3 = createInstruction("3) git approve_request '<insert_chore_name>' will approve a "
+                + "chore that has been review requested, if it exists.");
+
+        guidePanel.add(guideTitle);
+        guidePanel.add(command1);
+        guidePanel.add(command2);
+        guidePanel.add(command3);
+        guidePanel.add(Box.createVerticalStrut(VERTICAL_SPACING * 2));
+
+        return guidePanel;
     }
 
     private JPanel createCommandPanel() {

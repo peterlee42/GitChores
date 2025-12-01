@@ -54,12 +54,12 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
         }
         // Verify the prefix of the command
         else if (!(command.startsWith("git "))) {
-            output = "Invalid command. Commands must start with 'git'. Type ?guide for help.";
+            output = "Invalid command. Commands must start with 'git'.";
         } else {
             // Break command into sub-parts for easier identification
             final String[] parts = command.split(" ");
             if (parts.length < 2) {
-                output = "Missing subcommand after git. Type ?guide for help.";
+                output = "Missing subcommand after git.";
             } else {
                 final String subcommand = parts[1];
                 output = switch (subcommand) {

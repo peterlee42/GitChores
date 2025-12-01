@@ -22,6 +22,9 @@ import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
 import interface_adapter.main.MainViewModel;
+import interface_adapter.profile.ProfileController;
+import interface_adapter.profile.ProfilePresenter;
+import interface_adapter.profile.ProfileViewModel;
 import interface_adapter.room.create.CreateRoomController;
 import interface_adapter.room.create.CreateRoomPresenter;
 import interface_adapter.room.create.CreateRoomViewModel;
@@ -46,6 +49,9 @@ import use_case.login.LoginDataAccessInterface;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
+import use_case.profile.UpdateProfileInputBoundary;
+import use_case.profile.UpdateProfileInteractor;
+import use_case.profile.UpdateProfileOutputBoundary;
 import use_case.room.RoomDataAccessInterface;
 import use_case.room.create.CreateRoomInputBoundary;
 import use_case.room.create.CreateRoomInteractor;
@@ -95,6 +101,8 @@ public class AppBuilder {
     private ProfileView profileView;
     private CreateRoomView createRoomView;
     private CreateRoomViewModel createRoomViewModel;
+    private ProfileView profileView;
+    private ProfileViewModel profileViewModel;
 
     private SessionDataAccessObject sessionDataAccess;
     private final CognitoUserDataAccessObject userDataAccess;
@@ -129,7 +137,7 @@ public class AppBuilder {
 
     /**
      * Adds dashboard view - incomplete.
-     * 
+     *
      * @return AppBuilder
      */
     public AppBuilder addDashboardView() {
@@ -218,6 +226,24 @@ public class AppBuilder {
                 dynamoDbClient);
         final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
 
+        // If the dashboard exists and we can determine a current room, load activity tiles
+        // TODO: Refactor to use a proper use case interactor
+        if (dashboardView != null) {
+            final entity.User current = userService.getUser();
+            if (current != null) {
+                final String currentRoomId = roomDataAccess.getUserRoomId(current.getId());
+                if (currentRoomId != null) {
+                    dashboardView.loadActivity(currentRoomId);
+                }
+            } else {
+                // Demo fallback: allow overriding a room id via system property for local testing
+                final String demoRoomId = System.getProperty("demo.roomId");
+                if (demoRoomId != null && !demoRoomId.isBlank()) {
+                    dashboardView.loadActivity(demoRoomId);
+                }
+            }
+        }
+
         // Git Console Use Case Layer
         final GitConsoleInputBoundary gitConsoleInteractor = new GitConsoleInteractor(gitConsoleOutputBoundary,
                 commitController, commitPresenter, roomMetadataDataAccessObject,
@@ -229,35 +255,13 @@ public class AppBuilder {
     }
 
     /**
-     * Adds Profile view (your screen). Does not modify teammates' views.
+     * Adds Profile view.
      *
      * @return AppBuilder
      */
     public AppBuilder addProfileView() {
-        // Prefer going back to Signup; else Join; else default name
-        final String backTarget;
-        if (signupView != null) {
-            backTarget = signupView.getViewName();
-        } else if (joinView != null) {
-            backTarget = joinView.getViewName();
-        } else {
-            backTarget = ViewConstants.JOIN_VIEW_NAME;
-        }
-
-        // Navigation callback: always show the card; also drive CA engine if wired
-        final java.util.function.Consumer<String> navigator = (String name) -> {
-            if (viewManagerModel != null) {
-                viewManagerModel.setActiveViewName(name);
-            }
-            cardLayout.show(cardPanel, name);
-        };
-
-        profileView = new ProfileView(viewManagerModel, backTarget, navigator);
-
-        // TEMP: populate profile with user info.
-        // Later, replace these with the real logged-in user’s data.
-        profileView.setUserInfo("Demo User", "demo@example.com");
-
+        profileViewModel = new ProfileViewModel();
+        profileView = new ProfileView(profileViewModel);
         return this;
     }
 
@@ -332,6 +336,23 @@ public class AppBuilder {
     }
 
     /**
+     * Adds Profile use case.
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addProfileUseCase() {
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
+        final UpdateProfileOutputBoundary updateProfileOutputBoundary = new ProfilePresenter(viewManagerModel,
+                profileViewModel, loginViewModel, joinViewModel);
+        final UpdateProfileInputBoundary updateProfileInteractor = new UpdateProfileInteractor(
+                updateProfileOutputBoundary, sessionDataAccess, roomDataAccess, userService);
+
+        final ProfileController controller = new ProfileController(updateProfileInteractor);
+        profileView.setProfileController(controller);
+        return this;
+    }
+
+    /**
      * Adds Chore Creation View.
      *
      * @return AppBuilder
@@ -374,8 +395,6 @@ public class AppBuilder {
                 viewManagerModel.setActiveViewName(joinView.getViewName());
             } else if (gitConsoleView != null) {
                 viewManagerModel.setActiveViewName(gitConsoleView.getViewName());
-            } else if (choreCreationView != null) {
-                viewManagerModel.setActiveViewName(choreCreationView.getViewName());
             }
         }
 

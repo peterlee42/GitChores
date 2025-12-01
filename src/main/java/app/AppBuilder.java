@@ -17,10 +17,10 @@ import interface_adapter.commit.CommitPresenter;
 import interface_adapter.git_console.GitConsoleController;
 import interface_adapter.git_console.GitConsolePresenter;
 import interface_adapter.git_console.GitConsoleViewModel;
+import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
-import interface_adapter.main.MainViewModel;
 import interface_adapter.profile.ProfileController;
 import interface_adapter.profile.ProfilePresenter;
 import interface_adapter.profile.ProfileViewModel;
@@ -78,7 +78,7 @@ public class AppBuilder {
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
 
     private MainView mainView;
-    private MainViewModel mainViewModel;
+    private LoggedInViewModel loggedInViewModel;
     private JoinView joinView;
     private JoinViewModel joinViewModel;
     private SignupView signupView;
@@ -116,8 +116,8 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addMainView() {
-        mainViewModel = new MainViewModel();
-        mainView = new MainView(mainViewModel, dashboardView, gitConsoleView, profileView);
+        loggedInViewModel = new LoggedInViewModel();
+        mainView = new MainView(loggedInViewModel, dashboardView, gitConsoleView, profileView);
         cardPanel.add(mainView, mainView.getViewName());
         return this;
     }
@@ -273,7 +273,7 @@ public class AppBuilder {
 
         // Create Room use case
         final CreateRoomPresenter createRoomPresenter = new CreateRoomPresenter(createRoomViewModel,
-                viewManagerModel, loginViewModel, joinViewModel, mainViewModel);
+                viewManagerModel, loginViewModel, joinViewModel, loggedInViewModel);
         final CreateRoomInputBoundary createRoomInteractor = new CreateRoomInteractor(roomDataAccess,
                 sessionDataAccess, createRoomPresenter, userService);
         final CreateRoomController createRoomController = new CreateRoomController(createRoomInteractor);
@@ -282,7 +282,7 @@ public class AppBuilder {
 
         // Join Room use case (reuse existing JoinViewModel)
         final JoinRoomPresenter joinRoomPresenter = new JoinRoomPresenter(joinViewModel, viewManagerModel,
-                loginViewModel, createRoomViewModel, mainViewModel);
+                loginViewModel, createRoomViewModel, loggedInViewModel);
         final JoinRoomInputBoundary joinRoomInteractor = new JoinRoomInteractor(roomDataAccess,
                 sessionDataAccess, joinRoomPresenter, userService);
         final JoinRoomController joinRoomController = new JoinRoomController(joinRoomInteractor);

@@ -20,6 +20,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import interface_adapter.room.join.JoinRoomController;
 import interface_adapter.room.join.JoinState;
@@ -139,6 +141,8 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
                 joinRoomController.switchToLoginView();
             }
         });
+
+        addInviteCodeListener();
     }
 
     private JPanel buildJoinSection() {
@@ -208,6 +212,33 @@ public class JoinView extends JPanel implements ActionListener, PropertyChangeLi
 
     public void setJoinRoomController(JoinRoomController joinRoomController) {
         this.joinRoomController = joinRoomController;
+    }
+
+    @SuppressWarnings({ "checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings" })
+    private void addInviteCodeListener() {
+        inviteCodeField.getDocument().addDocumentListener(new DocumentListener() {
+
+            private void documentListenerHelper() {
+                final JoinState currentState = joinViewModel.getState();
+                currentState.setRoomCode(inviteCodeField.getText());
+                joinViewModel.setState(currentState);
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+        });
     }
 
     @Override

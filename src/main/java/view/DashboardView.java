@@ -5,7 +5,7 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 
-import interface_adapter.dashboard.DashboardState;
+import interface_adapter.logged_in.LoggedInState;
 
 @SuppressWarnings("checkstyle:ClassDataAbstractionCoupling")
 public class DashboardView extends JPanel implements PropertyChangeListener {
@@ -76,7 +76,7 @@ public class DashboardView extends JPanel implements PropertyChangeListener {
 
     @Override
     public void propertyChange(java.beans.PropertyChangeEvent evt) {
-        final DashboardState state = (DashboardState) evt.getNewValue();
+        final LoggedInState state = (LoggedInState) evt.getNewValue();
         if (state.getErrorMessage() != null) {
             JOptionPane.showMessageDialog(this, state.getErrorMessage());
         }

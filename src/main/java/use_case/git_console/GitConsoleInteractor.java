@@ -3,6 +3,9 @@ package use_case.git_console;
 import java.util.Arrays;
 import java.util.List;
 
+import entity.User;
+import use_case.logged_in.UserService;
+import use_case.room.RoomDataAccessInterface;
 import data_access.dynamo_db.RoomMetadataDataAccessObject;
 import interface_adapter.commit.CommitController;
 import interface_adapter.commit.CommitPresenter;
@@ -12,20 +15,25 @@ import interface_adapter.commit.CommitPresenter;
  */
 public class GitConsoleInteractor implements GitConsoleInputBoundary {
 
-    private static final String TEMP_ROOM_NAME = "Different room";
     private final GitConsoleOutputBoundary presenter;
     private final CommitController commitController;
     private final CommitPresenter commitPresenter;
     private final RoomMetadataDataAccessObject roomMetadataDataAccessObject;
+    private final UserService userService;
+    private final RoomDataAccessInterface roomDataAccess;
 
     public GitConsoleInteractor(GitConsoleOutputBoundary presenter,
-            CommitController commitController,
-            CommitPresenter commitPresenter,
-            RoomMetadataDataAccessObject roomMetadataDataAccessObject) {
+                CommitController commitController,
+                CommitPresenter commitPresenter,
+                RoomMetadataDataAccessObject roomMetadataDataAccessObject,
+                UserService userService,
+                RoomDataAccessInterface roomDataAccess) {
         this.presenter = presenter;
         this.commitPresenter = commitPresenter;
         this.commitController = commitController;
         this.roomMetadataDataAccessObject = roomMetadataDataAccessObject;
+        this.userService = userService;
+        this.roomDataAccess = roomDataAccess;
 
     }
 
@@ -90,9 +98,9 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
                 output = "Error: empty commit message";
             } else {
                 // THESE ARE TEMP VARIABLES
-                final String tempRoomId = TEMP_ROOM_NAME;
-                final String tempUserId = "PraneethSqw42";
-                commitController.execute(tempRoomId, tempUserId, message);
+                final String userId = userService.getUser().getId();
+                final String roomId = roomDataAccess.getUserRoomId(userId);
+                commitController.execute(roomId, userId, message);
                 output = commitPresenter.getViewMessage();
             }
         }
@@ -110,11 +118,23 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
     @SuppressWarnings("checkstyle:ReturnCount")
     private String handleReviewRequest(String[] choreNameParts) {
         final String choreName = String.join(" ", choreNameParts);
-        final String tempRoomId = TEMP_ROOM_NAME;
 
-        final boolean added = roomMetadataDataAccessObject.addPendingReview(tempRoomId, choreName);
+        // Get current user and room ID
+        final User currentUser = userService.getUser();
+        if (currentUser == null) {
+            return "Error: User not logged in";
+        }
+
+        final String userId = currentUser.getId();
+        final String roomId = roomDataAccess.getUserRoomId(userId);
+
+        if (roomId == null) {
+            return "Error: User is not in a room";
+        }
+
+        final boolean added = roomMetadataDataAccessObject.addPendingReview(roomId, choreName);
         if (!added) {
-            final List<String> current = roomMetadataDataAccessObject.getPendingReviews(tempRoomId);
+            final List<String> current = roomMetadataDataAccessObject.getPendingReviews(roomId);
             if (current.contains(choreName)) {
                 return "Chore already pending review: " + choreName;
             }
@@ -134,11 +154,23 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
     @SuppressWarnings("checkstyle:ReturnCount")
     private String handleApproveRequest(String[] choreNameParts) {
         final String choreName = String.join(" ", choreNameParts);
-        final String tempRoomId = TEMP_ROOM_NAME;
 
-        final boolean removed = roomMetadataDataAccessObject.removePendingReview(tempRoomId, choreName);
+        // Get current user and room ID
+        final User currentUser = userService.getUser();
+        if (currentUser == null) {
+            return "Error: User not logged in";
+        }
+
+        final String userId = currentUser.getId();
+        final String roomId = roomDataAccess.getUserRoomId(userId);
+
+        if (roomId == null) {
+            return "Error: User is not in a room";
+        }
+
+        final boolean removed = roomMetadataDataAccessObject.removePendingReview(roomId, choreName);
         if (!removed) {
-            final List<String> current = roomMetadataDataAccessObject.getPendingReviews(tempRoomId);
+            final List<String> current = roomMetadataDataAccessObject.getPendingReviews(roomId);
             if (!current.contains(choreName)) {
                 return "This chore does not exist or is not yet pending review: " + choreName;
             }

@@ -4,34 +4,41 @@ import java.util.Arrays;
 import java.util.List;
 
 import data_access.dynamo_db.RoomMetadataDataAccessObject;
+import entity.User;
 import interface_adapter.commit.CommitController;
 import interface_adapter.commit.CommitPresenter;
+import use_case.logged_in.UserService;
+import use_case.room.RoomDataAccessInterface;
 
 /**
  * The Git Console Interactor.
  */
 public class GitConsoleInteractor implements GitConsoleInputBoundary {
 
-    private static final String TEMP_ROOM_NAME = "Different room";
     private final GitConsoleOutputBoundary presenter;
     private final CommitController commitController;
     private final CommitPresenter commitPresenter;
     private final RoomMetadataDataAccessObject roomMetadataDataAccessObject;
+    private final UserService userService;
+    private final RoomDataAccessInterface roomDataAccess;
 
     public GitConsoleInteractor(GitConsoleOutputBoundary presenter,
-            CommitController commitController,
-            CommitPresenter commitPresenter,
-            RoomMetadataDataAccessObject roomMetadataDataAccessObject) {
+                CommitController commitController,
+                CommitPresenter commitPresenter,
+                RoomMetadataDataAccessObject roomMetadataDataAccessObject,
+                UserService userService,
+                RoomDataAccessInterface roomDataAccess) {
         this.presenter = presenter;
         this.commitPresenter = commitPresenter;
         this.commitController = commitController;
         this.roomMetadataDataAccessObject = roomMetadataDataAccessObject;
+        this.userService = userService;
+        this.roomDataAccess = roomDataAccess;
 
     }
 
     /**
-     * Executes the command given by the user, or provides an error message if it is
-     * invalid.
+     * Executes the command given by the user or provides an error message if it is invalid.
      * 
      * @param command The string command inputted to the console text box.
      */
@@ -47,12 +54,12 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
         }
         // Verify the prefix of the command
         else if (!(command.startsWith("git "))) {
-            output = "Invalid command. Commands must start with 'git'. Type ?guide for help.";
+            output = "Invalid command. Commands must start with 'git'.";
         } else {
             // Break command into sub-parts for easier identification
             final String[] parts = command.split(" ");
             if (parts.length < 2) {
-                output = "Missing subcommand after git. Type ?guide for help.";
+                output = "Missing subcommand after git.";
             } else {
                 final String subcommand = parts[1];
                 output = switch (subcommand) {
@@ -65,6 +72,19 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
         }
 
         presenter.presentResponse(command, output);
+    }
+
+    /**
+     * Helper method to return the current user's room ID.
+     *
+     * @return Room ID or null if user is not logged in/not in a room
+     */
+    private String getCurrentUserRoomId() {
+        final User currentUser = userService.getUser();
+        if (currentUser == null) {
+            return null;
+        }
+        return roomDataAccess.getUserRoomId(currentUser.getId());
     }
 
     /**
@@ -89,10 +109,9 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
             if (message.isEmpty()) {
                 output = "Error: empty commit message";
             } else {
-                // THESE ARE TEMP VARIABLES
-                final String tempRoomId = TEMP_ROOM_NAME;
-                final String tempUserId = "PraneethSqw42";
-                commitController.execute(tempRoomId, tempUserId, message);
+                final String userId = userService.getUser().getId();
+                final String roomId = roomDataAccess.getUserRoomId(userId);
+                commitController.execute(roomId, userId, message);
                 output = commitPresenter.getViewMessage();
             }
         }
@@ -110,11 +129,15 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
     @SuppressWarnings("checkstyle:ReturnCount")
     private String handleReviewRequest(String[] choreNameParts) {
         final String choreName = String.join(" ", choreNameParts);
-        final String tempRoomId = TEMP_ROOM_NAME;
+        final String roomId = getCurrentUserRoomId();
 
-        final boolean added = roomMetadataDataAccessObject.addPendingReview(tempRoomId, choreName);
+        if (roomId == null) {
+            return "Error: User not logged in or is not in a room";
+        }
+
+        final boolean added = roomMetadataDataAccessObject.addPendingReview(roomId, choreName);
         if (!added) {
-            final List<String> current = roomMetadataDataAccessObject.getPendingReviews(tempRoomId);
+            final List<String> current = roomMetadataDataAccessObject.getPendingReviews(roomId);
             if (current.contains(choreName)) {
                 return "Chore already pending review: " + choreName;
             }
@@ -134,11 +157,15 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
     @SuppressWarnings("checkstyle:ReturnCount")
     private String handleApproveRequest(String[] choreNameParts) {
         final String choreName = String.join(" ", choreNameParts);
-        final String tempRoomId = TEMP_ROOM_NAME;
+        final String roomId = getCurrentUserRoomId();
 
-        final boolean removed = roomMetadataDataAccessObject.removePendingReview(tempRoomId, choreName);
+        if (roomId == null) {
+            return "Error: User not logged in or is not in a room";
+        }
+
+        final boolean removed = roomMetadataDataAccessObject.removePendingReview(roomId, choreName);
         if (!removed) {
-            final List<String> current = roomMetadataDataAccessObject.getPendingReviews(tempRoomId);
+            final List<String> current = roomMetadataDataAccessObject.getPendingReviews(roomId);
             if (!current.contains(choreName)) {
                 return "This chore does not exist or is not yet pending review: " + choreName;
             }

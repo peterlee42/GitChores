@@ -1,6 +1,6 @@
 package view;
 
-import java.awt.*;
+import java.awt.Font;
 
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
@@ -34,8 +34,6 @@ public final class ViewConstants {
     public static final int TEXT_FIELD_COLUMNS = 24;
     public static final int V_GAP = 16;
     public static final int PROFILE_MAIN_CENTER_GAP = V_GAP * 3;
-    public static final int DASHBOARD_PANEL_PADDING = 20;
-    public static final int DASHBOARD_COMPONENT_SPACING = 15;
 
     // ---- Profile photo ----
     public static final int PROFILE_PHOTO_WIDTH = 140;
@@ -67,12 +65,6 @@ public final class ViewConstants {
     public static final Border EMPTY_BORDER = BorderFactory.createEmptyBorder(5, 15, 5, 15);
     public static final Border DEFAULT_BUTTON_FOCUS_BORDER = BorderFactory.createLineBorder(ViewColors.DARK_BLUE, 2);
 
-    // ---- Dashboard Constants ----
-    public static final double DASHBOARD_WEIGHTX = 1.0;
-    public static final double DASHBOARD_WEIGHTY = 0.3;
-    public static final int DASHBOARD_BORDER = 10;
-    public static final int DASHBOARD_230 = 230;
-
     // ---- Join Constants ----
     public static final int PANEL_PADDING = 40;
     public static final int COMPONENT_SPACING = 15;
@@ -88,13 +80,6 @@ public final class ViewConstants {
     public static final int CODE_FIELD_WIDTH = 200;
     public static final int BORDER_WIDTH = 1;
     public static final int BORDER_COLOR = 230;
-
-    // ---- Activity Tiles Constants ----
-    public static final int TILE_SIZE = 18;
-    public static final int TILE_GAP = 4;
-    public static final int WEEKS_TO_SHOW = 36;
-    public static final int DAYS_PER_WEEK = 7;
-    public static final int DISMISS_DELAY = 10000;
 
     private ViewConstants() {
     }

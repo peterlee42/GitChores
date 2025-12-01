@@ -45,7 +45,7 @@ public class CommitDataAccessObject implements CommitDataAccessInterface {
         final QueryRequest queryRequest = QueryRequest.builder()
                 .tableName(tableName)
                 .keyConditionExpression("roomId = :roomId")
-                .expressionAttributeValues(Map.of(":roomId", AttributeValue.fromS(roomId)))
+                .expressionAttributeValues(Map.of(":r", AttributeValue.fromS(roomId)))
                 .scanIndexForward(true)
                 .build();
 

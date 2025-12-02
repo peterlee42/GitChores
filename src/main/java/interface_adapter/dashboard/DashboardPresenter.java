@@ -1,14 +1,20 @@
 package interface_adapter.dashboard;
 
+import interface_adapter.ViewManagerModel;
+import interface_adapter.chore_creation.ChoreCreationViewModel;
 import use_case.dashboard.DashboardOutputBoundary;
 import use_case.dashboard.DashboardOutputData;
 
 public class DashboardPresenter implements DashboardOutputBoundary {
     private final DashboardViewModel dashboardViewModel;
+    private final ViewManagerModel viewManagerModel;
+    private final ChoreCreationViewModel choreCreationViewModel;
 
-    public DashboardPresenter(DashboardViewModel dashboardViewModel) {
+    public DashboardPresenter(DashboardViewModel dashboardViewModel, ViewManagerModel viewManagerModel,
+            ChoreCreationViewModel choreCreationViewModel) {
         this.dashboardViewModel = dashboardViewModel;
-
+        this.viewManagerModel = viewManagerModel;
+        this.choreCreationViewModel = choreCreationViewModel;
     }
 
     @Override
@@ -31,5 +37,11 @@ public class DashboardPresenter implements DashboardOutputBoundary {
         dashboardState.setErrorMessage(errorMessage);
         dashboardViewModel.setState(dashboardState);
         dashboardViewModel.firePropertyChange();
+    }
+
+    @Override
+    public void presentChoreCreationView() {
+        viewManagerModel.setState(choreCreationViewModel.getViewName());
+        viewManagerModel.firePropertyChange();
     }
 }

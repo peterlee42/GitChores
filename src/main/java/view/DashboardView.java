@@ -1,11 +1,14 @@
 package view;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 
+import interface_adapter.dashboard.DashboardController;
 import interface_adapter.dashboard.DashboardState;
 import interface_adapter.dashboard.DashboardViewModel;
 
@@ -14,6 +17,7 @@ public class DashboardView extends JPanel implements PropertyChangeListener {
 
     private final ActivityTilesPanel activityTilesPanel;
     private final DashboardViewModel dashboardViewModel;
+    private DashboardController dashboardController;
 
     public DashboardView(DashboardViewModel dashboardViewModel) {
         this.dashboardViewModel = dashboardViewModel;
@@ -56,12 +60,31 @@ public class DashboardView extends JPanel implements PropertyChangeListener {
                 BorderFactory.createEmptyBorder(ViewConstants.DASHBOARD_BORDER, ViewConstants.DASHBOARD_BORDER,
                         ViewConstants.DASHBOARD_BORDER, ViewConstants.DASHBOARD_BORDER)));
 
+        final JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(ViewColors.SAND_BACKGROUND);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, ViewConstants.DASHBOARD_BORDER, 0));
+
         final JLabel titleLabel = new JLabel("Chore Activity");
         titleLabel.setFont(ViewConstants.TITLE_FONT);
         titleLabel.setForeground(ViewColors.DARK_BLUE);
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, ViewConstants.DASHBOARD_BORDER, 0));
 
-        section.add(titleLabel, BorderLayout.NORTH);
+        final JButton createChoreButton = new ButtonBuilder()
+                .setText("Create Chore")
+                .setFont(ViewConstants.LABEL_FONT)
+                .setBackground(ViewColors.ORANGE)
+                .setForeground(Color.WHITE)
+                .build();
+
+        createChoreButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dashboardController.switchToChoreCreationView();
+            }
+        });
+
+        headerPanel.add(titleLabel, BorderLayout.WEST);
+        headerPanel.add(createChoreButton, BorderLayout.EAST);
+        section.add(headerPanel, BorderLayout.NORTH);
         section.add(content, BorderLayout.CENTER);
 
         return section;
@@ -88,5 +111,9 @@ public class DashboardView extends JPanel implements PropertyChangeListener {
      */
     public String getViewName() {
         return "dashboard";
+    }
+
+    public void setDashboardController(DashboardController dashboardController) {
+        this.dashboardController = dashboardController;
     }
 }

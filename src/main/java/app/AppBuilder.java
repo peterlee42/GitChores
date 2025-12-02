@@ -274,7 +274,7 @@ public class AppBuilder {
                 DynamoDbClientSingleton.getInstance());
 
         final DashboardOutputBoundary dashboardOutputBoundary = new DashboardPresenter(
-                dashboardViewModel);
+                dashboardViewModel, viewManagerModel, choreCreationViewModel);
 
         final DashboardInputBoundary dashboardInteractor = new DashboardInteractor(dashboardOutputBoundary, userService,
                 roomDataAccess, commitDataAccess);
@@ -282,6 +282,7 @@ public class AppBuilder {
         final DashboardController dashboardController = new DashboardController(
                 dashboardInteractor);
 
+        dashboardView.setDashboardController(dashboardController);
         mainView.setDashboardController(dashboardController);
         return this;
     }

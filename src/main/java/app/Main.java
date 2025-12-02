@@ -22,13 +22,13 @@ public class Main {
                 .addGitConsoleView()
                 .addProfileView()
                 .addMainView()
+                .addChoreCreationView()
                 .addSignupUseCase()
                 .addLoginUseCase()
                 .addGitConsoleUseCase()
                 .addRoomUseCases()
                 .addProfileUseCase()
                 .addDashboardUseCase()
-                .addChoreCreationView()
                 .addChoreCreationUseCase()
                 .build();
 

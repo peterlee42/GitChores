@@ -14,4 +14,9 @@ public interface DashboardOutputBoundary {
      * @param errorMessage the explanation of the failure
      */
     void prepareFailView(String errorMessage);
+
+    /**
+     * Presents the Chore Creation View.
+     */
+    void presentChoreCreationView();
 }

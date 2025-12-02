@@ -4,9 +4,9 @@ import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
-import interface_adapter.ViewModel;
-
 import javax.swing.*;
+
+import interface_adapter.ViewModel;
 
 /**
  * The ViewModel for the Chore view.

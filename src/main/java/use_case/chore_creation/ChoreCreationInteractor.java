@@ -1,5 +1,8 @@
 package use_case.chore_creation;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+
 import entity.Chore;
 import entity.ChoreStatus;
 import entity.DomainIdGenerator;
@@ -8,9 +11,6 @@ import use_case.chore.ChoreDataAccessInterface;
 import use_case.exception.ChoreCreationFailedException;
 import use_case.logged_in.UserService;
 import use_case.room.RoomDataAccessInterface;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 
 /**
  * Interactor for the Chore Creation Use Case.
@@ -34,25 +34,26 @@ public class ChoreCreationInteractor implements ChoreCreationInputBoundary {
     }
 
     @Override
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public void execute(ChoreCreationInputData inputData) {
         try {
 
-            User user = userService.getUser();
+            final User user = userService.getUser();
             if (user == null) {
                 presenter.prepareFailView("User must be logged in.");
                 return;
             }
 
-            String roomId = roomDao.getUserRoomId(user.getId());
+            final String roomId = roomDao.getUserRoomId(user.getId());
             if (roomId == null) {
                 presenter.prepareFailView("User must be in a room.");
                 return;
             }
 
-            LocalDateTime dueDate;
+            final LocalDateTime dueDate;
             try {
                 dueDate = LocalDateTime.parse(inputData.getDueDate());
-            } catch (DateTimeParseException e) {
+            } catch (DateTimeParseException exception) {
                 presenter.prepareFailView("Invalid due date format. Use YYYY-MM-DDTHH:MM.");
                 return;
             }
@@ -68,8 +69,8 @@ public class ChoreCreationInteractor implements ChoreCreationInputBoundary {
                 assignedUserId = user.getId();
             }
 
-            String choreId = DomainIdGenerator.generateIdWithPrefix("chore");
-            Chore chore = new Chore(
+            final String choreId = DomainIdGenerator.generateIdWithPrefix("chore");
+            final Chore chore = new Chore(
                     choreId,
                     roomId,
                     assignedUserId,
@@ -81,7 +82,7 @@ public class ChoreCreationInteractor implements ChoreCreationInputBoundary {
                     false
             );
             choreDao.saveChore(chore);
-            ChoreCreationOutputData output = new ChoreCreationOutputData(chore.getTitle());
+            final ChoreCreationOutputData output = new ChoreCreationOutputData(chore.getTitle());
             presenter.prepareSuccessView(output);
 
         } catch (ChoreCreationFailedException ex) {

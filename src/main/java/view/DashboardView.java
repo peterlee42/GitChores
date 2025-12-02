@@ -1,26 +1,25 @@
 package view;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;                          // ← NEW IMPORT
-import java.awt.event.ActionListener;                       // ← NEW IMPORT
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 
-import interface_adapter.ViewManagerModel;                  // ← NEW IMPORT
+import interface_adapter.ViewManagerModel;
 import interface_adapter.dashboard.DashboardState;
 
 @SuppressWarnings("checkstyle:ClassDataAbstractionCoupling")
 public class DashboardView extends JPanel implements PropertyChangeListener {
 
     private final ActivityTilesPanel activityTilesPanel;
-    private ViewManagerModel viewManagerModel;              // ← NEW FIELD
+    private ViewManagerModel viewManagerModel;
 
     public DashboardView() {
         setLayout(new BorderLayout());
         setBackground(ViewColors.SAND_BACKGROUND);
 
-        // Main content panel with grid layout
         final JPanel contentPanel = new JPanel(new GridBagLayout());
         final int pad = ViewConstants.DASHBOARD_PANEL_PADDING;
         contentPanel.setBorder(BorderFactory.createEmptyBorder(pad, pad, pad, pad));
@@ -30,7 +29,6 @@ public class DashboardView extends JPanel implements PropertyChangeListener {
         final int spacing = ViewConstants.DASHBOARD_COMPONENT_SPACING;
         constraints.insets = new Insets(spacing, spacing, spacing, spacing);
 
-        // Activity Tiles Section (top, full width)
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.gridwidth = 2;
@@ -80,7 +78,6 @@ public class DashboardView extends JPanel implements PropertyChangeListener {
                 .setFont(ViewConstants.LABEL_FONT)
                 .setBackground(ViewColors.ORANGE)
                 .setForeground(Color.WHITE)
-                .setBorder(ViewConstants.DEFAULT_BUTTON_FOCUS_BORDER)
                 .build();
 
         createChoreButton.addActionListener(new ActionListener() {

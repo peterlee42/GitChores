@@ -215,7 +215,6 @@ public class AppBuilder {
     public AppBuilder addGitConsoleView() {
         gitConsoleViewModel = new GitConsoleViewModel();
         gitConsoleView = new GitConsoleView(gitConsoleViewModel);
-        gitConsoleViewModel.addPropertyChangeListener(gitConsoleView);
         return this;
     }
 

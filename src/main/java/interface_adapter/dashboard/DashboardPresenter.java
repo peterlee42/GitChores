@@ -27,6 +27,7 @@ public class DashboardPresenter implements DashboardOutputBoundary {
         dashboardState.setRoomCode(dashboardOutputData.getRoomCode());
         dashboardState.setRoomName(dashboardOutputData.getRoomName());
         dashboardState.setRoomDescription(dashboardOutputData.getRoomDescription());
+        dashboardState.setChores(dashboardOutputData.getChores());
         dashboardViewModel.setState(dashboardState);
         dashboardViewModel.firePropertyChange();
     }

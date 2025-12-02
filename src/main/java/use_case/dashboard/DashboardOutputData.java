@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import entity.Chore;
+
 public class DashboardOutputData {
     private final boolean success;
     private final String currentUsername;
@@ -12,14 +14,17 @@ public class DashboardOutputData {
     private final String roomCode;
     private final Map<LocalDate, Integer> activityData;
     private final Map<LocalDate, List<String>> commitsMessages;
+    private final List<Chore> chores;
 
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public DashboardOutputData(boolean success,
             String currentUsername,
             String roomName,
             String roomDescription,
             String roomCode,
             Map<LocalDate, Integer> activityData,
-            Map<LocalDate, List<String>> commitsMessages) {
+            Map<LocalDate, List<String>> commitsMessages,
+                               List<Chore> chores) {
         this.success = success;
         this.currentUsername = currentUsername;
         this.roomName = roomName;
@@ -27,6 +32,7 @@ public class DashboardOutputData {
         this.roomCode = roomCode;
         this.activityData = activityData;
         this.commitsMessages = commitsMessages;
+        this.chores = chores;
     }
 
     public boolean isSuccess() {
@@ -55,5 +61,9 @@ public class DashboardOutputData {
 
     public Map<LocalDate, List<String>> getCommitsMessages() {
         return commitsMessages;
+    }
+
+    public List<Chore> getChores() {
+        return chores;
     }
 }

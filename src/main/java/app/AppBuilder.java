@@ -272,12 +272,14 @@ public class AppBuilder {
                 DynamoDbClientSingleton.getInstance());
         final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(
                 DynamoDbClientSingleton.getInstance());
+        final ChoreDataAccessInterface choreDataAccess = new ChoreDataAccessObject(
+                DynamoDbClientSingleton.getInstance());
 
         final DashboardOutputBoundary dashboardOutputBoundary = new DashboardPresenter(
                 dashboardViewModel, viewManagerModel, choreCreationViewModel);
 
         final DashboardInputBoundary dashboardInteractor = new DashboardInteractor(dashboardOutputBoundary, userService,
-                roomDataAccess, commitDataAccess);
+                roomDataAccess, commitDataAccess, choreDataAccess);
 
         final DashboardController dashboardController = new DashboardController(
                 dashboardInteractor);

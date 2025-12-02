@@ -13,6 +13,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import interface_adapter.chore_creation.ChoreCreationController;
 import interface_adapter.chore_creation.ChoreCreationState;
 import interface_adapter.chore_creation.ChoreCreationViewModel;
 
@@ -24,6 +25,7 @@ public class ChoreCreationView extends JPanel implements ActionListener, Propert
     private final String viewName = "chore creation";
 
     private final ChoreCreationViewModel choreCreationViewModel;
+    private ChoreCreationController choreCreationController;
 
     private final JTextField titleField = new JTextField(20);
     private final JTextField descriptionField = new JTextField(20);
@@ -264,21 +266,27 @@ public class ChoreCreationView extends JPanel implements ActionListener, Propert
 
     @Override
     public void actionPerformed(ActionEvent evt) {
+        final ChoreCreationState currentState = choreCreationViewModel.getState();
         if (evt.getSource() == createButton) {
-            final ChoreCreationState currentState = choreCreationViewModel.getState();
             if (currentState.getDescription() == null || currentState.getDescription().trim().isEmpty()) {
                 currentState.setDescription("None");
-                choreCreationViewModel.setState(currentState);
             }
             if (currentState.getAssignedUser() == null || currentState.getAssignedUser().trim().isEmpty()) {
                 currentState.setAssignedUser("None");
-                choreCreationViewModel.setState(currentState);
             }
-            JOptionPane.showMessageDialog(this, "Create not implemented yet.");
+            choreCreationController.execute(
+                    currentState.getTitle(),
+                    currentState.getDescription(),
+                    currentState.getPriority(),
+                    currentState.getDueDate(),
+                    currentState.getAssignedUser()
+            );
+
         } else if (evt.getSource() == cancelButton) {
-            JOptionPane.showMessageDialog(this, "Cancel not implemented yet.");
+            choreCreationController.switchToDashboardView();
         }
     }
+
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -290,5 +298,9 @@ public class ChoreCreationView extends JPanel implements ActionListener, Propert
 
     public String getViewName() {
         return viewName;
+    }
+
+    public void setChoreCreationController(ChoreCreationController controller) {
+        this.choreCreationController = controller;
     }
 }

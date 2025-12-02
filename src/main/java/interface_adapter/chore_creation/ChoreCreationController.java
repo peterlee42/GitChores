@@ -27,9 +27,9 @@ public class ChoreCreationController {
     }
 
     /**
-     * Executes the "switch to Signup View" use case.
+     * Executes the "switch to Dashboard View" use case.
      */
-    public void switchToSignupView() {
-        choreCreationInteractor.switchToSignupView();
+    public void switchToDashboardView() {
+        choreCreationInteractor.switchToDashboardView();
     }
 }

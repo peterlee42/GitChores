@@ -17,7 +17,7 @@ public interface ChoreCreationOutputBoundary {
     void prepareFailView(String errorMessage);
 
     /**
-     * Switches the view back to the chore list.
+     * Switches the view back to the dashboard.
      */
-    void switchToSignupView(); // change to chorelistview once thats made
+    void switchToDashboardView();
 }

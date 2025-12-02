@@ -1,16 +1,20 @@
 package view;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;                          // ← NEW IMPORT
+import java.awt.event.ActionListener;                       // ← NEW IMPORT
 import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 
+import interface_adapter.ViewManagerModel;                  // ← NEW IMPORT
 import interface_adapter.dashboard.DashboardState;
 
 @SuppressWarnings("checkstyle:ClassDataAbstractionCoupling")
 public class DashboardView extends JPanel implements PropertyChangeListener {
 
     private final ActivityTilesPanel activityTilesPanel;
+    private ViewManagerModel viewManagerModel;              // ← NEW FIELD
 
     public DashboardView() {
         setLayout(new BorderLayout());
@@ -63,12 +67,35 @@ public class DashboardView extends JPanel implements PropertyChangeListener {
                         ViewConstants.DASHBOARD_BORDER, ViewConstants.DASHBOARD_BORDER)
         ));
 
+        final JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(ViewColors.SAND_BACKGROUND);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, ViewConstants.DASHBOARD_BORDER, 0));
+
         final JLabel titleLabel = new JLabel("Chore Activity");
         titleLabel.setFont(ViewConstants.TITLE_FONT);
         titleLabel.setForeground(ViewColors.DARK_BLUE);
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, ViewConstants.DASHBOARD_BORDER, 0));
 
-        section.add(titleLabel, BorderLayout.NORTH);
+        final JButton createChoreButton = new ButtonBuilder()
+                .setText("Create Chore")
+                .setFont(ViewConstants.LABEL_FONT)
+                .setBackground(ViewColors.ORANGE)
+                .setForeground(Color.WHITE)
+                .setBorder(ViewConstants.DEFAULT_BUTTON_FOCUS_BORDER)
+                .build();
+
+        createChoreButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (viewManagerModel != null) {
+                    viewManagerModel.setState("chore creation");
+                    viewManagerModel.firePropertyChange();
+                }
+            }
+        });
+
+        headerPanel.add(titleLabel, BorderLayout.WEST);
+        headerPanel.add(createChoreButton, BorderLayout.EAST);
+        section.add(headerPanel, BorderLayout.NORTH);
         section.add(content, BorderLayout.CENTER);
 
         return section;
@@ -89,5 +116,14 @@ public class DashboardView extends JPanel implements PropertyChangeListener {
      */
     public String getViewName() {
         return "dashboard";
+    }
+
+    /**
+     * Sets the ViewManagerModel for navigation.
+     *
+     * @param viewManagerModel the ViewManagerModel
+     */
+    public void setViewManagerModel(ViewManagerModel viewManagerModel) {
+        this.viewManagerModel = viewManagerModel;
     }
 }

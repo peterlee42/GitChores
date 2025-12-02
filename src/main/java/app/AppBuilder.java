@@ -7,11 +7,10 @@ import javax.swing.*;
 import data_access.SessionDataAccessObject;
 import data_access.cognito.CognitoUserDataAccessObject;
 import data_access.cognito.IdentityProviderClientFactory;
-import data_access.dynamo_db.CommitDataAccessObject;
-import data_access.dynamo_db.DynamoDbClientFactory;
-import data_access.dynamo_db.RoomDataAccessObject;
-import data_access.dynamo_db.RoomMetadataDataAccessObject;
+import data_access.dynamo_db.*;
 import interface_adapter.ViewManagerModel;
+import interface_adapter.chore_creation.ChoreCreationController;
+import interface_adapter.chore_creation.ChoreCreationPresenter;
 import interface_adapter.commit.CommitController;
 import interface_adapter.commit.CommitPresenter;
 import interface_adapter.chore_creation.ChoreCreationViewModel;
@@ -36,11 +35,14 @@ import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import use_case.chore.ChoreDataAccessInterface;
+import use_case.chore_creation.ChoreCreationInputBoundary;
+import use_case.chore_creation.ChoreCreationInteractor;
+import use_case.chore_creation.ChoreCreationOutputBoundary;
 import use_case.commit.CommitDataAccessInterface;
 import use_case.commit.CommitInputBoundary;
 import use_case.commit.CommitInteractor;
 import use_case.commit.RoomMetadataDataAccessInterface;
-import interface_adapter.chore_creation.ChoreCreationViewModel;
 import use_case.git_console.GitConsoleInputBoundary;
 import use_case.git_console.GitConsoleInteractor;
 import use_case.git_console.GitConsoleOutputBoundary;
@@ -63,7 +65,6 @@ import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
 import view.CreateRoomView;
 import view.ChoreCreationView;
-import view.ViewConstants;
 import view.DashboardView;
 import view.GitConsoleView;
 import view.JoinView;
@@ -71,9 +72,7 @@ import view.LoginView;
 import view.MainView;
 import view.ProfileView;
 import view.SignupView;
-import view.ViewConstants;
 import view.ViewManager;
-import view.ChoreCreationView;
 
 /**
  * Class for building the app.
@@ -98,10 +97,10 @@ public class AppBuilder {
     private GitConsoleView gitConsoleView;
     private GitConsoleViewModel gitConsoleViewModel;
     private ChoreCreationView choreCreationView;
+    private ChoreCreationViewModel choreCreationViewModel;
     private ProfileView profileView;
     private CreateRoomView createRoomView;
     private CreateRoomViewModel createRoomViewModel;
-    private ProfileView profileView;
     private ProfileViewModel profileViewModel;
 
     private SessionDataAccessObject sessionDataAccess;
@@ -142,6 +141,7 @@ public class AppBuilder {
      */
     public AppBuilder addDashboardView() {
         dashboardView = new DashboardView();
+        dashboardView.setViewManagerModel(viewManagerModel);
         return this;
     }
 
@@ -358,9 +358,30 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addChoreCreationView() {
-        final ChoreCreationViewModel choreCreationViewModel = new ChoreCreationViewModel();
+        choreCreationViewModel = new ChoreCreationViewModel();
         choreCreationView = new ChoreCreationView(choreCreationViewModel);
         cardPanel.add(choreCreationView, choreCreationView.getViewName());
+        return this;
+    }
+
+    /**
+     * Adds Chore Creation use case.
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addChoreCreationUseCase() {
+        final ChoreDataAccessInterface choreDataAccess = new ChoreDataAccessObject(dynamoDbClient);
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
+        final ChoreCreationOutputBoundary choreCreationOutputBoundary = new ChoreCreationPresenter(
+                choreCreationViewModel,
+                viewManagerModel);
+        final ChoreCreationInputBoundary choreCreationInteractor = new ChoreCreationInteractor(
+                choreCreationOutputBoundary,
+                choreDataAccess,
+                roomDataAccess,
+                userService);
+        final ChoreCreationController choreCreationController = new ChoreCreationController(choreCreationInteractor);
+        choreCreationView.setChoreCreationController(choreCreationController);
         return this;
     }
 

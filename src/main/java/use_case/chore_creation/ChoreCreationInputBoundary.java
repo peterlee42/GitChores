@@ -9,7 +9,7 @@ public interface ChoreCreationInputBoundary {
     void execute(ChoreCreationInputData choreCreationInputData);
 
     /**
-     * Executes the switch to chore list use case.
+     * Executes the switch to dashboard.
      */
-    void switchToSignupView(); // change to chorelistview once thats made
+    void switchToDashboardView();
 }

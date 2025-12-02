@@ -181,4 +181,38 @@ class JoinRoomInteractorTest {
 
         verify(joinRoomPresenter, times(1)).presentFailure("Failed to join create room: db down");
     }
+
+    // ---------- 9. switchToCreateView and switchToLoginView ----------
+    @Test
+    void switchMethods_delegateToPresenterAndClearSession() {
+        JoinRoomInteractor interactor = new JoinRoomInteractor(
+                roomDataAccess, sessionDataAccess, joinRoomPresenter, userService
+        );
+
+        interactor.switchToCreateView();
+        verify(joinRoomPresenter, times(1)).switchToCreateView();
+
+        interactor.switchToLoginView();
+        verify(sessionDataAccess, times(1)).clearCurrentToken();
+        verify(joinRoomPresenter, times(1)).switchToLoginView();
+    }
+
+    // ---------- 10. getRoomByInviteCode throws JoinRoomFailedException (presents failure) ----------
+    @Test
+    void execute_getRoomByInviteCodeThrows_presentsFailure() {
+        final User user = mock(User.class);
+        when(userService.getUser()).thenReturn(user);
+        when(user.getId()).thenReturn("u7");
+
+        when(roomDataAccess.getRoomByInviteCode("444444")).thenThrow(new use_case.exception.JoinRoomFailedException("lookup fail"));
+
+        JoinRoomInteractor interactor = new JoinRoomInteractor(
+                roomDataAccess, sessionDataAccess, joinRoomPresenter, userService
+        );
+
+        interactor.execute(new JoinRoomInputData("444444"));
+
+        verify(joinRoomPresenter, times(1)).presentFailure("Failed to join create room: lookup fail");
+    }
+
 }

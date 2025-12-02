@@ -37,7 +37,6 @@ import interface_adapter.room.join.JoinViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import use_case.chore.ChoreDataAccessInterface;
 import use_case.chore_creation.ChoreCreationInputBoundary;
 import use_case.chore_creation.ChoreCreationInteractor;
@@ -374,8 +373,9 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addChoreCreationUseCase() {
-        final ChoreDataAccessInterface choreDataAccess = new ChoreDataAccessObject(dynamoDbClient);
-        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
+        final ChoreDataAccessInterface choreDataAccess =
+                new ChoreDataAccessObject(DynamoDbClientSingleton.getInstance());
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(DynamoDbClientSingleton.getInstance());
         final ChoreCreationOutputBoundary choreCreationOutputBoundary = new ChoreCreationPresenter(
                 choreCreationViewModel,
                 viewManagerModel);

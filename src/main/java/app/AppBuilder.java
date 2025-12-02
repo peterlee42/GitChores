@@ -6,10 +6,10 @@ import javax.swing.*;
 
 import data_access.SessionDataAccessObject;
 import data_access.cognito.CognitoUserDataAccessObject;
-import data_access.cognito.IdentityProviderClientFactory;
+import data_access.cognito.IdentityProviderClientSingleton;
 import data_access.dynamo_db.ChoreDataAccessObject;
 import data_access.dynamo_db.CommitDataAccessObject;
-import data_access.dynamo_db.DynamoDbClientFactory;
+import data_access.dynamo_db.DynamoDbClientSingleton;
 import data_access.dynamo_db.RoomDataAccessObject;
 import data_access.dynamo_db.RoomMetadataDataAccessObject;
 import interface_adapter.ViewManagerModel;
@@ -37,7 +37,6 @@ import interface_adapter.room.join.JoinViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
-import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import use_case.chore.ChoreDataAccessInterface;
 import use_case.chore_creation.ChoreCreationInputBoundary;
@@ -87,7 +86,6 @@ public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
-    private final DynamoDbClient dynamoDbClient = DynamoDbClientFactory.createClient();
 
     private MainView mainView;
     private MainViewModel mainViewModel;
@@ -109,7 +107,6 @@ public class AppBuilder {
 
     private SessionDataAccessObject sessionDataAccess;
     private final CognitoUserDataAccessObject userDataAccess;
-    private final CognitoIdentityProviderClient identityProviderClient;
 
     private final UserService userService;
 
@@ -121,8 +118,7 @@ public class AppBuilder {
         final ViewManager viewManager = new ViewManager(cardPanel, cardLayout);
         viewManagerModel.addPropertyChangeListener(viewManager);
         this.sessionDataAccess = new SessionDataAccessObject();
-        this.identityProviderClient = IdentityProviderClientFactory.createClient();
-        this.userDataAccess = new CognitoUserDataAccessObject(this.identityProviderClient);
+        this.userDataAccess = new CognitoUserDataAccessObject(IdentityProviderClientSingleton.getInstance());
         this.userService = new UserService(userDataAccess, sessionDataAccess);
     }
 
@@ -220,17 +216,20 @@ public class AppBuilder {
         final GitConsoleOutputBoundary gitConsoleOutputBoundary = new GitConsolePresenter(gitConsoleViewModel);
 
         // Commit Use case Layer (backend logic)
-        final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(dynamoDbClient);
-        final RoomMetadataDataAccessInterface roomMetadataDataAccess = new RoomMetadataDataAccessObject(dynamoDbClient);
+        final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(
+                DynamoDbClientSingleton.getInstance());
+        final RoomMetadataDataAccessInterface roomMetadataDataAccess = new RoomMetadataDataAccessObject(
+                DynamoDbClientSingleton.getInstance());
         final CommitPresenter commitPresenter = new CommitPresenter();
         final CommitInputBoundary commitInteractor = new CommitInteractor(commitDataAccess,
                 roomMetadataDataAccess, commitPresenter);
         final CommitController commitController = new CommitController(commitInteractor);
         final RoomMetadataDataAccessObject roomMetadataDataAccessObject = new RoomMetadataDataAccessObject(
-                dynamoDbClient);
-        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
+                DynamoDbClientSingleton.getInstance());
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(DynamoDbClientSingleton.getInstance());
 
-        // If the dashboard exists and we can determine a current room, load activity tiles
+        // If the dashboard exists and we can determine a current room, load activity
+        // tiles
         // TODO: Refactor to use a proper use case interactor
         if (dashboardView != null) {
             final entity.User current = userService.getUser();
@@ -240,7 +239,8 @@ public class AppBuilder {
                     dashboardView.loadActivity(currentRoomId);
                 }
             } else {
-                // Demo fallback: allow overriding a room id via system property for local testing
+                // Demo fallback: allow overriding a room id via system property for local
+                // testing
                 final String demoRoomId = System.getProperty("demo.roomId");
                 if (demoRoomId != null && !demoRoomId.isBlank()) {
                     dashboardView.loadActivity(demoRoomId);
@@ -282,7 +282,7 @@ public class AppBuilder {
             return this;
         }
 
-        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(DynamoDbClientSingleton.getInstance());
 
         // Create Room use case
         final CreateRoomPresenter createRoomPresenter = new CreateRoomPresenter(createRoomViewModel,
@@ -328,7 +328,7 @@ public class AppBuilder {
      */
     public AppBuilder addLoginUseCase() {
         final LoginDataAccessInterface loginDataAccess = userDataAccess;
-        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(DynamoDbClientSingleton.getInstance());
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel, loginViewModel,
                 signupViewModel, joinViewModel);
         final LoginInputBoundary loginInteractor = new LoginInteractor(loginOutputBoundary, loginDataAccess,
@@ -341,11 +341,11 @@ public class AppBuilder {
 
     /**
      * Adds Profile use case.
-     *
+     * 
      * @return AppBuilder
      */
     public AppBuilder addProfileUseCase() {
-        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(DynamoDbClientSingleton.getInstance());
         final UpdateProfileOutputBoundary updateProfileOutputBoundary = new ProfilePresenter(viewManagerModel,
                 profileViewModel, loginViewModel, joinViewModel);
         final UpdateProfileInputBoundary updateProfileInteractor = new UpdateProfileInteractor(

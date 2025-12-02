@@ -97,6 +97,23 @@ public final class ViewConstants {
     public static final int DAYS_PER_WEEK = 7;
     public static final int DISMISS_DELAY = 10000;
 
+    // ---- Chore Card Constants ----
+    public static final int CHORE_CARD_BORDER_COLOR = 220;
+    public static final int CHORE_CARD_BORDER_THICKNESS = 1;
+    public static final int CHORE_CARD_PADDING_VERTICAL = 10;
+    public static final int CHORE_CARD_PADDING_HORIZONTAL = 15;
+    public static final int CHORE_CARD_MAX_HEIGHT = 80;
+    public static final int CHORE_CARD_SPACING = 10;
+    public static final int CHORE_DESCRIPTION_FONT_SIZE = 12;
+    public static final int CHORE_STATUS_FONT_SIZE = 11;
+    public static final int CHORE_STATUS_PADDING = 2;
+    public static final int CHORE_STATUS_PADDING_HORIZONTAL = 8;
+    public static final int CHORE_EMPTY_MESSAGE_PADDING = 20;
+
+    // ---- Dashboard Section Weights ----
+    public static final double DASHBOARD_SECTION_WEIGHT = 0.5;
+    public static final int DASHBOARD_GRID_WIDTH = 2;
+
     // ---- Insets ----
     public static final Insets TEXT_FIELD_INSETS = new Insets(5, 5, 5, 5);
 

@@ -1,9 +1,12 @@
 package interface_adapter.dashboard;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import entity.Chore;
 
 public class DashboardState {
     private String currentUsername;
@@ -12,6 +15,7 @@ public class DashboardState {
     private String roomCode;
     private Map<LocalDate, Integer> activityData = new HashMap<>();
     private Map<LocalDate, List<String>> commitsMessages = new HashMap<>();
+    private List<Chore> chores = new ArrayList<>();
     private String errorMessage;
 
     public Map<LocalDate, Integer> getActivityData() {
@@ -36,6 +40,10 @@ public class DashboardState {
 
     public Map<LocalDate, List<String>> getCommitsMessages() {
         return commitsMessages;
+    }
+
+    public List<Chore> getChores() {
+        return chores;
     }
 
     public String getErrorMessage() {
@@ -64,6 +72,10 @@ public class DashboardState {
 
     public void setCommitsMessages(Map<LocalDate, List<String>> commitsMessages) {
         this.commitsMessages = commitsMessages;
+    }
+
+    public void setChores(List<Chore> chores) {
+        this.chores = chores;
     }
 
     public void setErrorMessage(String errorMessage) {

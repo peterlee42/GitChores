@@ -2,12 +2,15 @@ package use_case.dashboard;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import entity.Chore;
 import entity.Commit;
 import entity.Room;
 import entity.User;
+import use_case.chore.ChoreDataAccessInterface;
 import use_case.commit.CommitDataAccessInterface;
 import use_case.logged_in.UserService;
 import use_case.room.RoomDataAccessInterface;
@@ -17,18 +20,21 @@ public class DashboardInteractor implements DashboardInputBoundary {
     private final UserService userService;
     private final RoomDataAccessInterface roomDataAccessObject;
     private final CommitDataAccessInterface commitDataAccessObject;
+    private final ChoreDataAccessInterface choreDataAccessObject;
 
     public DashboardInteractor(DashboardOutputBoundary dashboardPresenter,
             UserService userService,
             RoomDataAccessInterface roomDataAccessObject,
-            CommitDataAccessInterface commitDataAccessObject) {
+            CommitDataAccessInterface commitDataAccessObject, ChoreDataAccessInterface choreDataAccessObject) {
         this.dashboardPresenter = dashboardPresenter;
         this.userService = userService;
         this.roomDataAccessObject = roomDataAccessObject;
         this.commitDataAccessObject = commitDataAccessObject;
+        this.choreDataAccessObject = choreDataAccessObject;
     }
 
     @Override
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public void execute(DashboardInputData dashboardInputData) {
         final User user = userService.getUser();
         if (user == null) {
@@ -61,13 +67,22 @@ public class DashboardInteractor implements DashboardInputBoundary {
             messages.computeIfAbsent(date, key -> new ArrayList<>()).add(commit.getMessage());
         }
 
+        List<Chore> chores;
+        try {
+            chores = choreDataAccessObject.getChoresForRoom(roomId);
+            chores.sort(Comparator.comparing(Chore::getDueDate));
+        } catch (Exception empty) {
+            chores = new ArrayList<>();
+        }
+
         final DashboardOutputData dashboardOutputData = new DashboardOutputData(true,
                 user.getUsername(),
                 room.getName(),
                 room.getDescription(),
                 room.getInviteCode(),
                 counts,
-                messages);
+                messages,
+                chores);
 
         dashboardPresenter.prepareSuccessView(dashboardOutputData);
     }

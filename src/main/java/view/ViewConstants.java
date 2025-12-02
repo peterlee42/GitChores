@@ -97,6 +97,9 @@ public final class ViewConstants {
     public static final int DAYS_PER_WEEK = 7;
     public static final int DISMISS_DELAY = 10000;
 
+    // ---- Insets ----
+    public static final Insets TEXT_FIELD_INSETS = new Insets(5, 5, 5, 5);
+
     private ViewConstants() {
     }
 }

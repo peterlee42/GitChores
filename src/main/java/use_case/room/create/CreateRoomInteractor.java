@@ -84,8 +84,8 @@ public class CreateRoomInteractor implements CreateRoomInputBoundary {
             // Success Confirmation
             final CreateRoomOutputData outputData = new CreateRoomOutputData(
                     inputData.getRoomName(),
-                    inviteCode,
-                    true);
+                    inputData.getDescription(),
+                    inviteCode);
             createRoomPresenter.presentSuccess(outputData);
         } catch (CreateRoomFailedException ex) {
             createRoomPresenter.presentFailure("Failed to create room: " + ex.getMessage());

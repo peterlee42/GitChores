@@ -38,16 +38,27 @@ public class UpdateProfileInteractor implements UpdateProfileInputBoundary {
     }
 
     @Override
-    public void updateProfile(final UpdateProfileInputData data) {
-        // Later: call DAOs here to update User and profile photo path.
+    public void execute() {
+        final User user = userService.getUser();
 
-        final String email = data.getEmail();
+        final String message = "Profile updated.";
+        final UpdateProfileOutputData output = new UpdateProfileOutputData(message, user.getUsername(),
+                user.getEmail(), null);
+
+        presenter.prepareSuccessView(output);
+    }
+
+    @Override
+    public void updateProfile(UpdateProfileInputData data) {
+        final User user = userService.getUser();
+
         final String photoPath = data.getProfilePhotoPath();
 
         final String message = "Profile updated.";
-        final UpdateProfileOutputData output = new UpdateProfileOutputData(message, email, photoPath);
+        final UpdateProfileOutputData output = new UpdateProfileOutputData(message, user.getUsername(), user.getEmail(),
+                photoPath);
 
-        presenter.prepareSuccessView(output);
+        presenter.prepareProfilePic(output);
     }
 
     @Override

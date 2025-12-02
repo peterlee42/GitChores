@@ -3,10 +3,10 @@ package use_case.git_console;
 import java.util.Arrays;
 import java.util.List;
 
-import data_access.dynamo_db.RoomMetadataDataAccessObject;
 import entity.User;
 import interface_adapter.commit.CommitController;
 import interface_adapter.commit.CommitPresenter;
+import use_case.commit.RoomMetadataDataAccessInterface;
 import use_case.logged_in.UserService;
 import use_case.room.RoomDataAccessInterface;
 
@@ -18,16 +18,16 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
     private final GitConsoleOutputBoundary presenter;
     private final CommitController commitController;
     private final CommitPresenter commitPresenter;
-    private final RoomMetadataDataAccessObject roomMetadataDataAccessObject;
+    private final RoomMetadataDataAccessInterface roomMetadataDataAccessObject;
     private final UserService userService;
     private final RoomDataAccessInterface roomDataAccess;
 
     public GitConsoleInteractor(GitConsoleOutputBoundary presenter,
-                CommitController commitController,
-                CommitPresenter commitPresenter,
-                RoomMetadataDataAccessObject roomMetadataDataAccessObject,
-                UserService userService,
-                RoomDataAccessInterface roomDataAccess) {
+            CommitController commitController,
+            CommitPresenter commitPresenter,
+            RoomMetadataDataAccessInterface roomMetadataDataAccessObject,
+            UserService userService,
+            RoomDataAccessInterface roomDataAccess) {
         this.presenter = presenter;
         this.commitPresenter = commitPresenter;
         this.commitController = commitController;
@@ -38,7 +38,8 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
     }
 
     /**
-     * Executes the command given by the user or provides an error message if it is invalid.
+     * Executes the command given by the user or provides an error message if it is
+     * invalid.
      * 
      * @param command The string command inputted to the console text box.
      */

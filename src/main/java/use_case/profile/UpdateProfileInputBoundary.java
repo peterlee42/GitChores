@@ -6,6 +6,11 @@ package use_case.profile;
 public interface UpdateProfileInputBoundary {
 
     /**
+     * Executes the profile update process.
+     */
+    void execute();
+
+    /**
      * Executes a profile update.
      *
      * @param data input data containing new profile information

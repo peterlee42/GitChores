@@ -20,6 +20,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import interface_adapter.room.create.CreateRoomController;
 import interface_adapter.room.create.CreateRoomState;
@@ -141,6 +143,9 @@ public class CreateRoomView extends JPanel implements ActionListener,
                 createRoomController.switchToLoginView();
             }
         });
+
+        addRoomNameListener();
+        addRoomDescriptionListener();
     }
 
     @SuppressWarnings("checkstyle:ExecutableStatementCountCheck")
@@ -235,7 +240,7 @@ public class CreateRoomView extends JPanel implements ActionListener,
     public void propertyChange(PropertyChangeEvent evt) {
         // create room view model
         if (evt.getSource() == createRoomViewModel) {
-            final CreateRoomState createRoomState = (CreateRoomState) evt.getNewValue();
+            final CreateRoomState createRoomState = createRoomViewModel.getState();
 
             if (createRoomState.getError() != null) {
                 JOptionPane.showMessageDialog(this,
@@ -244,6 +249,60 @@ public class CreateRoomView extends JPanel implements ActionListener,
                         JOptionPane.ERROR_MESSAGE);
             }
         }
+    }
+
+    @SuppressWarnings({ "checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings" })
+    private void addRoomNameListener() {
+        roomNameField.getDocument().addDocumentListener(new DocumentListener() {
+
+            private void documentListenerHelper() {
+                final CreateRoomState currentState = createRoomViewModel.getState();
+                currentState.setRoomName(roomNameField.getText());
+                createRoomViewModel.setState(currentState);
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+        });
+    }
+
+    @SuppressWarnings({ "checkstyle:AnonInnerLength", "checkstyle:SuppressWarnings" })
+    private void addRoomDescriptionListener() {
+        roomDescriptionField.getDocument().addDocumentListener(new DocumentListener() {
+
+            private void documentListenerHelper() {
+                final CreateRoomState currentState = createRoomViewModel.getState();
+                currentState.setDescription(roomDescriptionField.getText());
+                createRoomViewModel.setState(currentState);
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                documentListenerHelper();
+            }
+        });
     }
 
     public String getViewName() {

@@ -20,7 +20,14 @@ public interface UpdateProfileOutputBoundary {
     void prepareFailView(String errorMessage);
 
     /**
-     * Switwches to login view.
+     * Prepares profile picture.
+     * 
+     * @param data output data with profile picture info
+     */
+    void prepareProfilePic(UpdateProfileOutputData data);
+
+    /**
+     * Switches to login view.
      */
     void prepareLoginView();
 

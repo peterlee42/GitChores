@@ -14,8 +14,8 @@ public class CommitInteractor implements CommitInputBoundary {
     private final CommitOutputBoundary commitPresenter;
 
     public CommitInteractor(CommitDataAccessInterface commitDataAccess,
-                            RoomMetadataDataAccessInterface roomMetadataDataAccess,
-                            CommitOutputBoundary commitPresenter) {
+            RoomMetadataDataAccessInterface roomMetadataDataAccess,
+            CommitOutputBoundary commitPresenter) {
         this.commitDataAccess = commitDataAccess;
         this.roomMetadataDataAccess = roomMetadataDataAccess;
         this.commitPresenter = commitPresenter;
@@ -45,11 +45,9 @@ public class CommitInteractor implements CommitInputBoundary {
         // Catch exceptions (had to replace generic ones with these specific ones)
         catch (DynamoDbException ex) {
             commitPresenter.presentFailure("Commit failed (DynamoDB error): " + ex.getMessage());
-        }
-        catch (SdkClientException ex) {
+        } catch (SdkClientException ex) {
             commitPresenter.presentFailure("Commit failed (AWS client error): " + ex.getMessage());
-        }
-        catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             commitPresenter.presentFailure("Commit failed (bad input): " + ex.getMessage());
         }
     }

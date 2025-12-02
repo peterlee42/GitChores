@@ -19,8 +19,8 @@ public class CommitPresenter implements CommitOutputBoundary {
                 "Commit #%d created: %s at %s",
                 responseModel.getCommitId(),
                 responseModel.getMessage(),
-                formattedTime
-        );
+                formattedTime);
+
     }
 
     @Override

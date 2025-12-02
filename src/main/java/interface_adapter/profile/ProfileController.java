@@ -16,18 +16,24 @@ public class ProfileController {
      *
      * @param interactor the profile update use case interactor
      */
-    public ProfileController(final UpdateProfileInputBoundary interactor) {
+    public ProfileController(UpdateProfileInputBoundary interactor) {
         this.interactor = interactor;
     }
 
     /**
-     * Saves the profile information.
+     * Executes the profile update process.
+     */
+    public void execute() {
+        interactor.execute();
+    }
+
+    /**
+     * Updates the profile picture.
      *
-     * @param email            the current email address
      * @param profilePhotoPath the path to the profile photo; may be null
      */
-    public void saveProfile(final String email, final String profilePhotoPath) {
-        final UpdateProfileInputData data = new UpdateProfileInputData(email, profilePhotoPath);
+    public void saveProfile(String profilePhotoPath) {
+        final UpdateProfileInputData data = new UpdateProfileInputData(profilePhotoPath);
         interactor.updateProfile(data);
     }
 

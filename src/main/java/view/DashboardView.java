@@ -1,18 +1,23 @@
 package view;
 
 import java.awt.*;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.*;
 
 import interface_adapter.dashboard.DashboardState;
+import interface_adapter.dashboard.DashboardViewModel;
 
 @SuppressWarnings("checkstyle:ClassDataAbstractionCoupling")
 public class DashboardView extends JPanel implements PropertyChangeListener {
 
     private final ActivityTilesPanel activityTilesPanel;
+    private final DashboardViewModel dashboardViewModel;
 
-    public DashboardView() {
+    public DashboardView(DashboardViewModel dashboardViewModel) {
+        this.dashboardViewModel = dashboardViewModel;
+
         setLayout(new BorderLayout());
         setBackground(ViewColors.SAND_BACKGROUND);
 
@@ -32,25 +37,14 @@ public class DashboardView extends JPanel implements PropertyChangeListener {
         constraints.gridwidth = 2;
         constraints.weightx = ViewConstants.DASHBOARD_WEIGHTX;
         constraints.weighty = ViewConstants.DASHBOARD_WEIGHTY;
-        this.activityTilesPanel = new ActivityTilesPanel();
-        ViewSampleData.initializeSampleData(activityTilesPanel);
+
+        final DashboardState dashboardState = dashboardViewModel.getState();
+        activityTilesPanel = new ActivityTilesPanel(dashboardState.getActivityData(),
+                dashboardState.getCommitsMessages());
         final JPanel tilesSection = createSection(activityTilesPanel);
         contentPanel.add(tilesSection, constraints);
 
         add(contentPanel, BorderLayout.CENTER);
-    }
-
-    /**
-     * Load activity data for a room (temporary implementation).
-     * TODO: Refactor to use a proper use case interactor.
-     *
-     * @param roomId the room id to fetch commits for
-     */
-    public void loadActivity(String roomId) {
-        if (roomId == null) {
-            return;
-        }
-        activityTilesPanel.loadFromCommitDao(roomId);
     }
 
     private JPanel createSection(Component content) {
@@ -60,8 +54,7 @@ public class DashboardView extends JPanel implements PropertyChangeListener {
                 BorderFactory.createLineBorder(new Color(ViewConstants.DASHBOARD_230, ViewConstants.DASHBOARD_230,
                         ViewConstants.DASHBOARD_230), 1),
                 BorderFactory.createEmptyBorder(ViewConstants.DASHBOARD_BORDER, ViewConstants.DASHBOARD_BORDER,
-                        ViewConstants.DASHBOARD_BORDER, ViewConstants.DASHBOARD_BORDER)
-        ));
+                        ViewConstants.DASHBOARD_BORDER, ViewConstants.DASHBOARD_BORDER)));
 
         final JLabel titleLabel = new JLabel("Chore Activity");
         titleLabel.setFont(ViewConstants.TITLE_FONT);
@@ -75,11 +68,17 @@ public class DashboardView extends JPanel implements PropertyChangeListener {
     }
 
     @Override
-    public void propertyChange(java.beans.PropertyChangeEvent evt) {
-        final DashboardState state = (DashboardState) evt.getNewValue();
+    public void propertyChange(PropertyChangeEvent evt) {
+        final DashboardState state = dashboardViewModel.getState();
         if (state.getErrorMessage() != null) {
             JOptionPane.showMessageDialog(this, state.getErrorMessage());
         }
+
+        activityTilesPanel.setActivityData(state.getActivityData());
+        activityTilesPanel.setDetailedActivityData(state.getActivityData(), state.getCommitsMessages());
+
+        revalidate();
+        repaint();
     }
 
     /**

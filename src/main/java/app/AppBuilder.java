@@ -7,20 +7,27 @@ import javax.swing.*;
 import data_access.SessionDataAccessObject;
 import data_access.cognito.CognitoUserDataAccessObject;
 import data_access.cognito.IdentityProviderClientSingleton;
+import data_access.dynamo_db.ChoreDataAccessObject;
 import data_access.dynamo_db.CommitDataAccessObject;
 import data_access.dynamo_db.DynamoDbClientSingleton;
 import data_access.dynamo_db.RoomDataAccessObject;
 import data_access.dynamo_db.RoomMetadataDataAccessObject;
 import interface_adapter.ViewManagerModel;
+import interface_adapter.chore_creation.ChoreCreationController;
+import interface_adapter.chore_creation.ChoreCreationPresenter;
+import interface_adapter.chore_creation.ChoreCreationViewModel;
 import interface_adapter.commit.CommitController;
 import interface_adapter.commit.CommitPresenter;
+import interface_adapter.dashboard.DashboardController;
+import interface_adapter.dashboard.DashboardPresenter;
+import interface_adapter.dashboard.DashboardViewModel;
 import interface_adapter.git_console.GitConsoleController;
 import interface_adapter.git_console.GitConsolePresenter;
 import interface_adapter.git_console.GitConsoleViewModel;
+import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
-import interface_adapter.main.MainViewModel;
 import interface_adapter.profile.ProfileController;
 import interface_adapter.profile.ProfilePresenter;
 import interface_adapter.profile.ProfileViewModel;
@@ -33,10 +40,17 @@ import interface_adapter.room.join.JoinViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import use_case.chore.ChoreDataAccessInterface;
+import use_case.chore_creation.ChoreCreationInputBoundary;
+import use_case.chore_creation.ChoreCreationInteractor;
+import use_case.chore_creation.ChoreCreationOutputBoundary;
 import use_case.commit.CommitDataAccessInterface;
 import use_case.commit.CommitInputBoundary;
 import use_case.commit.CommitInteractor;
 import use_case.commit.RoomMetadataDataAccessInterface;
+import use_case.dashboard.DashboardInputBoundary;
+import use_case.dashboard.DashboardInteractor;
+import use_case.dashboard.DashboardOutputBoundary;
 import use_case.git_console.GitConsoleInputBoundary;
 import use_case.git_console.GitConsoleInteractor;
 import use_case.git_console.GitConsoleOutputBoundary;
@@ -57,6 +71,7 @@ import use_case.signup.SignupDataAccessInterface;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
+import view.ChoreCreationView;
 import view.CreateRoomView;
 import view.DashboardView;
 import view.GitConsoleView;
@@ -78,7 +93,7 @@ public class AppBuilder {
     private final ViewManagerModel viewManagerModel = new ViewManagerModel();
 
     private MainView mainView;
-    private MainViewModel mainViewModel;
+    private LoggedInViewModel loggedInViewModel;
     private JoinView joinView;
     private JoinViewModel joinViewModel;
     private SignupView signupView;
@@ -86,11 +101,14 @@ public class AppBuilder {
     private LoginView loginView;
     private LoginViewModel loginViewModel;
     private DashboardView dashboardView;
+    private DashboardViewModel dashboardViewModel;
     private GitConsoleView gitConsoleView;
     private GitConsoleViewModel gitConsoleViewModel;
+    private ChoreCreationView choreCreationView;
+    private ChoreCreationViewModel choreCreationViewModel;
+    private ProfileView profileView;
     private CreateRoomView createRoomView;
     private CreateRoomViewModel createRoomViewModel;
-    private ProfileView profileView;
     private ProfileViewModel profileViewModel;
 
     private SessionDataAccessObject sessionDataAccess;
@@ -116,19 +134,22 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addMainView() {
-        mainViewModel = new MainViewModel();
-        mainView = new MainView(mainViewModel, dashboardView, gitConsoleView, profileView);
+        loggedInViewModel = new LoggedInViewModel();
+        mainView = new MainView(loggedInViewModel, dashboardView, gitConsoleView, profileView);
+        loggedInViewModel.addPropertyChangeListener(mainView);
         cardPanel.add(mainView, mainView.getViewName());
         return this;
     }
 
     /**
-     * Adds dashboard view - incomplete.
+     * Adds dashboard view.
      *
      * @return AppBuilder
      */
     public AppBuilder addDashboardView() {
-        dashboardView = new DashboardView();
+        dashboardViewModel = new DashboardViewModel();
+        dashboardView = new DashboardView(dashboardViewModel);
+        dashboardViewModel.addPropertyChangeListener(dashboardView);
         return this;
     }
 
@@ -140,6 +161,7 @@ public class AppBuilder {
     public AppBuilder addJoinView() {
         joinViewModel = new JoinViewModel();
         joinView = new JoinView(joinViewModel);
+        joinViewModel.addPropertyChangeListener(joinView);
         cardPanel.add(joinView, joinView.getViewName());
         return this;
     }
@@ -152,6 +174,7 @@ public class AppBuilder {
     public AppBuilder addCreateRoomView() {
         createRoomViewModel = new CreateRoomViewModel();
         createRoomView = new CreateRoomView(createRoomViewModel);
+        createRoomViewModel.addPropertyChangeListener(createRoomView);
         cardPanel.add(createRoomView, createRoomView.getViewName());
         return this;
     }
@@ -164,6 +187,7 @@ public class AppBuilder {
     public AppBuilder addSignupView() {
         signupViewModel = new SignupViewModel();
         signupView = new SignupView(signupViewModel);
+        signupViewModel.addPropertyChangeListener(signupView);
         cardPanel.add(signupView, signupView.getViewName());
 
         return this;
@@ -177,6 +201,7 @@ public class AppBuilder {
     public AppBuilder addLoginView() {
         loginViewModel = new LoginViewModel();
         loginView = new LoginView(loginViewModel);
+        loginViewModel.addPropertyChangeListener(loginView);
         cardPanel.add(loginView, loginView.getViewName());
 
         return this;
@@ -205,35 +230,15 @@ public class AppBuilder {
         // Commit Use case Layer (backend logic)
         final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(
                 DynamoDbClientSingleton.getInstance());
-        final RoomMetadataDataAccessInterface roomMetadataDataAccess = new RoomMetadataDataAccessObject(
+        final RoomMetadataDataAccessInterface roomMetadataDataAccessObject = new RoomMetadataDataAccessObject(
                 DynamoDbClientSingleton.getInstance());
         final CommitPresenter commitPresenter = new CommitPresenter();
         final CommitInputBoundary commitInteractor = new CommitInteractor(commitDataAccess,
-                roomMetadataDataAccess, commitPresenter);
+                roomMetadataDataAccessObject,
+                commitPresenter);
         final CommitController commitController = new CommitController(commitInteractor);
-        final RoomMetadataDataAccessObject roomMetadataDataAccessObject = new RoomMetadataDataAccessObject(
-                DynamoDbClientSingleton.getInstance());
-        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(DynamoDbClientSingleton.getInstance());
 
-        // If the dashboard exists and we can determine a current room, load activity
-        // tiles
-        // TODO: Refactor to use a proper use case interactor
-        if (dashboardView != null) {
-            final entity.User current = userService.getUser();
-            if (current != null) {
-                final String currentRoomId = roomDataAccess.getUserRoomId(current.getId());
-                if (currentRoomId != null) {
-                    dashboardView.loadActivity(currentRoomId);
-                }
-            } else {
-                // Demo fallback: allow overriding a room id via system property for local
-                // testing
-                final String demoRoomId = System.getProperty("demo.roomId");
-                if (demoRoomId != null && !demoRoomId.isBlank()) {
-                    dashboardView.loadActivity(demoRoomId);
-                }
-            }
-        }
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(DynamoDbClientSingleton.getInstance());
 
         // Git Console Use Case Layer
         final GitConsoleInputBoundary gitConsoleInteractor = new GitConsoleInteractor(gitConsoleOutputBoundary,
@@ -253,6 +258,31 @@ public class AppBuilder {
     public AppBuilder addProfileView() {
         profileViewModel = new ProfileViewModel();
         profileView = new ProfileView(profileViewModel);
+        profileViewModel.addPropertyChangeListener(profileView);
+        return this;
+    }
+
+    /**
+     * Adds Dashboard use case.
+     * 
+     * @return AppBuilder
+     */
+    public AppBuilder addDashboardUseCase() {
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(
+                DynamoDbClientSingleton.getInstance());
+        final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(
+                DynamoDbClientSingleton.getInstance());
+
+        final DashboardOutputBoundary dashboardOutputBoundary = new DashboardPresenter(
+                dashboardViewModel);
+
+        final DashboardInputBoundary dashboardInteractor = new DashboardInteractor(dashboardOutputBoundary, userService,
+                roomDataAccess, commitDataAccess);
+
+        final DashboardController dashboardController = new DashboardController(
+                dashboardInteractor);
+
+        mainView.setDashboardController(dashboardController);
         return this;
     }
 
@@ -273,7 +303,7 @@ public class AppBuilder {
 
         // Create Room use case
         final CreateRoomPresenter createRoomPresenter = new CreateRoomPresenter(createRoomViewModel,
-                viewManagerModel, loginViewModel, joinViewModel, mainViewModel);
+                viewManagerModel, loginViewModel, joinViewModel, loggedInViewModel);
         final CreateRoomInputBoundary createRoomInteractor = new CreateRoomInteractor(roomDataAccess,
                 sessionDataAccess, createRoomPresenter, userService);
         final CreateRoomController createRoomController = new CreateRoomController(createRoomInteractor);
@@ -282,7 +312,7 @@ public class AppBuilder {
 
         // Join Room use case (reuse existing JoinViewModel)
         final JoinRoomPresenter joinRoomPresenter = new JoinRoomPresenter(joinViewModel, viewManagerModel,
-                loginViewModel, createRoomViewModel, mainViewModel);
+                loginViewModel, createRoomViewModel, loggedInViewModel);
         final JoinRoomInputBoundary joinRoomInteractor = new JoinRoomInteractor(roomDataAccess,
                 sessionDataAccess, joinRoomPresenter, userService);
         final JoinRoomController joinRoomController = new JoinRoomController(joinRoomInteractor);
@@ -317,7 +347,7 @@ public class AppBuilder {
         final LoginDataAccessInterface loginDataAccess = userDataAccess;
         final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(DynamoDbClientSingleton.getInstance());
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel, loginViewModel,
-                signupViewModel, joinViewModel);
+                signupViewModel, joinViewModel, loggedInViewModel);
         final LoginInputBoundary loginInteractor = new LoginInteractor(loginOutputBoundary, loginDataAccess,
                 sessionDataAccess, roomDataAccess);
 
@@ -340,6 +370,42 @@ public class AppBuilder {
 
         final ProfileController controller = new ProfileController(updateProfileInteractor);
         profileView.setProfileController(controller);
+
+        mainView.setProfileController(controller);
+        return this;
+    }
+
+    /**
+     * Adds Chore Creation View.
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addChoreCreationView() {
+        choreCreationViewModel = new ChoreCreationViewModel();
+        choreCreationView = new ChoreCreationView(choreCreationViewModel);
+        cardPanel.add(choreCreationView, choreCreationView.getViewName());
+        return this;
+    }
+
+    /**
+     * Adds Chore Creation use case.
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addChoreCreationUseCase() {
+        final ChoreDataAccessInterface choreDataAccess = new ChoreDataAccessObject(
+                DynamoDbClientSingleton.getInstance());
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(DynamoDbClientSingleton.getInstance());
+        final ChoreCreationOutputBoundary choreCreationOutputBoundary = new ChoreCreationPresenter(
+                choreCreationViewModel,
+                viewManagerModel);
+        final ChoreCreationInputBoundary choreCreationInteractor = new ChoreCreationInteractor(
+                choreCreationOutputBoundary,
+                choreDataAccess,
+                roomDataAccess,
+                userService);
+        final ChoreCreationController choreCreationController = new ChoreCreationController(choreCreationInteractor);
+        choreCreationView.setChoreCreationController(choreCreationController);
         return this;
     }
 

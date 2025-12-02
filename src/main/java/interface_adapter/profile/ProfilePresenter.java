@@ -23,10 +23,20 @@ public class ProfilePresenter implements UpdateProfileOutputBoundary {
     @Override
     public void prepareSuccessView(UpdateProfileOutputData data) {
         final ProfileState profileState = profileViewModel.getState();
+        profileState.setUsername(data.getUsername());
         profileState.setEmail(data.getEmail());
-        profileState.setProfilePhotoPath(data.getProfilePhotoPath());
         profileState.setErrorMessage(null);
+        profileViewModel.setState(profileState);
         profileViewModel.firePropertyChange();
+    }
+
+    @Override
+    public void prepareProfilePic(UpdateProfileOutputData data) {
+        final ProfileState profileState = profileViewModel.getState();
+        profileState.setProfilePhotoPath(data.getProfilePhotoPath());
+        profileViewModel.setState(profileState);
+        profileViewModel.firePropertyChange();
+
     }
 
     @Override

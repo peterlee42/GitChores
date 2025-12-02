@@ -15,9 +15,9 @@ public class Main {
         final AppBuilder appBuilder = new AppBuilder();
         final JFrame application = appBuilder
                 .addLoginView()
+                .addJoinView()
                 .addSignupView()
                 .addCreateRoomView()
-                .addJoinView()
                 .addDashboardView()
                 .addGitConsoleView()
                 .addProfileView()
@@ -27,6 +27,9 @@ public class Main {
                 .addGitConsoleUseCase()
                 .addRoomUseCases()
                 .addProfileUseCase()
+                .addDashboardUseCase()
+                .addChoreCreationView()
+                .addChoreCreationUseCase()
                 .build();
 
         application.setFocusable(true);

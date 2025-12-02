@@ -1,7 +1,8 @@
-package interface_adapter.main;
+package interface_adapter.logged_in;
 
-public class MainState {
+public class LoggedInState {
     private String activeTab = "dashboard";
+
     private String errorMessage;
 
     public String getErrorMessage() {
@@ -19,5 +20,4 @@ public class MainState {
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
     }
-
 }

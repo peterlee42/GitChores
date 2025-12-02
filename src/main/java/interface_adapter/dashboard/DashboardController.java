@@ -17,4 +17,11 @@ public class DashboardController {
         final DashboardInputData inputData = new DashboardInputData();
         dashboardInteractor.execute(inputData);
     }
+
+    /**
+     * Switches the view to the Chore Creation View.
+     */
+    public void switchToChoreCreationView() {
+        dashboardInteractor.switchToChoreCreationView();
+    }
 }

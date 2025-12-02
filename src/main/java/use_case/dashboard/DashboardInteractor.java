@@ -71,4 +71,9 @@ public class DashboardInteractor implements DashboardInputBoundary {
 
         dashboardPresenter.prepareSuccessView(dashboardOutputData);
     }
+
+    @Override
+    public void switchToChoreCreationView() {
+        dashboardPresenter.presentChoreCreationView();
+    }
 }

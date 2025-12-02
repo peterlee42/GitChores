@@ -42,7 +42,7 @@ public class ChoreCreationView extends JPanel implements ActionListener, Propert
      *
      * @param choreCreationViewModel the ChoreCreationViewModel
      */
-    @SuppressWarnings({"checkstyle:ExecutableStatementCountCheck", "JavaNCSS"})
+    @SuppressWarnings({ "checkstyle:ExecutableStatementCountCheck", "JavaNCSS" })
     public ChoreCreationView(ChoreCreationViewModel choreCreationViewModel) {
         this.choreCreationViewModel = choreCreationViewModel;
         choreCreationViewModel.addPropertyChangeListener(this);
@@ -280,8 +280,7 @@ public class ChoreCreationView extends JPanel implements ActionListener, Propert
                     currentState.getDescription(),
                     currentState.getPriority(),
                     currentState.getDueDate(),
-                    currentState.getAssignedUser()
-            );
+                    currentState.getAssignedUser());
 
         } else if (evt.getSource() == cancelButton) {
             choreCreationController.switchToDashboardView();

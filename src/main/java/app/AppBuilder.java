@@ -7,11 +7,15 @@ import javax.swing.*;
 import data_access.SessionDataAccessObject;
 import data_access.cognito.CognitoUserDataAccessObject;
 import data_access.cognito.IdentityProviderClientSingleton;
+import data_access.dynamo_db.ChoreDataAccessObject;
 import data_access.dynamo_db.CommitDataAccessObject;
 import data_access.dynamo_db.DynamoDbClientSingleton;
 import data_access.dynamo_db.RoomDataAccessObject;
 import data_access.dynamo_db.RoomMetadataDataAccessObject;
 import interface_adapter.ViewManagerModel;
+import interface_adapter.chore_creation.ChoreCreationController;
+import interface_adapter.chore_creation.ChoreCreationPresenter;
+import interface_adapter.chore_creation.ChoreCreationViewModel;
 import interface_adapter.commit.CommitController;
 import interface_adapter.commit.CommitPresenter;
 import interface_adapter.dashboard.DashboardController;
@@ -36,6 +40,10 @@ import interface_adapter.room.join.JoinViewModel;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import use_case.chore.ChoreDataAccessInterface;
+import use_case.chore_creation.ChoreCreationInputBoundary;
+import use_case.chore_creation.ChoreCreationInteractor;
+import use_case.chore_creation.ChoreCreationOutputBoundary;
 import use_case.commit.CommitDataAccessInterface;
 import use_case.commit.CommitInputBoundary;
 import use_case.commit.CommitInteractor;
@@ -63,6 +71,7 @@ import use_case.signup.SignupDataAccessInterface;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
+import view.ChoreCreationView;
 import view.CreateRoomView;
 import view.DashboardView;
 import view.GitConsoleView;
@@ -95,9 +104,11 @@ public class AppBuilder {
     private DashboardViewModel dashboardViewModel;
     private GitConsoleView gitConsoleView;
     private GitConsoleViewModel gitConsoleViewModel;
+    private ChoreCreationView choreCreationView;
+    private ChoreCreationViewModel choreCreationViewModel;
+    private ProfileView profileView;
     private CreateRoomView createRoomView;
     private CreateRoomViewModel createRoomViewModel;
-    private ProfileView profileView;
     private ProfileViewModel profileViewModel;
 
     private SessionDataAccessObject sessionDataAccess;
@@ -218,28 +229,18 @@ public class AppBuilder {
         final GitConsoleOutputBoundary gitConsoleOutputBoundary = new GitConsolePresenter(gitConsoleViewModel);
 
         // Commit Use case Layer (backend logic)
-<<<<<<< HEAD
         final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(
                 DynamoDbClientSingleton.getInstance());
         final RoomMetadataDataAccessInterface roomMetadataDataAccess = new RoomMetadataDataAccessObject(
                 DynamoDbClientSingleton.getInstance());
-=======
-        final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(dynamoDbClient);
-        final RoomMetadataDataAccessInterface roomMetadataDataAccessObject = new RoomMetadataDataAccessObject(
-                dynamoDbClient);
->>>>>>> 21c77a7 (loads user data to dashboard)
         final CommitPresenter commitPresenter = new CommitPresenter();
         final CommitInputBoundary commitInteractor = new CommitInteractor(commitDataAccess,
                 roomMetadataDataAccessObject,
                 commitPresenter);
         final CommitController commitController = new CommitController(commitInteractor);
-<<<<<<< HEAD
         final RoomMetadataDataAccessObject roomMetadataDataAccessObject = new RoomMetadataDataAccessObject(
                 DynamoDbClientSingleton.getInstance());
         final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(DynamoDbClientSingleton.getInstance());
-=======
-        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
->>>>>>> 21c77a7 (loads user data to dashboard)
 
         // Git Console Use Case Layer
         final GitConsoleInputBoundary gitConsoleInteractor = new GitConsoleInteractor(gitConsoleOutputBoundary,
@@ -371,6 +372,40 @@ public class AppBuilder {
         profileView.setProfileController(controller);
 
         mainView.setProfileController(controller);
+        return this;
+    }
+
+    /**
+     * Adds Chore Creation View.
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addChoreCreationView() {
+        choreCreationViewModel = new ChoreCreationViewModel();
+        choreCreationView = new ChoreCreationView(choreCreationViewModel);
+        cardPanel.add(choreCreationView, choreCreationView.getViewName());
+        return this;
+    }
+
+    /**
+     * Adds Chore Creation use case.
+     *
+     * @return AppBuilder
+     */
+    public AppBuilder addChoreCreationUseCase() {
+        final ChoreDataAccessInterface choreDataAccess =
+                new ChoreDataAccessObject(DynamoDbClientSingleton.getInstance());
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(DynamoDbClientSingleton.getInstance());
+        final ChoreCreationOutputBoundary choreCreationOutputBoundary = new ChoreCreationPresenter(
+                choreCreationViewModel,
+                viewManagerModel);
+        final ChoreCreationInputBoundary choreCreationInteractor = new ChoreCreationInteractor(
+                choreCreationOutputBoundary,
+                choreDataAccess,
+                roomDataAccess,
+                userService);
+        final ChoreCreationController choreCreationController = new ChoreCreationController(choreCreationInteractor);
+        choreCreationView.setChoreCreationController(choreCreationController);
         return this;
     }
 

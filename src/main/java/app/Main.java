@@ -28,6 +28,8 @@ public class Main {
                 .addRoomUseCases()
                 .addProfileUseCase()
                 .addDashboardUseCase()
+                .addChoreCreationView()
+                .addChoreCreationUseCase()
                 .build();
 
         application.setFocusable(true);

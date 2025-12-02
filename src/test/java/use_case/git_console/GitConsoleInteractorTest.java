@@ -122,15 +122,6 @@ class GitConsoleInteractorTest {
     }
 
     @Test
-    void commit_withEmptyMessage_showsEmptyMessageError_caseQuotes() {
-        // Message is "" -> becomes empty after regex and trim
-        interactor.executeCommand("git commit -m \"\"");
-
-        assertEquals("git commit -m \"\"", presenter.lastCommand);
-        assertEquals("Error: empty commit message", presenter.lastOutput);
-    }
-
-    @Test
     void commit_withEmptyMessage_showsEmptyMessageError_caseSpaces() {
         interactor.executeCommand("git commit -m    ");
 

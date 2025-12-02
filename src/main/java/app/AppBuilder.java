@@ -231,15 +231,14 @@ public class AppBuilder {
         // Commit Use case Layer (backend logic)
         final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(
                 DynamoDbClientSingleton.getInstance());
-        final RoomMetadataDataAccessInterface roomMetadataDataAccess = new RoomMetadataDataAccessObject(
+        final RoomMetadataDataAccessInterface roomMetadataDataAccessObject = new RoomMetadataDataAccessObject(
                 DynamoDbClientSingleton.getInstance());
         final CommitPresenter commitPresenter = new CommitPresenter();
         final CommitInputBoundary commitInteractor = new CommitInteractor(commitDataAccess,
                 roomMetadataDataAccessObject,
                 commitPresenter);
         final CommitController commitController = new CommitController(commitInteractor);
-        final RoomMetadataDataAccessObject roomMetadataDataAccessObject = new RoomMetadataDataAccessObject(
-                DynamoDbClientSingleton.getInstance());
+
         final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(DynamoDbClientSingleton.getInstance());
 
         // Git Console Use Case Layer
@@ -270,8 +269,10 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addDashboardUseCase() {
-        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
-        final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(dynamoDbClient);
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(
+                DynamoDbClientSingleton.getInstance());
+        final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(
+                DynamoDbClientSingleton.getInstance());
 
         final DashboardOutputBoundary dashboardOutputBoundary = new DashboardPresenter(
                 dashboardViewModel);
@@ -393,8 +394,8 @@ public class AppBuilder {
      * @return AppBuilder
      */
     public AppBuilder addChoreCreationUseCase() {
-        final ChoreDataAccessInterface choreDataAccess =
-                new ChoreDataAccessObject(DynamoDbClientSingleton.getInstance());
+        final ChoreDataAccessInterface choreDataAccess = new ChoreDataAccessObject(
+                DynamoDbClientSingleton.getInstance());
         final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(DynamoDbClientSingleton.getInstance());
         final ChoreCreationOutputBoundary choreCreationOutputBoundary = new ChoreCreationPresenter(
                 choreCreationViewModel,

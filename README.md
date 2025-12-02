@@ -4,12 +4,12 @@ To organize roommate chores.
 
 ### Use Cases
 - [X] User authentication with Amazon Cognito
-- [ ] Profile
-- [ ] Room creation
-- [ ] Room joining
-- [ ] Git console to manage chores
-- [ ] Listing chores
-- [ ] Github tiles to track roommate chores
+- [x] Profile
+- [x] Room creation
+- [x] Room joining
+- [x] Git console to manage chores
+- [x] Listing chores
+- [x] Github tiles to track roommate chores
 
 ### Team
 

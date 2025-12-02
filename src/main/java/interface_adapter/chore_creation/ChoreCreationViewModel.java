@@ -1,11 +1,5 @@
 package interface_adapter.chore_creation;
 
-import java.awt.*;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-
-import javax.swing.*;
-
 import interface_adapter.ViewModel;
 
 /**
@@ -22,31 +16,8 @@ public class ChoreCreationViewModel extends ViewModel<ChoreCreationState> {
     public static final String CREATE_BUTTON_LABEL = "Create Chore";
     public static final String CANCEL_BUTTON_LABEL = "Cancel Creation";
 
-    private final PropertyChangeSupport support = new PropertyChangeSupport(this);
-    private ChoreCreationState state = new ChoreCreationState();
-
     public ChoreCreationViewModel() {
         super("chore creation");
         setState(new ChoreCreationState());
-    }
-
-    @Override
-    public ChoreCreationState getState() {
-        return state;
-    }
-
-    @Override
-    public void setState(ChoreCreationState state) {
-        this.state = state;
-    }
-
-    @Override
-    public void firePropertyChange() {
-        support.firePropertyChange("state", null, this.state);
-    }
-
-    @Override
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        support.addPropertyChangeListener(listener);
     }
 }

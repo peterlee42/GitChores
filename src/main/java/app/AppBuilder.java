@@ -399,7 +399,7 @@ public class AppBuilder {
         final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(DynamoDbClientSingleton.getInstance());
         final ChoreCreationOutputBoundary choreCreationOutputBoundary = new ChoreCreationPresenter(
                 choreCreationViewModel,
-                viewManagerModel);
+                viewManagerModel, loggedInViewModel);
         final ChoreCreationInputBoundary choreCreationInteractor = new ChoreCreationInteractor(
                 choreCreationOutputBoundary,
                 choreDataAccess,

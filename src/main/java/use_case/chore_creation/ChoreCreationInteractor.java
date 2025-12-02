@@ -79,8 +79,7 @@ public class ChoreCreationInteractor implements ChoreCreationInputBoundary {
                     inputData.getDescription(),
                     dueDate,
                     ChoreStatus.PENDING,
-                    false
-            );
+                    false);
             choreDao.saveChore(chore);
             final ChoreCreationOutputData output = new ChoreCreationOutputData(chore.getTitle());
             presenter.prepareSuccessView(output);

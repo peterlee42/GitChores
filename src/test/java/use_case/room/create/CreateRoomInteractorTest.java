@@ -161,4 +161,131 @@ class CreateRoomInteractorTest {
         verify(createRoomPresenter, times(1)).presentFailure("Failed to create room: db down");
         verify(roomDataAccess, never()).addUserToRoom(anyString(), anyString());
     }
+
+    // ---------- 7. invite code retries then success ----------
+    @Test
+    void execute_inviteCodeCollision_thenSucceeds() {
+        final User user = mock(User.class);
+        when(userService.getUser()).thenReturn(user);
+        when(user.getId()).thenReturn("user-5");
+
+        // First call returns non-null (collision), second returns null -> succeed
+        when(roomDataAccess.getRoomByInviteCode(anyString()))
+                .thenReturn(new Room("x", "n", "d", "o", "111111"))
+                .thenReturn(null);
+
+        CreateRoomInteractor interactor = new CreateRoomInteractor(
+                roomDataAccess, sessionDataAccess, createRoomPresenter, userService
+        );
+
+        interactor.execute(new CreateRoomInputData("name", "desc"));
+
+        // Should save and present success
+        verify(roomDataAccess, times(1)).saveRoom(any());
+        verify(createRoomPresenter, times(1)).presentSuccess(any());
+    }
+
+    // ---------- 8. invite code exhaustion throws RuntimeException ----------
+    @Test
+    void execute_inviteCodeExhaustion_throwsRuntime() {
+        final User user = mock(User.class);
+        when(userService.getUser()).thenReturn(user);
+        when(user.getId()).thenReturn("user-6");
+
+        // Always collide
+        when(roomDataAccess.getRoomByInviteCode(anyString())).thenReturn(new Room("x", "n", "d", "o", "111111"));
+
+        CreateRoomInteractor interactor = new CreateRoomInteractor(
+                roomDataAccess, sessionDataAccess, createRoomPresenter, userService
+        );
+
+        assertThrows(RuntimeException.class, () -> interactor.execute(new CreateRoomInputData("name", "desc")));
+    }
+
+    // ---------- 9. switchToJoinView and switchToLoginView ----------
+    @Test
+    void switchMethods_delegateToPresenterAndClearSession() {
+        CreateRoomInteractor interactor = new CreateRoomInteractor(
+                roomDataAccess, sessionDataAccess, createRoomPresenter, userService
+        );
+
+        interactor.switchToJoinView();
+        verify(createRoomPresenter, times(1)).switchToJoinView();
+
+        interactor.switchToLoginView();
+        verify(sessionDataAccess, times(1)).clearCurrentToken();
+        verify(createRoomPresenter, times(1)).switchToLoginView();
+    }
+
+    // ---------- 10. getUserRoomId throws CreateRoomFailedException (presents failure) ----------
+    @Test
+    void execute_getUserRoomIdThrows_presentsFailure() {
+        final User user = mock(User.class);
+        when(userService.getUser()).thenReturn(user);
+        when(user.getId()).thenReturn("user-7");
+
+        when(roomDataAccess.getUserRoomId("user-7")).thenThrow(new CreateRoomFailedException("lookup failed"));
+
+        CreateRoomInteractor interactor = new CreateRoomInteractor(
+                roomDataAccess, sessionDataAccess, createRoomPresenter, userService
+        );
+
+        interactor.execute(new CreateRoomInputData("name", "desc"));
+
+        verify(createRoomPresenter, times(1)).presentFailure("Failed to create room: lookup failed");
+    }
+
+    // ---------- 11. addUserToRoom throws CreateRoomFailedException (presents failure) ----------
+    @Test
+    void execute_addUserThrows_presentsFailure() {
+        final User user = mock(User.class);
+        when(userService.getUser()).thenReturn(user);
+        when(user.getId()).thenReturn("user-8");
+
+        when(roomDataAccess.getRoomByInviteCode(anyString())).thenReturn(null);
+        doThrow(new CreateRoomFailedException("add failed")).when(roomDataAccess).addUserToRoom(anyString(), eq("user-8"));
+
+        CreateRoomInteractor interactor = new CreateRoomInteractor(
+                roomDataAccess, sessionDataAccess, createRoomPresenter, userService
+        );
+
+        interactor.execute(new CreateRoomInputData("name", "desc"));
+
+        verify(createRoomPresenter, times(1)).presentFailure("Failed to create room: add failed");
+    }
+
+    // ---------- 12. null room name ----------
+    @Test
+    void execute_nullName_presentsValidation() {
+        final User user = mock(User.class);
+        when(userService.getUser()).thenReturn(user);
+        when(user.getId()).thenReturn("user-9");
+
+        CreateRoomInteractor interactor = new CreateRoomInteractor(
+                roomDataAccess, sessionDataAccess, createRoomPresenter, userService
+        );
+
+        interactor.execute(new CreateRoomInputData(null, "desc"));
+
+        verify(createRoomPresenter, times(1)).presentFailure("Room name cannot be empty");
+        verify(roomDataAccess, never()).saveRoom(any());
+    }
+
+    // ---------- 13. getRoomByInviteCode throws during generation ----------
+    @Test
+    void execute_getRoomByInviteCodeThrowsDuringGeneration_presentsFailure() {
+        final User user = mock(User.class);
+        when(userService.getUser()).thenReturn(user);
+        when(user.getId()).thenReturn("user-10");
+
+        when(roomDataAccess.getRoomByInviteCode(anyString())).thenThrow(new CreateRoomFailedException("lookup error"));
+
+        CreateRoomInteractor interactor = new CreateRoomInteractor(
+                roomDataAccess, sessionDataAccess, createRoomPresenter, userService
+        );
+
+        interactor.execute(new CreateRoomInputData("name", "desc"));
+
+        verify(createRoomPresenter, times(1)).presentFailure("Failed to create room: lookup error");
+    }
 }

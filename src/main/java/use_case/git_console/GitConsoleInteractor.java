@@ -53,7 +53,7 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
             output = "Please enter a command.";
         }
         // Verify the prefix of the command
-        else if (!(command.startsWith("git "))) {
+        else if (!(command.startsWith("git"))) {
             output = "Invalid command. Commands must start with 'git'.";
         } else {
             // Break command into sub-parts for easier identification
@@ -93,6 +93,7 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
      * @param command The string command inputted to the console text box
      * @return A message presented to the screen
      */
+    @SuppressWarnings("checkstyle:AvoidInlineConditionals")
     private String handleCommit(String command) {
         final String output;
 
@@ -100,12 +101,8 @@ public class GitConsoleInteractor implements GitConsoleInputBoundary {
             output = "Your commit is missing an '-m' before the message";
         } else {
             final String[] parts = command.split("-m", 2);
-            final String message;
-            if (parts.length > 1) {
-                message = parts[1].trim().replaceAll("^\"\"$|", "");
-            } else {
-                message = "";
-            }
+            final String message = parts[1].trim();
+
             if (message.isEmpty()) {
                 output = "Error: empty commit message";
             } else {

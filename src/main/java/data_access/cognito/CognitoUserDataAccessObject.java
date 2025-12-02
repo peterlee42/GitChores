@@ -13,6 +13,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import entity.Token;
 import entity.User;
+import entity.UserFactory;
 import io.github.cdimascio.dotenv.Dotenv;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AttributeType;
@@ -183,7 +184,7 @@ public class CognitoUserDataAccessObject
         }
 
         // return User entity
-        return new User(userId, response.username(), email);
+        return new UserFactory().create(userId, response.username(), email);
     }
 
     @Override

@@ -16,11 +16,11 @@ public class CommitPresenter implements CommitOutputBoundary {
         final String formattedTime = time.substring(0, 10) + ", Time " + time.substring(11, 19);
 
         this.viewMessage = String.format(
-                "Commit #%d created: %s at %s",
+                "Commit #%s created: %s at %s",
                 responseModel.getCommitId(),
                 responseModel.getMessage(),
-                formattedTime
-        );
+                formattedTime);
+
     }
 
     @Override

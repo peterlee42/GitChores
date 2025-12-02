@@ -30,7 +30,6 @@ public class LoginInteractor implements LoginInputBoundary {
 
         if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
             loginPresenter.prepareFailView("Username and password cannot be empty.");
-            return;
         } else {
 
             try {

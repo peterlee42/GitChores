@@ -73,6 +73,12 @@ public class DashboardView extends JPanel implements PropertyChangeListener {
         if (state.getErrorMessage() != null) {
             JOptionPane.showMessageDialog(this, state.getErrorMessage());
         }
+
+        activityTilesPanel.setActivityData(state.getActivityData());
+        activityTilesPanel.setDetailedActivityData(state.getActivityData(), state.getCommitsMessages());
+
+        revalidate();
+        repaint();
     }
 
     /**

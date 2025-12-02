@@ -11,15 +11,11 @@ import java.awt.event.MouseMotionAdapter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.JPanel;
 import javax.swing.ToolTipManager;
-
-import data_access.dynamo_db.CommitDataAccessObject;
-import data_access.dynamo_db.DynamoDbClientFactory;
 
 public class ActivityTilesPanel extends JPanel {
     private final Map<LocalDate, Integer> activityData;
@@ -194,41 +190,6 @@ public class ActivityTilesPanel extends JPanel {
     public void addCommitForDate(LocalDate date, String message) {
         addCommit(date, message);
         repaint();
-    }
-
-    /**
-     * Loads commit data for the given room.
-     * TODO: Refactor to use a use-case interactor.
-     *
-     * @param roomId the room id to load commits for
-     */
-    public void loadFromCommitDao(String roomId) {
-        if (roomId == null) {
-            return;
-        }
-
-        new Thread(() -> fetchAndApplyCommits(roomId)).start();
-    }
-
-    // TODO: Refactor to use a use-case interactor.
-    private void fetchAndApplyCommits(String roomId) {
-        final CommitDataAccessObject dao = new CommitDataAccessObject(DynamoDbClientFactory.createClient());
-        final java.util.List<entity.Commit> commits = dao.getCommitsForRoom(roomId);
-
-        if (commits == null) {
-            return;
-        }
-
-        final java.util.Map<LocalDate, Integer> counts = new HashMap<>();
-        final java.util.Map<LocalDate, java.util.List<String>> messages = new HashMap<>();
-
-        for (entity.Commit c : commits) {
-            final LocalDate date = c.getTimestamp().toLocalDate();
-            counts.put(date, counts.getOrDefault(date, 0) + 1);
-            messages.computeIfAbsent(date, key -> new ArrayList<>()).add(c.getMessage());
-        }
-
-        javax.swing.SwingUtilities.invokeLater(() -> setDetailedActivityData(counts, messages));
     }
 
     @Override

@@ -27,6 +27,7 @@ public class Main {
                 .addGitConsoleUseCase()
                 .addRoomUseCases()
                 .addProfileUseCase()
+                .addDashboardUseCase()
                 .build();
 
         application.setFocusable(true);

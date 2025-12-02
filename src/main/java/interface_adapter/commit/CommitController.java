@@ -16,8 +16,9 @@ public class CommitController {
 
     /**
      * Called by GitConsoleInteractor when a "git commit -m" command is written.
-     * @param roomId the room id of the user creating the commit
-     * @param userId the id of the user creating the commit
+     * 
+     * @param roomId  the room id of the user creating the commit
+     * @param userId  the id of the user creating the commit
      * @param message the commit message
      */
     public void execute(String roomId, String userId, String message) {

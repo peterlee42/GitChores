@@ -9,6 +9,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.*;
 import javax.swing.border.Border;
 
+import interface_adapter.dashboard.DashboardController;
 import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
 
@@ -30,6 +31,8 @@ public class MainView extends JPanel implements ActionListener, PropertyChangeLi
     private final ProfileView profileView;
 
     private final LoggedInViewModel loggedInViewModel;
+
+    private DashboardController dashboardController;
 
     private JButton activeButton;
 
@@ -137,25 +140,53 @@ public class MainView extends JPanel implements ActionListener, PropertyChangeLi
 
         if (source == dashboardButton) {
             contentLayout.show(contentPanel, dashboardView.getViewName());
+
+            if (dashboardController != null) {
+                dashboardController.execute();
+            }
+
             state.setActiveTab(dashboardView.getViewName());
-            setActiveTab(dashboardButton);
+            loggedInViewModel.setState(state);
+            loggedInViewModel.firePropertyChange();
         } else if (source == consoleButton) {
             contentLayout.show(contentPanel, consoleView.getViewName());
             state.setActiveTab(consoleView.getViewName());
-            setActiveTab(consoleButton);
+
+            loggedInViewModel.setState(state);
+            loggedInViewModel.firePropertyChange();
         } else if (source == profileButton) {
             contentLayout.show(contentPanel, profileView.getViewName());
             state.setActiveTab(profileView.getViewName());
-            setActiveTab(profileButton);
+
+            loggedInViewModel.setState(state);
+            loggedInViewModel.firePropertyChange();
         }
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        final LoggedInState state = (LoggedInState) evt.getNewValue();
+        final LoggedInState state = loggedInViewModel.getState();
         if (state.getErrorMessage() != null) {
             JOptionPane.showMessageDialog(this, state.getErrorMessage());
         }
+        final String activeTab = state.getActiveTab();
+        if (activeTab.equals(dashboardView.getViewName())) {
+            setActiveTab(dashboardButton);
+            contentLayout.show(contentPanel, dashboardView.getViewName());
+            if (dashboardController != null) {
+                dashboardController.execute();
+            }
+        } else if (activeTab.equals(consoleView.getViewName())) {
+            contentLayout.show(contentPanel, consoleView.getViewName());
+            setActiveTab(consoleButton);
+        } else if (activeTab.equals(profileView.getViewName())) {
+            contentLayout.show(contentPanel, profileView.getViewName());
+            setActiveTab(profileButton);
+        }
+    }
+
+    public void setDashboardController(DashboardController controller) {
+        this.dashboardController = controller;
     }
 
     public String getViewName() {

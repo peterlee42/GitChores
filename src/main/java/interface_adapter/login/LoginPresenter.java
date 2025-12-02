@@ -1,6 +1,7 @@
 package interface_adapter.login;
 
 import interface_adapter.ViewManagerModel;
+import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.room.join.JoinViewModel;
 import interface_adapter.signup.SignupViewModel;
@@ -31,6 +32,11 @@ public class LoginPresenter implements LoginOutputBoundary {
         // clear login state
         loginViewModel.setState(new LoginState());
         loginViewModel.firePropertyChange();
+
+        final LoggedInState loggedInState = loggedInViewModel.getState();
+        loggedInState.setActiveTab("dashboard");
+        loggedInViewModel.setState(loggedInState);
+        loggedInViewModel.firePropertyChange();
 
         if (!response.isInRoom()) {
             viewManagerModel.setState(joinViewModel.getViewName());

@@ -14,6 +14,8 @@ import data_access.dynamo_db.RoomMetadataDataAccessObject;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.commit.CommitController;
 import interface_adapter.commit.CommitPresenter;
+import interface_adapter.dashboard.DashboardController;
+import interface_adapter.dashboard.DashboardPresenter;
 import interface_adapter.dashboard.DashboardViewModel;
 import interface_adapter.git_console.GitConsoleController;
 import interface_adapter.git_console.GitConsolePresenter;
@@ -38,6 +40,9 @@ import use_case.commit.CommitDataAccessInterface;
 import use_case.commit.CommitInputBoundary;
 import use_case.commit.CommitInteractor;
 import use_case.commit.RoomMetadataDataAccessInterface;
+import use_case.dashboard.DashboardInputBoundary;
+import use_case.dashboard.DashboardInteractor;
+import use_case.dashboard.DashboardOutputBoundary;
 import use_case.git_console.GitConsoleInputBoundary;
 import use_case.git_console.GitConsoleInteractor;
 import use_case.git_console.GitConsoleOutputBoundary;
@@ -120,18 +125,20 @@ public class AppBuilder {
     public AppBuilder addMainView() {
         loggedInViewModel = new LoggedInViewModel();
         mainView = new MainView(loggedInViewModel, dashboardView, gitConsoleView, profileView);
+        loggedInViewModel.addPropertyChangeListener(mainView);
         cardPanel.add(mainView, mainView.getViewName());
         return this;
     }
 
     /**
-     * Adds dashboard view - incomplete.
+     * Adds dashboard view.
      *
      * @return AppBuilder
      */
     public AppBuilder addDashboardView() {
         dashboardViewModel = new DashboardViewModel();
         dashboardView = new DashboardView(dashboardViewModel);
+        dashboardViewModel.addPropertyChangeListener(dashboardView);
         return this;
     }
 
@@ -143,6 +150,7 @@ public class AppBuilder {
     public AppBuilder addJoinView() {
         joinViewModel = new JoinViewModel();
         joinView = new JoinView(joinViewModel);
+        joinViewModel.addPropertyChangeListener(joinView);
         cardPanel.add(joinView, joinView.getViewName());
         return this;
     }
@@ -155,6 +163,7 @@ public class AppBuilder {
     public AppBuilder addCreateRoomView() {
         createRoomViewModel = new CreateRoomViewModel();
         createRoomView = new CreateRoomView(createRoomViewModel);
+        createRoomViewModel.addPropertyChangeListener(createRoomView);
         cardPanel.add(createRoomView, createRoomView.getViewName());
         return this;
     }
@@ -167,6 +176,7 @@ public class AppBuilder {
     public AppBuilder addSignupView() {
         signupViewModel = new SignupViewModel();
         signupView = new SignupView(signupViewModel);
+        signupViewModel.addPropertyChangeListener(signupView);
         cardPanel.add(signupView, signupView.getViewName());
 
         return this;
@@ -180,6 +190,7 @@ public class AppBuilder {
     public AppBuilder addLoginView() {
         loginViewModel = new LoginViewModel();
         loginView = new LoginView(loginViewModel);
+        loginViewModel.addPropertyChangeListener(loginView);
         cardPanel.add(loginView, loginView.getViewName());
 
         return this;
@@ -193,6 +204,7 @@ public class AppBuilder {
     public AppBuilder addGitConsoleView() {
         gitConsoleViewModel = new GitConsoleViewModel();
         gitConsoleView = new GitConsoleView(gitConsoleViewModel);
+        gitConsoleViewModel.addPropertyChangeListener(gitConsoleView);
         return this;
     }
 
@@ -206,17 +218,28 @@ public class AppBuilder {
         final GitConsoleOutputBoundary gitConsoleOutputBoundary = new GitConsolePresenter(gitConsoleViewModel);
 
         // Commit Use case Layer (backend logic)
+<<<<<<< HEAD
         final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(
                 DynamoDbClientSingleton.getInstance());
         final RoomMetadataDataAccessInterface roomMetadataDataAccess = new RoomMetadataDataAccessObject(
                 DynamoDbClientSingleton.getInstance());
+=======
+        final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(dynamoDbClient);
+        final RoomMetadataDataAccessInterface roomMetadataDataAccessObject = new RoomMetadataDataAccessObject(
+                dynamoDbClient);
+>>>>>>> 21c77a7 (loads user data to dashboard)
         final CommitPresenter commitPresenter = new CommitPresenter();
         final CommitInputBoundary commitInteractor = new CommitInteractor(commitDataAccess,
-                roomMetadataDataAccess, commitPresenter);
+                roomMetadataDataAccessObject,
+                commitPresenter);
         final CommitController commitController = new CommitController(commitInteractor);
+<<<<<<< HEAD
         final RoomMetadataDataAccessObject roomMetadataDataAccessObject = new RoomMetadataDataAccessObject(
                 DynamoDbClientSingleton.getInstance());
         final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(DynamoDbClientSingleton.getInstance());
+=======
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
+>>>>>>> 21c77a7 (loads user data to dashboard)
 
         // Git Console Use Case Layer
         final GitConsoleInputBoundary gitConsoleInteractor = new GitConsoleInteractor(gitConsoleOutputBoundary,
@@ -236,6 +259,28 @@ public class AppBuilder {
     public AppBuilder addProfileView() {
         profileViewModel = new ProfileViewModel();
         profileView = new ProfileView(profileViewModel);
+        return this;
+    }
+
+    /**
+     * Adds Dashboard use case.
+     * 
+     * @return AppBuilder
+     */
+    public AppBuilder addDashboardUseCase() {
+        final RoomDataAccessInterface roomDataAccess = new RoomDataAccessObject(dynamoDbClient);
+        final CommitDataAccessInterface commitDataAccess = new CommitDataAccessObject(dynamoDbClient);
+
+        final DashboardOutputBoundary dashboardOutputBoundary = new DashboardPresenter(
+                dashboardViewModel);
+
+        final DashboardInputBoundary dashboardInteractor = new DashboardInteractor(dashboardOutputBoundary, userService,
+                roomDataAccess, commitDataAccess);
+
+        final DashboardController dashboardController = new DashboardController(
+                dashboardInteractor);
+
+        mainView.setDashboardController(dashboardController);
         return this;
     }
 

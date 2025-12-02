@@ -12,6 +12,7 @@ import javax.swing.border.Border;
 import interface_adapter.dashboard.DashboardController;
 import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
+import interface_adapter.profile.ProfileController;
 
 public class MainView extends JPanel implements ActionListener, PropertyChangeListener {
     private final String viewName = "logged_in";
@@ -33,6 +34,7 @@ public class MainView extends JPanel implements ActionListener, PropertyChangeLi
     private final LoggedInViewModel loggedInViewModel;
 
     private DashboardController dashboardController;
+    private ProfileController profileController;
 
     private JButton activeButton;
 
@@ -180,13 +182,20 @@ public class MainView extends JPanel implements ActionListener, PropertyChangeLi
             contentLayout.show(contentPanel, consoleView.getViewName());
             setActiveTab(consoleButton);
         } else if (activeTab.equals(profileView.getViewName())) {
-            contentLayout.show(contentPanel, profileView.getViewName());
             setActiveTab(profileButton);
+            contentLayout.show(contentPanel, profileView.getViewName());
+            if (profileController != null) {
+                profileController.execute();
+            }
         }
     }
 
     public void setDashboardController(DashboardController controller) {
         this.dashboardController = controller;
+    }
+
+    public void setProfileController(ProfileController profileController) {
+        this.profileController = profileController;
     }
 
     public String getViewName() {

@@ -259,6 +259,7 @@ public class AppBuilder {
     public AppBuilder addProfileView() {
         profileViewModel = new ProfileViewModel();
         profileView = new ProfileView(profileViewModel);
+        profileViewModel.addPropertyChangeListener(profileView);
         return this;
     }
 
@@ -368,6 +369,8 @@ public class AppBuilder {
 
         final ProfileController controller = new ProfileController(updateProfileInteractor);
         profileView.setProfileController(controller);
+
+        mainView.setProfileController(controller);
         return this;
     }
 

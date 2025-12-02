@@ -1,6 +1,12 @@
 package view;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -48,9 +54,7 @@ public class ProfileView extends JPanel implements ActionListener, PropertyChang
      *
      * @param profileViewModel view model for this view
      */
-
-    public ProfileView(
-            ProfileViewModel profileViewModel) {
+    public ProfileView(ProfileViewModel profileViewModel) {
 
         this.profileViewModel = profileViewModel;
 
@@ -58,10 +62,11 @@ public class ProfileView extends JPanel implements ActionListener, PropertyChang
         this.emailValueLabel = new JLabel("");
         this.messageLabel = new JLabel("");
 
-        this.logoutButton = createPrimaryButton(ViewConstants.LOGOUT_BUTTON_TEXT);
-        this.saveButton = createPrimaryButton(ViewConstants.SAVE_BUTTON_TEXT);
-        this.leaveRoomButton = createPrimaryButton(ViewConstants.LEAVE_ROOM_BUTTON_TEXT);
-        this.changePhotoButton = createPrimaryButton(ViewConstants.CHANGE_PHOTO_BUTTON_TEXT);
+        this.logoutButton = createButton(ViewConstants.LOGOUT_BUTTON_TEXT);
+        this.saveButton = createButton(ViewConstants.SAVE_BUTTON_TEXT);
+        this.leaveRoomButton = createButton(ViewConstants.LEAVE_ROOM_BUTTON_TEXT);
+        this.changePhotoButton = createButton(ViewConstants.CHANGE_PHOTO_BUTTON_TEXT);
+
         messageLabel.setFont(ViewConstants.LABEL_FONT);
         messageLabel.setForeground(ViewColors.DARK_BLUE);
         messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -74,46 +79,87 @@ public class ProfileView extends JPanel implements ActionListener, PropertyChang
      * Sets up the layout and adds all components.
      */
     private void initializeLayout() {
-        setBackground(ViewColors.SAND_BACKGROUND);
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        addTitleSection();
-        add(Box.createVerticalStrut(ViewConstants.V_GAP));
-        addMainContentSection();
-        add(Box.createVerticalStrut(ViewConstants.V_GAP));
-        addButtonsSection();
+        setLayout(new BorderLayout());
+        setBackground(Color.WHITE);
+
+        final JPanel mainPanel = new JPanel(new GridBagLayout());
+        mainPanel.setBackground(ViewColors.SAND_BACKGROUND);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(
+                ViewConstants.DASHBOARD_PANEL_PADDING,
+                ViewConstants.DASHBOARD_PANEL_PADDING,
+                ViewConstants.DASHBOARD_PANEL_PADDING,
+                ViewConstants.DASHBOARD_PANEL_PADDING));
+
+        final GridBagConstraints constraint = new GridBagConstraints();
+        constraint.fill = GridBagConstraints.HORIZONTAL;
+        constraint.insets = new Insets(ViewConstants.DASHBOARD_COMPONENT_SPACING / 2, 0,
+                ViewConstants.DASHBOARD_COMPONENT_SPACING / 2, 0);
+        constraint.gridx = 0;
+        constraint.gridy = 0;
+
+        addTitleSection(mainPanel, constraint);
+
+        constraint.gridy++;
+        mainPanel.add(Box.createVerticalStrut(ViewConstants.SPACING_20), constraint);
+
+        constraint.gridy++;
+        mainPanel.add(buildProfileSection(), constraint);
+
+        constraint.gridy++;
+        mainPanel.add(Box.createVerticalStrut(ViewConstants.SPACING_20), constraint);
+
+        constraint.gridy++;
+        mainPanel.add(buildButtonSection(), constraint);
+
+        constraint.gridy++;
+        mainPanel.add(messageLabel, constraint);
+
+        add(mainPanel, BorderLayout.CENTER);
     }
 
     /**
      * Adds the title label to the view.
+     * 
+     * @param mainPanel  main panel to add the title to
+     * @param constraint layout constraints
      */
-    private void addTitleSection() {
+    private void addTitleSection(JPanel mainPanel, GridBagConstraints constraint) {
         final JLabel titleLabel = new JLabel(ViewConstants.PROFILE_TITLE_TEXT);
-        titleLabel.setFont(ViewConstants.WELCOME_FONT);
+        titleLabel.setFont(ViewConstants.HEADER_FONT);
         titleLabel.setForeground(ViewColors.DARK_BLUE);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        add(Box.createVerticalStrut(ViewConstants.V_GAP));
-        add(titleLabel);
+
+        mainPanel.add(titleLabel, constraint);
     }
 
     /**
      * Adds the upper content: photo on the left, user info on the right.
+     * 
+     * @return panel containing the profile section
      */
-    private void addMainContentSection() {
-        final JPanel mainRow = new JPanel();
-        mainRow.setBackground(ViewColors.SAND_BACKGROUND);
-        mainRow.setLayout(new BoxLayout(mainRow, BoxLayout.X_AXIS));
+    private JPanel buildProfileSection() {
 
-        final JPanel photoColumn = createPhotoColumn();
-        final JPanel infoColumn = createInfoColumn();
+        final JPanel section = new JPanel();
+        section.setLayout(new BoxLayout(section, BoxLayout.X_AXIS));
+        section.setBackground(Color.WHITE);
 
-        mainRow.add(Box.createHorizontalStrut(ViewConstants.V_GAP * 2));
-        mainRow.add(photoColumn);
-        mainRow.add(Box.createHorizontalStrut(ViewConstants.PROFILE_MAIN_CENTER_GAP));
-        mainRow.add(infoColumn);
-        mainRow.add(Box.createHorizontalStrut(ViewConstants.V_GAP * 2));
+        section.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(
+                        ViewConstants.BORDER_COLOR,
+                        ViewConstants.BORDER_COLOR,
+                        ViewConstants.BORDER_COLOR), ViewConstants.BORDER_WIDTH),
+                BorderFactory.createEmptyBorder(
+                        ViewConstants.SPACING_20,
+                        ViewConstants.SPACING_20,
+                        ViewConstants.SPACING_20,
+                        ViewConstants.SPACING_20)));
 
-        add(mainRow);
+        section.add(createPhotoColumn());
+        section.add(Box.createHorizontalStrut(ViewConstants.SPACING_20));
+        section.add(createInfoColumn());
+
+        return section;
     }
 
     /**
@@ -123,7 +169,7 @@ public class ProfileView extends JPanel implements ActionListener, PropertyChang
      */
     private JPanel createPhotoColumn() {
         final JPanel column = new JPanel();
-        column.setBackground(ViewColors.SAND_BACKGROUND);
+        column.setBackground(Color.WHITE);
         column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
 
         profilePhotoLabel = new JLabel("No photo");
@@ -133,7 +179,7 @@ public class ProfileView extends JPanel implements ActionListener, PropertyChang
         profilePhotoLabel.setHorizontalAlignment(JLabel.CENTER);
         profilePhotoLabel.setVerticalAlignment(JLabel.CENTER);
 
-        final java.awt.Dimension photoSize = new java.awt.Dimension(
+        final Dimension photoSize = new Dimension(
                 ViewConstants.PROFILE_PHOTO_WIDTH,
                 ViewConstants.PROFILE_PHOTO_HEIGHT);
 
@@ -142,15 +188,13 @@ public class ProfileView extends JPanel implements ActionListener, PropertyChang
         profilePhotoLabel.setMaximumSize(photoSize);
 
         profilePhotoLabel.setBorder(
-                BorderFactory.createLineBorder(
-                        ViewColors.DARK_BLUE,
-                        ViewConstants.PROFILE_PHOTO_BORDER_THICKNESS,
+                BorderFactory.createLineBorder(ViewColors.DARK_BLUE, ViewConstants.PROFILE_PHOTO_BORDER_THICKNESS,
                         true));
 
         changePhotoButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         column.add(profilePhotoLabel);
-        column.add(Box.createVerticalStrut(ViewConstants.V_GAP / 2));
+        column.add(Box.createVerticalStrut(ViewConstants.SPACING_15));
         column.add(changePhotoButton);
 
         return column;
@@ -163,7 +207,7 @@ public class ProfileView extends JPanel implements ActionListener, PropertyChang
      */
     private JPanel createInfoColumn() {
         final JPanel column = new JPanel();
-        column.setBackground(ViewColors.SAND_BACKGROUND);
+        column.setBackground(Color.WHITE);
         column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
 
         final JLabel usernameLabel = new JLabel(ViewConstants.USERNAME_LABEL_TEXT);
@@ -177,41 +221,43 @@ public class ProfileView extends JPanel implements ActionListener, PropertyChang
         usernameValueLabel.setFont(ViewConstants.LABEL_FONT);
         emailValueLabel.setFont(ViewConstants.LABEL_FONT);
 
-        final JPanel usernameRow = new JPanel();
-        usernameRow.setBackground(ViewColors.SAND_BACKGROUND);
-        usernameRow.add(usernameLabel);
-        usernameRow.add(usernameValueLabel);
+        usernameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        usernameValueLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        emailLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        emailValueLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        final JPanel emailRow = new JPanel();
-        emailRow.setBackground(ViewColors.SAND_BACKGROUND);
-        emailRow.add(emailLabel);
-        emailRow.add(emailValueLabel);
-
-        column.add(usernameRow);
-        column.add(Box.createVerticalStrut(ViewConstants.V_GAP));
-        column.add(emailRow);
+        column.add(usernameLabel);
+        column.add(Box.createVerticalStrut(ViewConstants.SPACING_5));
+        column.add(usernameValueLabel);
+        column.add(Box.createVerticalStrut(ViewConstants.SPACING_15));
+        column.add(emailLabel);
+        column.add(Box.createVerticalStrut(ViewConstants.SPACING_5));
+        column.add(emailValueLabel);
 
         return column;
     }
 
     /**
      * Adds the bottom row with Back, Save, and Leave Room buttons.
+     * 
+     * @return panel containing the buttons
      */
-    private void addButtonsSection() {
-        final JPanel buttonsRow = new JPanel();
-        buttonsRow.setBackground(ViewColors.SAND_BACKGROUND);
-        buttonsRow.add(logoutButton);
-        buttonsRow.add(Box.createHorizontalStrut(ViewConstants.V_GAP));
-        buttonsRow.add(saveButton);
-        buttonsRow.add(Box.createHorizontalStrut(ViewConstants.V_GAP));
-        buttonsRow.add(leaveRoomButton);
+    private JPanel buildButtonSection() {
+        final JPanel section = new JPanel();
+        section.setBackground(Color.WHITE);
+        section.setLayout(new BoxLayout(section, BoxLayout.X_AXIS));
 
-        add(buttonsRow);
+        logoutButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        saveButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        leaveRoomButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        add(Box.createVerticalStrut(ViewConstants.V_GAP / 2));
-        messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        add(messageLabel);
+        section.add(logoutButton);
+        section.add(Box.createHorizontalStrut(ViewConstants.SPACING_20));
+        section.add(saveButton);
+        section.add(Box.createHorizontalStrut(ViewConstants.SPACING_20));
+        section.add(leaveRoomButton);
 
+        return section;
     }
 
     /**
@@ -259,27 +305,29 @@ public class ProfileView extends JPanel implements ActionListener, PropertyChang
 
         final int result = fileChooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
+
             final File selectedFile = fileChooser.getSelectedFile();
             profilePhotoPath = selectedFile.getAbsolutePath();
-            final ImageLabel newPhotoLabel = new ImageLabel(profilePhotoPath,
-                    ViewConstants.PROFILE_PHOTO_WIDTH, ViewConstants.PROFILE_PHOTO_HEIGHT);
-            newPhotoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            final java.awt.Dimension photoSize = new java.awt.Dimension(
+            final ImageLabel newPhotoLabel = new ImageLabel(
+                    profilePhotoPath,
                     ViewConstants.PROFILE_PHOTO_WIDTH,
                     ViewConstants.PROFILE_PHOTO_HEIGHT);
+
+            final Dimension photoSize = new Dimension(
+                    ViewConstants.PROFILE_PHOTO_WIDTH,
+                    ViewConstants.PROFILE_PHOTO_HEIGHT);
+
             newPhotoLabel.setPreferredSize(photoSize);
             newPhotoLabel.setMinimumSize(photoSize);
             newPhotoLabel.setMaximumSize(photoSize);
+            newPhotoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             newPhotoLabel.setBorder(
-                    BorderFactory.createLineBorder(
-                            ViewColors.DARK_BLUE,
-                            ViewConstants.PROFILE_PHOTO_BORDER_THICKNESS,
+                    BorderFactory.createLineBorder(ViewColors.DARK_BLUE, ViewConstants.PROFILE_PHOTO_BORDER_THICKNESS,
                             true));
 
             replaceProfilePhotoLabel(newPhotoLabel);
-
             messageLabel.setText("Profile photo updated.");
         }
     }
@@ -290,15 +338,12 @@ public class ProfileView extends JPanel implements ActionListener, PropertyChang
      * @param event the action event
      */
     private void handleSave(final ActionEvent event) {
-        // Get the current email shown on the profile.
-        final String email = emailValueLabel.getText();
         final String photoPath = profilePhotoPath;
 
         if (profileController != null) {
-            profileController.saveProfile(email, photoPath);
+            profileController.saveProfile(photoPath);
         }
 
-        // Keep local feedback so user sees something immediately.
         if (messageLabel != null) {
             messageLabel.setText("Profile updated.");
         }
@@ -340,17 +385,13 @@ public class ProfileView extends JPanel implements ActionListener, PropertyChang
      * @param text text to show on the button
      * @return configured JButton
      */
-    private JButton createPrimaryButton(final String text) {
-        final JButton button = new JButton(text);
-        button.setFont(ViewConstants.LABEL_FONT);
-        button.setBackground(ViewColors.ORANGE);
-        button.setForeground(java.awt.Color.WHITE);
-        button.setFocusPainted(false);
-        button.setBorder(ViewConstants.EMPTY_BORDER);
-
-        // These two lines force the orange fill to be visible (especially on macOS).
-        button.setOpaque(true);
-        button.setContentAreaFilled(true);
+    private JButton createButton(final String text) {
+        final JButton button = new ButtonBuilder()
+                .setText(text)
+                .setFont(ViewConstants.BUTTON_FONT)
+                .setBackground(ViewColors.ORANGE)
+                .setForeground(Color.WHITE)
+                .build();
 
         return button;
     }
@@ -366,6 +407,8 @@ public class ProfileView extends JPanel implements ActionListener, PropertyChang
         if (state.getErrorMessage() != null) {
             JOptionPane.showMessageDialog(this, state.getErrorMessage());
         }
+        usernameValueLabel.setText(state.getUsername());
+        emailValueLabel.setText(state.getEmail());
     }
 
     /**

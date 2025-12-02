@@ -18,30 +18,51 @@ public class DashboardView extends JPanel implements PropertyChangeListener {
     private final ActivityTilesPanel activityTilesPanel;
     private final DashboardViewModel dashboardViewModel;
     private DashboardController dashboardController;
+    private final JLabel roomNameLabel;
+    private final JLabel inviteCodeLabel;
+    private final JLabel descriptionLabel;
 
+    @SuppressWarnings("checkstyle:ExecutableStatementCount")
     public DashboardView(DashboardViewModel dashboardViewModel) {
         this.dashboardViewModel = dashboardViewModel;
 
         setLayout(new BorderLayout());
-        setBackground(ViewColors.SAND_BACKGROUND);
 
-        // Main content panel with grid layout
         final JPanel contentPanel = new JPanel(new GridBagLayout());
+        contentPanel.setBackground(Color.WHITE);
         final int pad = ViewConstants.DASHBOARD_PANEL_PADDING;
         contentPanel.setBorder(BorderFactory.createEmptyBorder(pad, pad, pad, pad));
 
         final GridBagConstraints constraints = new GridBagConstraints();
-        constraints.fill = GridBagConstraints.BOTH;
-        final int spacing = ViewConstants.DASHBOARD_COMPONENT_SPACING;
-        constraints.insets = new Insets(spacing, spacing, spacing, spacing);
+        constraints.fill = GridBagConstraints.VERTICAL;
+        final int spacing = ViewConstants.SPACING_5;
+        constraints.insets = new Insets(1, spacing, 1, spacing);
 
-        // Activity Tiles Section (top, full width)
         constraints.gridx = 0;
         constraints.gridy = 0;
-        constraints.gridwidth = 2;
+        constraints.gridwidth = 1;
         constraints.weightx = ViewConstants.DASHBOARD_WEIGHTX;
         constraints.weighty = ViewConstants.DASHBOARD_WEIGHTY;
 
+        roomNameLabel = new JLabel();
+        roomNameLabel.setFont(ViewConstants.TITLE_FONT);
+        roomNameLabel.setForeground(ViewColors.DARK_BLUE);
+        contentPanel.add(roomNameLabel, constraints);
+
+        constraints.anchor = GridBagConstraints.EAST;
+        inviteCodeLabel = new JLabel();
+        inviteCodeLabel.setFont(ViewConstants.LABEL_FONT);
+        inviteCodeLabel.setForeground(ViewColors.DARK_BLUE);
+        contentPanel.add(inviteCodeLabel, constraints);
+
+        constraints.gridy++;
+        constraints.anchor = GridBagConstraints.CENTER;
+        descriptionLabel = new JLabel();
+        descriptionLabel.setFont(ViewConstants.LABEL_FONT);
+        descriptionLabel.setForeground(ViewColors.DARK_BLUE);
+        contentPanel.add(descriptionLabel, constraints);
+
+        constraints.gridy++;
         final DashboardState dashboardState = dashboardViewModel.getState();
         activityTilesPanel = new ActivityTilesPanel(dashboardState.getActivityData(),
                 dashboardState.getCommitsMessages());
@@ -99,6 +120,10 @@ public class DashboardView extends JPanel implements PropertyChangeListener {
 
         activityTilesPanel.setActivityData(state.getActivityData());
         activityTilesPanel.setDetailedActivityData(state.getActivityData(), state.getCommitsMessages());
+
+        roomNameLabel.setText("Welcome to " + state.getRoomName());
+        descriptionLabel.setText("Description: " + state.getRoomDescription());
+        inviteCodeLabel.setText("Invite Code: " + state.getRoomCode());
 
         revalidate();
         repaint();

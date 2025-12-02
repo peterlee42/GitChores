@@ -142,11 +142,6 @@ public class MainView extends JPanel implements ActionListener, PropertyChangeLi
 
         if (source == dashboardButton) {
             contentLayout.show(contentPanel, dashboardView.getViewName());
-
-            if (dashboardController != null) {
-                dashboardController.execute();
-            }
-
             state.setActiveTab(dashboardView.getViewName());
             loggedInViewModel.setState(state);
             loggedInViewModel.firePropertyChange();
